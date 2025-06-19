@@ -1,0 +1,116 @@
+# PetLog – 第一階段 PRD（產品需求文件）
+
+## 1. 概述  
+PetLog 是一款多貓健康追蹤 Web 應用，協助飼主集中紀錄並視覺化每隻貓咪的日常活動與醫療歷史。  
+**痛點**－ 試算表、紙本與手機備忘錄零散，對多貓家庭難以管理。  
+**目標使用者**－ 個人飼主與小型救援站（1–10 隻貓）。  
+**價值**－ 集中資料方便就診、及早發現異常，並減少飼主記憶負擔。
+
+---
+
+## 2. 核心功能（Phase 1 MVP）
+
+| 功能 | 功能說明 | 為何重要 | 高層實作 |
+|------|----------|----------|----------|
+| **寵物檔案** | 儲存名字、頭像、生日、品種、晶片號 | 所有紀錄的關聯根基 | Mongo `pets` 集合；頭像存 S3 |
+| **活動日曆** | 體重、食量、貓砂、行為筆記之時間軸 | 及早發現體重變化或異常 | `health_logs`；Next.js 日曆 |
+| **醫療紀錄** | 疫苗、驅蟲、看診、用藥與劑量 | 就診時快速調閱、排程提醒 | `medical_records` 子文件 |
+| **身份驗證** | Email＋密碼註冊登入 | 多裝置安全存取 | Go JWT；bcrypt 密碼 |
+| **回應式 UI** | 手機優先介面 | 飼主多用手機記錄 | Next.js＋Tailwind；PWA |
+
+*Phase 2+：LINE Notify、語音轉錄（Whisper）、GPT 摘要、公開分享鏈結*
+
+---
+
+## 3. 使用者體驗
+
+### 人物誌
+1. **Emily（32，飼主）**－兩隻室內貓，需要簡易日誌與疫苗提醒  
+2. **陳醫師（45，獸醫）**－看診時閱讀匯出 PDF
+
+### 關鍵流程
+1. **首次使用** → 註冊 → 新增第一隻貓 → 進入日曆  
+2. **每日記錄** → 選日期 → 填體重／筆記 → 儲存  
+3. **瀏覽歷史** → 選貓 → 熱度日曆 → 點日期 → 詳情  
+4. **新增醫療** → 醫療頁 → 「＋」 → 填表 → 儲存
+
+### UI/UX 重點
+- 單手操作、大按鈕  
+- 日曆彩色標記  
+- 深色模式  
+- 儲存後可「復原」提示
+
+---
+
+## 4. 技術架構
+
+### 系統組件
+| 層 | 技術 |
+|----|------|
+| **前端** | Next.js 14、TypeScript、TailwindCSS |
+| **API 傳輸** | Gin + Go‑kit (REST/JSON) |
+| **應用層** | Go Clean Architecture `internal/usecase` |
+| **領域層** | Entity：Pet、HealthLog、MedicalRecord、User |
+| **儲存** | MongoDB Atlas |
+| **靜態檔** | S3 兼容（Wasabi/MinIO） |
+| **CI/CD** | GitHub Actions → Docker → k3s |
+| **IaC** | Terraform `deployments/terraform` |
+
+### 資料模型（簡化）
+- `pets` {id, ownerId, name, avatarURL, dob, breed, microchipId}  
+- `health_logs` {id, petId, date, weightKg, foodGram, litterNotes, behaviourNotes}  
+- `medical_records` {id, petId, type, description, date, nextDueDate, dosage}
+
+### 公開 API 範例
+| 方法 | 路徑 | 功能 |
+|------|------|------|
+| GET | `/v1/pets` | 列出寵物 |
+| POST | `/v1/pets` | 新增寵物 |
+| GET | `/v1/pets/{id}/logs` | 查詢日誌 |
+| POST | `/v1/pets/{id}/logs` | 新增日誌 |
+
+### 基礎設施需求
+- Dev：1 Gi RAM / 1 vCPU  
+- TLS：Caddy 反向代理  
+- Atlas 每日快照備份
+
+---
+
+## 5. 開發路線圖（僅範疇，無時間）
+
+| 階段 | 內容 |
+|------|------|
+| **P1** | 全部核心功能、基本驗證、本地 Docker 開發、單元＋小型整合測試、GitHub Actions CI |
+| **P1.5** | CSV/PDF 匯出、唯讀分享權限 |
+| **P2** | LINE Notify 提醒、Web Push |
+| **P3** | Whisper 語音記錄＋GPT 摘要 |
+
+---
+
+## 6. 依賴鏈
+
+1. **領域模型＋儲存**  
+2. **身份驗證**  
+3. **CRUD API**  
+4. **前端骨架**  
+5. **日曆檢視**  
+6. **醫療 UI**  
+7. **PWA 打包與優化**
+
+---
+
+## 7. 風險與因應
+
+| 風險 | 影響 | 因應 |
+|------|------|------|
+| 前後端合約漂移 | UI 失效 | OpenAPI 產生 client＋合約測試 |
+| 手機大量資料載入 | 慢 | 分頁＋索引 `petId+date` |
+| 單人開發時程 | 延遲 | 嚴守 MVP 範疇；每週檢視 backlog |
+| 自架資料遺失 | 高 | 先用 Atlas 免費層＋每日備份 |
+
+---
+
+## 8. 附錄
+- 競品：PawTrack、CatGuru（無多貓＋PWA）  
+- 參考書籍：Clean Architecture；Go‑kit 範例  
+- MongoDB ERD：draw.io 連結

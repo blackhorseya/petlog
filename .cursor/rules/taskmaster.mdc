@@ -555,3 +555,7 @@ Environment variables are used **only** for sensitive API keys related to AI pro
 ---
 
 For details on how these commands fit into the development process, see the [Development Workflow Guide](mdc:.cursor/rules/dev_workflow.mdc).
+
+---
+
+寫任務和PRD一律用繁體中文

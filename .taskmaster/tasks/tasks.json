@@ -1,0 +1,339 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Repository and Development Environment",
+        "description": "Initialize the project repository with Next.js 14, TypeScript, and TailwindCSS. Set up a local Docker development environment.",
+        "details": "1. Create a new GitHub repository named 'petlog'\n2. Initialize Next.js 14 project with TypeScript:\n   npx create-next-app@latest petlog --typescript\n3. Install TailwindCSS:\n   npm install -D tailwindcss postcss autoprefixer\n   npx tailwindcss init -p\n4. Set up Docker for local development:\n   - Create Dockerfile and docker-compose.yml\n   - Include services for Next.js, Go API, and MongoDB\n5. Set up VSCode with recommended extensions (ESLint, Prettier, Docker)\n6. Initialize Go modules and create basic project structure following Clean Architecture",
+        "testStrategy": "Verify that the development environment can be started with Docker Compose and that Next.js, Go API, and MongoDB services are running correctly.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize GitHub Repository and Next.js Project",
+            "description": "Create a new GitHub repository and set up a Next.js 14 project with TypeScript",
+            "dependencies": [],
+            "details": "1. Create a new GitHub repository named 'petlog'\n2. Clone the repository locally\n3. Run 'npx create-next-app@latest petlog --typescript'\n4. Push the initial commit to GitHub",
+            "status": "done",
+            "testStrategy": "Verify the repository is created on GitHub and the Next.js project structure is present locally"
+          },
+          {
+            "id": 2,
+            "title": "Install and Configure TailwindCSS",
+            "description": "Add TailwindCSS to the Next.js project and set up the necessary configuration",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Run 'npm install -D tailwindcss postcss autoprefixer'\n2. Execute 'npx tailwindcss init -p'\n3. Configure Tailwind by updating tailwind.config.js and globals.css",
+            "status": "done",
+            "testStrategy": "Create a sample component using Tailwind classes and verify styling is applied correctly"
+          },
+          {
+            "id": 3,
+            "title": "Set Up Docker Development Environment",
+            "description": "Create Docker configuration for local development including Next.js, Go API, and MongoDB services",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Create a Dockerfile for the Next.js application\n2. Create a docker-compose.yml file with services for Next.js, Go API, and MongoDB\n3. Configure environment variables and network settings",
+            "status": "deferred",
+            "testStrategy": "Run 'docker-compose up' and verify all services start without errors"
+          },
+          {
+            "id": 4,
+            "title": "Configure VSCode with Recommended Extensions",
+            "description": "Set up Visual Studio Code with ESLint, Prettier, and Docker extensions",
+            "dependencies": [],
+            "details": "1. Install ESLint, Prettier, and Docker extensions in VSCode\n2. Create .vscode/extensions.json with recommended extensions\n3. Set up ESLint and Prettier configuration files",
+            "status": "pending",
+            "testStrategy": "Open the project in VSCode and verify all recommended extensions are installed and functioning"
+          },
+          {
+            "id": 5,
+            "title": "Initialize Go API Project Structure",
+            "description": "Set up the Go API project following Clean Architecture principles",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Initialize Go modules with 'go mod init github.com/yourusername/petlog-api'\n2. Create directory structure: cmd, internal, pkg\n3. Set up basic main.go file in cmd/api\n4. Implement initial Clean Architecture layers: domain, usecase, repository, delivery",
+            "status": "pending",
+            "testStrategy": "Run 'go build ./...' and ensure the project compiles without errors"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Implement User Authentication",
+        "description": "Create user registration and login functionality using Email and password with JWT for authentication.",
+        "details": "1. Set up Go-kit for the authentication service\n2. Implement user registration endpoint:\n   - Validate email and password\n   - Hash password using bcrypt (use latest version, e.g., 'golang.org/x/crypto/bcrypt')\n   - Store user in MongoDB\n3. Implement login endpoint:\n   - Verify credentials\n   - Generate JWT token using 'github.com/golang-jwt/jwt/v4'\n4. Create middleware for JWT verification\n5. Implement logout functionality (token invalidation)\n6. Create frontend components for registration and login forms\n7. Implement client-side form validation using react-hook-form\n8. Store JWT in HttpOnly cookie for security",
+        "testStrategy": "Write unit tests for authentication logic. Implement integration tests for registration and login flows. Test token expiration and refresh mechanisms.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Design and Implement MongoDB Schema",
+        "description": "Create MongoDB schema for pets, health logs, and medical records collections.",
+        "details": "1. Set up MongoDB Atlas cluster\n2. Design schemas for collections:\n   - pets: {id, ownerId, name, avatarURL, dob, breed, microchipId}\n   - health_logs: {id, petId, date, weightKg, foodGram, litterNotes, behaviourNotes}\n   - medical_records: {id, petId, type, description, date, nextDueDate, dosage}\n3. Create indexes for frequent queries:\n   - Create compound index on health_logs: {petId: 1, date: -1}\n   - Create index on pets: {ownerId: 1}\n4. Implement MongoDB connection in Go using 'go.mongodb.org/mongo-driver/mongo'\n5. Create CRUD operations for each collection\n6. Implement data validation using MongoDB schema validation",
+        "testStrategy": "Write unit tests for CRUD operations. Verify index performance with large datasets. Test data integrity constraints.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Implement Pet Profile CRUD API",
+        "description": "Create REST API endpoints for managing pet profiles.",
+        "details": "1. Use Gin framework (github.com/gin-gonic/gin) for routing\n2. Implement endpoints:\n   - GET /v1/pets (list all pets for authenticated user)\n   - POST /v1/pets (create new pet)\n   - GET /v1/pets/{id} (get pet details)\n   - PUT /v1/pets/{id} (update pet details)\n   - DELETE /v1/pets/{id} (delete pet)\n3. Implement request validation using go-playground/validator\n4. Use Clean Architecture pattern:\n   - Create use cases in internal/usecase\n   - Implement repository pattern for MongoDB interactions\n5. Implement error handling and logging using uber-go/zap\n6. Generate OpenAPI specification using swaggo/swag",
+        "testStrategy": "Write unit tests for each use case. Implement integration tests for API endpoints. Verify OpenAPI spec correctness.",
+        "priority": "high",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement Health Log CRUD API",
+        "description": "Create REST API endpoints for managing pet health logs.",
+        "details": "1. Implement endpoints:\n   - GET /v1/pets/{id}/logs (list logs with pagination)\n   - POST /v1/pets/{id}/logs (create new log)\n   - PUT /v1/pets/{id}/logs/{logId} (update log)\n   - DELETE /v1/pets/{id}/logs/{logId} (delete log)\n2. Implement pagination using cursor-based pagination for efficiency\n3. Add filtering options (date range, log type)\n4. Implement bulk insert for multiple logs\n5. Use go-kit for service layer implementation\n6. Implement caching using Redis for frequently accessed data",
+        "testStrategy": "Write unit tests for log-related use cases. Test pagination and filtering. Perform load testing for bulk inserts.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement Medical Record CRUD API",
+        "description": "Create REST API endpoints for managing pet medical records.",
+        "details": "1. Implement endpoints:\n   - GET /v1/pets/{id}/medical-records\n   - POST /v1/pets/{id}/medical-records\n   - PUT /v1/pets/{id}/medical-records/{recordId}\n   - DELETE /v1/pets/{id}/medical-records/{recordId}\n2. Implement sorting and filtering options\n3. Add support for file attachments (store in S3-compatible storage)\n4. Implement reminder system for upcoming medical events\n5. Use go-kit for service layer implementation\n6. Implement rate limiting using golang.org/x/time/rate",
+        "testStrategy": "Write unit tests for medical record use cases. Test file upload and download. Verify reminder system functionality.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Setup S3-compatible Storage",
+        "description": "Integrate S3-compatible storage (Wasabi/MinIO) for storing pet avatars and medical record attachments.",
+        "details": "1. Set up Wasabi or MinIO account\n2. Create necessary buckets for avatars and attachments\n3. Implement Go client for S3 using AWS SDK (github.com/aws/aws-sdk-go-v2)\n4. Create service for file upload and download\n5. Implement file type and size validation\n6. Generate signed URLs for secure file access\n7. Implement file deletion when associated records are deleted",
+        "testStrategy": "Test file upload, download, and deletion. Verify signed URL functionality. Test with various file types and sizes.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Frontend Authentication",
+        "description": "Create frontend components and logic for user registration, login, and authentication state management.",
+        "details": "1. Create React components for registration and login forms\n2. Implement form validation using react-hook-form\n3. Create authentication context using React Context API\n4. Implement API calls using axios or fetch API\n5. Store JWT token in HttpOnly cookie\n6. Create protected routes using Next.js middleware\n7. Implement logout functionality\n8. Add remember me functionality\n9. Implement password reset flow",
+        "testStrategy": "Write unit tests for authentication components. Implement integration tests for the entire authentication flow. Test token refresh mechanism.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Design and Implement Responsive UI Layout",
+        "description": "Create a responsive layout for the application with a focus on mobile-first design.",
+        "details": "1. Design mobile-first layouts using Figma or similar tool\n2. Implement responsive layout using TailwindCSS\n3. Create reusable components (Header, Footer, Navigation)\n4. Implement a side menu for desktop and bottom navigation for mobile\n5. Use Next.js App Router for efficient routing\n6. Implement lazy loading for components and images\n7. Ensure accessibility (WCAG 2.1 AA compliance)\n8. Implement dark mode using TailwindCSS",
+        "testStrategy": "Test responsiveness across various devices and screen sizes. Conduct accessibility audit. Perform usability testing with potential users.",
+        "priority": "high",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement Pet Profile Management UI",
+        "description": "Create frontend components for adding, editing, and viewing pet profiles.",
+        "details": "1. Create components:\n   - PetList: Display all pets\n   - PetForm: Add/Edit pet details\n   - PetProfile: View pet details\n2. Implement image upload for pet avatars\n3. Use react-query for efficient data fetching and caching\n4. Implement optimistic updates for better UX\n5. Add form validation using react-hook-form\n6. Implement error handling and display error messages\n7. Add confirmation dialogs for delete actions\n8. Implement skeleton loading states",
+        "testStrategy": "Write unit tests for components. Implement integration tests for the pet management flow. Test error scenarios and edge cases.",
+        "priority": "high",
+        "dependencies": [
+          4,
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement Health Log Calendar View",
+        "description": "Create a calendar view to display and manage pet health logs.",
+        "details": "1. Use react-big-calendar for the calendar component\n2. Implement day, week, and month views\n3. Create custom event rendering for different log types\n4. Implement log entry creation and editing through calendar interface\n5. Add color coding for different log types\n6. Implement filters for log types and date ranges\n7. Create a heatmap view for quick overview (use d3.js)\n8. Implement infinite scrolling for performance\n9. Add drag-and-drop functionality for log entries",
+        "testStrategy": "Write unit tests for calendar components. Test different view modes and interactions. Perform performance testing with large datasets.",
+        "priority": "high",
+        "dependencies": [
+          5,
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Implement Medical Record Management UI",
+        "description": "Create frontend components for adding, editing, and viewing medical records.",
+        "details": "1. Create components:\n   - MedicalRecordList: Display all records\n   - MedicalRecordForm: Add/Edit record\n   - MedicalRecordDetail: View record details\n2. Implement file attachment upload and preview\n3. Create a timeline view for medical history\n4. Implement sorting and filtering options\n5. Add form validation using react-hook-form\n6. Implement reminder settings for upcoming events\n7. Create a print view for medical records\n8. Implement search functionality",
+        "testStrategy": "Write unit tests for medical record components. Test file upload and preview functionality. Verify reminder creation and notification.",
+        "priority": "high",
+        "dependencies": [
+          6,
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Implement Data Visualization for Health Trends",
+        "description": "Create charts and graphs to visualize pet health trends over time.",
+        "details": "1. Use recharts or Chart.js for creating visualizations\n2. Implement weight trend chart\n3. Create food intake visualization\n4. Implement behavior trend analysis\n5. Add customizable date range for all charts\n6. Create exportable reports of health trends\n7. Implement comparative analysis between multiple pets\n8. Add annotations for significant events (e.g., medication changes)",
+        "testStrategy": "Test chart rendering with various datasets. Verify export functionality. Test performance with large datasets.",
+        "priority": "medium",
+        "dependencies": [
+          11,
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Implement CSV/PDF Export Functionality",
+        "description": "Add the ability to export pet data, health logs, and medical records in CSV and PDF formats.",
+        "details": "1. Implement CSV export using encoding/csv package in Go\n2. Use gopdf or gofpdf for PDF generation\n3. Create API endpoints for initiating exports\n4. Implement background job processing for large exports\n5. Add progress tracking for export jobs\n6. Implement file download mechanism\n7. Create frontend UI for initiating and downloading exports\n8. Add customization options for export content",
+        "testStrategy": "Test export functionality with various data sizes. Verify CSV and PDF format correctness. Test concurrent export requests.",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Implement Read-only Sharing Feature",
+        "description": "Create functionality to generate read-only sharing links for pet profiles and records.",
+        "details": "1. Implement token-based sharing mechanism\n2. Create API endpoint for generating share tokens\n3. Implement middleware for validating share tokens\n4. Create read-only views for shared data\n5. Add ability to revoke share tokens\n6. Implement expiration for share tokens\n7. Create UI for managing shared links\n8. Add email sharing option",
+        "testStrategy": "Test share link generation and access. Verify token expiration and revocation. Test concurrent access to shared resources.",
+        "priority": "low",
+        "dependencies": [
+          4,
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Implement PWA Functionality",
+        "description": "Convert the web application into a Progressive Web App for offline capabilities and improved mobile experience.",
+        "details": "1. Add Web App Manifest\n2. Implement Service Worker using Workbox\n3. Set up offline caching strategies\n4. Implement background sync for offline data submission\n5. Add 'Add to Home Screen' prompt\n6. Implement push notifications (prepare for future LINE Notify integration)\n7. Optimize assets for faster loading\n8. Implement app shell architecture",
+        "testStrategy": "Test offline functionality. Verify PWA installation process. Test sync behavior when coming back online.",
+        "priority": "medium",
+        "dependencies": [
+          9,
+          10,
+          11,
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Implement Error Handling and Logging",
+        "description": "Set up comprehensive error handling and logging across the application.",
+        "details": "1. Implement structured logging using uber-go/zap\n2. Set up error tracking service (e.g., Sentry)\n3. Create custom error types and error wrapping\n4. Implement global error handler for API\n5. Create error boundary components in React\n6. Implement user-friendly error messages\n7. Set up log rotation and archiving\n8. Implement audit logging for sensitive operations",
+        "testStrategy": "Simulate various error scenarios. Verify log output and error reporting. Test error recovery mechanisms.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Implement API Documentation",
+        "description": "Create comprehensive API documentation using OpenAPI/Swagger.",
+        "details": "1. Use swaggo/swag to generate OpenAPI specification\n2. Implement API annotations in Go code\n3. Set up Swagger UI for interactive documentation\n4. Create usage examples for each endpoint\n5. Document authentication and error responses\n6. Implement API versioning\n7. Generate client SDKs using OpenAPI Generator\n8. Create Postman collection for API testing",
+        "testStrategy": "Verify OpenAPI spec correctness. Test Swagger UI functionality. Validate generated client SDKs.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Setup CI/CD Pipeline",
+        "description": "Implement Continuous Integration and Continuous Deployment using GitHub Actions.",
+        "details": "1. Create GitHub Actions workflow for CI:\n   - Run tests for both frontend and backend\n   - Perform linting and code style checks\n   - Build Docker images\n2. Implement CD pipeline:\n   - Deploy to staging environment on PR merge\n   - Deploy to production on release tag\n3. Set up k3s cluster for deployment\n4. Implement blue-green deployment strategy\n5. Set up automated database migrations\n6. Implement secret management using GitHub Secrets\n7. Set up monitoring and alerting",
+        "testStrategy": "Test CI pipeline with various scenarios (PR, merge, release). Verify staging and production deployments. Test rollback procedures.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "Implement Infrastructure as Code",
+        "description": "Set up infrastructure using Terraform for reproducible deployments.",
+        "details": "1. Create Terraform configurations for:\n   - k3s cluster setup\n   - MongoDB Atlas cluster\n   - S3-compatible storage\n   - Networking and security groups\n2. Implement modular Terraform structure\n3. Set up remote state storage\n4. Implement Terraform workspaces for different environments\n5. Create Terraform output for sensitive information\n6. Implement Terraform validation in CI pipeline\n7. Document Terraform usage and variables",
+        "testStrategy": "Test Terraform configurations in a sandbox environment. Verify idempotency of Terraform apply. Test disaster recovery scenarios.",
+        "priority": "medium",
+        "dependencies": [
+          19
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-06-19T23:35:36.274Z",
+      "updated": "2025-06-19T23:44:29.325Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
