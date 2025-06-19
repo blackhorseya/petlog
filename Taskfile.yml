@@ -1,0 +1,22 @@
+version: "3"
+
+tasks:
+  build:
+    desc: 編譯所有 Go binary，輸出到 ./bin
+    cmds:
+      - go build -v ./...
+
+  run:
+    desc: 編譯並啟動主程式
+    cmds:
+      - go run ./cmd/server
+
+  test:
+    desc: 執行 Go 測試
+    cmds:
+      - go test -v ./...
+
+  clean:
+    desc: 清理 ./bin 內所有編譯檔
+    cmds:
+      - rm -rf ./bin
