@@ -9,7 +9,7 @@ tasks:
   run:
     desc: 編譯並啟動主程式
     cmds:
-      - go run ./cmd/server
+      - go run ./cmd/petlog
 
   test:
     desc: 執行 Go 測試
