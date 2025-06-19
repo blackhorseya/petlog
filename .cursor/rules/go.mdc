@@ -1,0 +1,409 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Go-kit + Clean Architecture + DDD 精簡分層規範
+
+## 核心理念
+
+本規範結合 Clean Architecture 與 Domain-Driven Design（DDD），以 Go-kit 微服務分層實踐高可維護性、可測試性與業務邏輯隔離。
+
+- **Clean Architecture**：強調依賴反轉、分層明確、業務邏輯與基礎設施解耦，確保核心邏輯不受外部框架影響。
+- **Domain-Driven Design（DDD）**：以業務語言建模，聚焦於聚合根（Aggregate）、實體（Entity）、值物件（Value Object）、領域服務（Domain Service）、領域事件（Domain Event）與倉儲（Repository）等核心概念，讓程式碼結構貼近真實業務。
+
+---
+
+詳細的專案目錄結構請參閱：[PetLog 專案目錄結構規範](mdc:.cursor/rules/project_layout.mdc)
+
+---
+
+## 分層原則 (Layering Principles)
+
+各層之間必須遵守嚴格的依賴規則：外層可以依賴內層，但內層絕不能依賴外層。
+
+```mermaid
+graph TD
+    A[Transport (HTTP, gRPC)] --> B[Endpoint];
+    B --> C[Usecase (Service)];
+    C --> D[Domain];
+    E[Repository Impl] -.-> D;
+    C --> E_IF[Repository Interface];
+
+    subgraph "Infrastructure"
+        A
+        E
+    end
+
+    subgraph "Application"
+        B
+        C
+    end
+
+    subgraph "Domain"
+        D
+        E_IF
+    end
+
+    style D fill:#f9f,stroke:#333,stroke-width:2px
+    style E_IF fill:#f9f,stroke:#333,stroke-width:2px
+```
+
+1.  **Domain Layer (領域層)**
+
+    - **核心**: 包含業務實體 (Entities)、值物件 (Value Objects)，以及倉儲介面 (Repository Interfaces)。
+    - **規則**:
+      - **完全獨立**: 不依賴任何外部框架或函式庫 (如資料庫驅動、Web 框架)。
+      - **定義介面**: 定義倉儲和外部服務的介面，由外層（`repository`）來實現。
+    - **✅ DO**:
+
+      ```go
+      // internal/domain/pet/pet.go
+      package pet
+
+      import "context"
+
+      type Pet struct {
+          ID   string
+          Name string
+      }
+
+      type Repository interface {
+          FindByID(c context.Context, id string) (*Pet, error)
+      }
+      ```
+
+2.  **Usecase Layer (應用層)**
+
+    - **核心**: 實現具體的業務使用案例，協調領域物件完成特定功能。在 Go-kit 中，這通常對應到 `service`。
+    - **規則**:
+      - 依賴 `domain` 層。
+      - 透過 `domain` 定義的倉儲介面與資料庫互動。
+      - **不包含**任何 HTTP、gRPC 或其他傳輸層的細節。
+    - **✅ DO**:
+
+      ```go
+      // internal/usecase/pet_usecase.go
+      package usecase
+
+      import (
+          "context"
+          "petlog/internal/domain/pet"
+      )
+
+      type PetUsecase struct {
+          repo pet.Repository
+      }
+
+      func (uc *PetUsecase) GetPet(ctx context.Context, id string) (*pet.Pet, error) {
+          return uc.repo.FindByID(ctx, id)
+      }
+      ```
+
+3.  **Endpoint Layer (端點層)**
+
+    - **核心**: Go-kit 的核心元件之一，將 `usecase` 的方法轉換為標準的 `endpoint.Endpoint` 形式。
+    - **規則**:
+      - 處理請求和回應的 DTO (Data Transfer Object) 轉換。
+      - 依賴 `usecase` 層。
+    - **✅ DO**:
+
+      ```go
+      // internal/endpoint/pet_endpoint.go
+      package endpoint
+
+      import (
+          "context"
+          "github.com/go-kit/kit/endpoint"
+          "petlog/internal/usecase"
+      )
+
+      type GetPetRequest struct {
+          ID string
+      }
+
+      type GetPetResponse struct {
+          ID   string `json:"id"`
+          Name string `json:"name"`
+          Err error `json:"error,omitempty"`
+      }
+
+      func MakeGetPetEndpoint(uc *usecase.PetUsecase) endpoint.Endpoint {
+          return func(ctx context.Context, request interface{}) (interface{}, error) {
+              req := request.(GetPetRequest)
+              p, err := uc.GetPet(ctx, req.ID)
+              if err != nil {
+                  return GetPetResponse{Err: err}, nil
+              }
+              return GetPetResponse{ID: p.ID, Name: p.Name}, nil
+          }
+      }
+      ```
+
+4.  **Transport Layer (傳輸層)**
+
+    - **核心**: 負責將外部請求（如 HTTP）轉換為 `endpoint` 層可以理解的格式。
+    - **規則**:
+      - 包含 HTTP handlers (e.g., Gin, net/http)、gRPC servers。
+      - 負責解碼請求 (Decode)、編碼回應 (Encode)，並呼叫對應的 `endpoint`。
+      - 依賴 `endpoint` 層。
+    - **✅ DO**:
+
+      ```go
+      // internal/transport/http/pet_handler.go
+      package http
+
+      import (
+          "github.com/go-kit/kit/transport/http"
+          "github.com/gin-gonic/gin"
+          "petlog/internal/endpoint"
+      )
+
+      func NewPetHandler(path string, endpoints endpoint.PetEndpoints) http.Handler {
+          // ...
+          router.GET("/pets/:id", gin.WrapH(
+              http.NewServer(
+                  endpoints.GetPet,
+                  decodeGetPetRequest,
+                  encodeResponse,
+              ),
+          ))
+          // ...
+      }
+      ```
+
+5.  **Repository Layer (倉儲實作層)**
+
+    - **核心**: 實現 `domain` 層定義的倉儲介面。
+    - **規則**:
+      - 包含所有與資料庫、外部 API 等基礎設施互動的程式碼。
+      - 依賴具體的資料庫驅動 (e.g., `mongo-driver`, `sqlx`)。
+    - **✅ DO**:
+
+      ```go
+      // internal/repository/pet_mongo.go
+      package repository
+
+      import (
+          "context"
+          "go.mongodb.org/mongo-driver/mongo"
+          "petlog/internal/domain/pet"
+      )
+
+      type petMongoRepo struct {
+          db *mongo.Database
+      }
+
+      func (r *petMongoRepo) FindByID(c context.Context, id string) (*pet.Pet, error) {
+          // ... MongoDB query logic
+          return nil, nil
+      }
+      ```
+
+---
+
+## 語言與風格 (Language & Style)
+
+為確保程式碼一致性與可維護性，所有 Go 程式碼應遵循以下風格指南，其中許多原則源自官方的 [Effective Go](mdc:https:/go.dev/doc/effective_go) 文件與社群的最佳實踐。
+
+### 格式化
+
+- **`gofmt` 與 `goimports`**: 所有提交的程式碼 **必須** 使用 `gofmt` 進行格式化。強烈建議使用 `goimports`，它在 `gofmt` 的基礎上還會自動管理 import 路徑的排序與分組。
+  ```sh
+  # 使用 goimports 自動格式化並整理 import
+  goimports -w .
+  ```
+- **行長度**: Go 沒有嚴格的行長度限制。遵循 `gofmt` 的預設排版，自然換行即可。避免手動為了符合 80 或 120 字元限制而進行不自然的斷行。
+
+### 命名慣例
+
+- **Package 名稱**:
+  - 使用簡短、小寫的單一名稱（例如：`http`, `oauth`, `repository`）。
+  - 避免使用底線 (`_`) 或混合大小寫 (`mixedCaps`)。
+  - 名稱應與其目錄名稱一致。例如，`internal/domain/pet` 路徑下的 package 應為 `package pet`。
+  - 由於 package 名稱會成為成員的前綴 (e.g. `bytes.Buffer`)，因此匯出的名稱應避免重複 package 名。
+    - ✅ `bytes.Buffer`
+    - ❌ `bytes.BytesBuffer`
+- **變數名稱**:
+  - 遵循 Go 的駝峰式命名法 (`camelCase`)，例如 `numConnections`。
+  - 當變數作用域較小時，可使用短名稱，例如 `i` (for index)、`r` (for reader)。
+  - 全域變數或常數若要匯出，應使用大寫開頭的駝峰命名法，例如 `DefaultTimeout`。
+- **函式與方法名稱**:
+  - 同樣使用駝峰式命名法。
+  - 匯出的函式/方法名稱應清晰說明其功能，例如 `GetUserProfile`。
+- **Getters**:
+  - Go 不鼓勵在 getter 方法前加上 `Get` 前綴。
+    - ✅ `func (u *User) Name() string`
+    - ❌ `func (u *User) GetName() string`
+- **介面名稱**:
+  - 單一方法的介面通常以 `er` 作為後綴，例如 `Reader`, `Writer`, `Stringer`。
+    - `type Reader interface { Read(p []byte) (n int, err error) }`
+  - 多個方法的介面名稱則應描述其職責，例如 `PetRepository`, `NotificationService`。
+
+### 註解
+
+- **Doc Comments**: 所有匯出的 (`public`) 函式、型別、常數和變數都 **必須** 有文件註解 (doc comment)。這些註解會被 `go doc` 工具提取，作為 package 的 API 文件。
+- **註解格式**: 註解應以被註解的對象名稱開頭。
+
+  ```go
+  // PetRepository 提供了對寵物資料的持久化存取。
+  type PetRepository interface {
+      // ...
+  }
+
+  // FindByID 根據 ID 尋找寵物。
+  // 如果找不到，將返回 domain.ErrNotFound 錯誤。
+  func (r *petRepo) FindByID(id string) (*Pet, error) {
+      // ...
+  }
+  ```
+
+- **實作細節**: 對於複雜、不直觀或重要的程式碼區塊，應在函式內部添加註解說明其目的和邏輯。
+
+### 錯誤處理
+
+- **明確處理**: 函式返回的 `error` **絕不能** 被忽略。必須明確檢查 `err != nil`。
+
+  ```go
+  // ❌ DON'T: 忽略錯誤
+  user, _ := repo.FindUser(id)
+
+  // ✅ DO: 明確檢查錯誤
+  user, err := repo.FindUser(id)
+  if err != nil {
+      return nil, fmt.Errorf("finding user %s: %w", id, err)
+  }
+  ```
+
+- **錯誤包裝**: 在錯誤傳遞鏈中，應使用 `fmt.Errorf` 搭配 `%w` 來包裝錯誤，以保留原始錯誤的上下文。
+  ```go
+  // 在 usecase 層
+  pet, err := s.repo.FindByID(ctx, id)
+  if err != nil {
+      // 添加上下文資訊並包裝底層錯誤
+      return nil, fmt.Errorf("usecase: could not find pet with id %s: %w", id, err)
+  }
+  ```
+- **哨兵錯誤 (Sentinel Errors)**: 對於特定的、可預期的錯誤，應在 `domain` 層定義為哨兵錯誤。
+
+  ```go
+  // internal/domain/errors.go
+  package domain
+
+  import "errors"
+
+  var ErrNotFound = errors.New("requested item was not found")
+  var ErrDuplicateEntry = errors.New("item already exists")
+  ```
+
+  上層可使用 `errors.Is` 來檢查特定錯誤類型。
+
+- **Panic & Recover**:
+  - `panic` 應只在發生真正意外、無法恢復的錯誤時使用（例如，服務啟動時依賴的核心設定檔遺失）。
+  - **禁止**將 `panic` 作為常規的錯誤處理機制跨越 package 邊界。一個 package 內部的 `panic` 應該在該 package 內被 `recover`，並以一個 `error` 值的形式返回給呼叫者。
+  - `recover` 必須在 `defer` 函式中直接呼叫才有效。
+
+### 控制結構 (Control Structures)
+
+- **`if`**: `if` 語句可以包含一個初始化敘述，常用於處理錯誤或設定局部變數。
+  ```go
+  if val, err := someFunc(); err != nil {
+      // handle error
+  } else {
+      // use val
+  }
+  ```
+- **`for`**: Go 只有 `for` 一種迴圈。它可以搭配 `range` 來遍歷 slice, array, map, string 或 channel。
+
+  ```go
+  // 使用 range 遍歷 map
+  for key, value := range myMap {
+      fmt.Println(key, value)
+  }
+
+  // 當作 while 使用
+  n := 0
+  for n < 5 {
+      n++
+  }
+  ```
+
+- **`switch`**: Go 的 `switch` 非常靈活。case 不需要 `break`，且 case 的值不限於常數。
+  - **型別斷言 (Type Switch)**: `switch` 可與型別斷言結合使用，方便地處理介面的不同實作型別。
+    ```go
+    switch v := i.(type) {
+    case string:
+        // v is a string
+    case int:
+        // v is an int
+    default:
+        // i is some other type
+    }
+    ```
+
+### 併發 (Concurrency)
+
+- **分享記憶體來溝通**: 這是 Go 的核心併發哲學。「Do not communicate by sharing memory; instead, share memory by communicating.」
+- **Goroutines**: 使用 `go` 關鍵字可以輕易地啟動一個 goroutine。它們是輕量級執行緒。
+- **Channels**: Channel 是 goroutine 之間溝通的主要橋樑，可以安全地傳遞資料。
+- **`select`**: `select` 語句可以等待多個 channel 操作，使複雜的併發邏輯變得清晰。
+
+### 其他
+
+- **Context**:
+  - `context.Context` 應作為函式的第一個參數，且永遠不應為 `nil`。
+  - 不要將 `Context` 作為 struct 的成員。
+- **Receiver 命名**: struct 方法的 receiver 應使用簡短、一致的名稱，通常是該型別名稱的一到兩個字母縮寫。
+
+  ```go
+  type PetService struct { ... }
+  func (ps *PetService) Get(id string) { ... } // ps for PetService
+
+  type repository struct { ... }
+  func (r *repository) Find() { ... } // r for repository
+  ```
+
+---
+
+## 命名與檔案慣例
+
+- **實作後綴 (Implementation Suffix)**:
+
+  - 介面實作的 struct 使用 `Impl` 後綴 (e.g., `PetRepositoryImpl`)。
+  - 存放該實作的檔案名使用 `_impl.go` 後綴 (e.g., `pet_repository_impl.go`)。
+
+- **模型檔案 (Model Files)**:
+
+  - 資料庫或領域模型的檔案使用 `_model.go` 後綴 (e.g., `pet_model.go`)。
+
+- **Context 變數命名**:
+
+  - 原生的 `context.Context` 參數，應命名為 `c`。
+  - 擴展的 `Contextx` ([contextx.go](mdc:pkg/contextx/contextx.go)) 變數，應命名為 `ctx`。
+  - **標準起手式**: 在函式開頭，應立即使用 `ctx := contextx.WithContext(c)` 將原生 `context` 轉換為擴展的 `Contextx`。這個「起手式」確保了後續所有操作都能方便地使用 `ctx` 內部已嵌入的 thread-safe logger。
+  - **✅ DO**:
+
+    ```go
+    import "github.com/blackhorseya/petlog/pkg/contextx"
+
+    func Foo(c context.Context) {
+      // 標準起手式：將原生 context 轉換為包含 logger 的擴展 context。
+      ctx := contextx.WithContext(c)
+      // ctx 包含了 logger，可以直接調用
+      ctx.Info("Successfully entered Foo function")
+    }
+    ```
+
+---
+
+## 相依注入與 Mock (Dependency Injection & Mocking)
+
+- **相依注入 (DI)**:
+
+  - 統一使用 [google/wire](mdc:https:/github.com/google/wire) 來自動生成依賴注入的程式碼。
+  - 應在 `cmd` 目錄下的 `main.go` 或相關的 `wire.go` 檔案中定義 `wire provider`。
+
+- **Mock 測試**:
+  - **必須** 使用 [uber-go/mock](mdc:https:/github.com/uber-go/mock) 來生成介面的 mock 實作。
+  - **嚴禁** 使用已封存的 [golang/mock](mdc:https:/github.com/golang/mock)。
+  - Mock 檔案應使用 `_mock.go` 作為後綴，例如 `pet_repository_mock.go`。
