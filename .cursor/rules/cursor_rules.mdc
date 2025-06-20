@@ -3,7 +3,7 @@ description: Guidelines for creating and maintaining Cursor rules to ensure cons
 globs: .cursor/rules/*.mdc
 alwaysApply: true
 ---
-一律用繁體中文
+一律使用正體中文來撰寫記錄
 
 ---
 

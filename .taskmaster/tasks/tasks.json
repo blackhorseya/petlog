@@ -159,7 +159,7 @@
         "id": 4,
         "title": "實作寵物管理的 Usecase/Service",
         "description": "在 `internal/usecase` 套件中，採用 CQRS (Command Query Responsibility Segregation) 架構實作寵物管理服務。將分離讀取操作 (Query) 和寫入操作 (Command)，並將共享的驗證邏輯放在 behavior 中。所有處理器將透過其建構函式，接收 `pet.Repository` 介面 (在任務 #3 中定義) 作為依賴。它們應實作寵物資料的 CRUD 核心業務邏輯，並由 `Endpoint` 層呼叫。此任務不應包含任何傳輸層或特定資料庫的程式碼。",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           2,
           3
@@ -185,7 +185,7 @@
               1
             ],
             "details": "1. 在 internal/usecase/command 目錄中建立 create_pet.go 檔案\n2. 定義 CreatePetCommand 結構體，包含建立寵物所需的所有資料\n3. 實作 CreatePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物建立邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 驗證輸入資料\n   - 建立新的寵物實體\n   - 調用儲存庫保存寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "編寫單元測試，覆蓋成功建立寵物和各種失敗情境，如無效輸入、儲存庫錯誤等"
           },
           {
@@ -196,7 +196,7 @@
               1
             ],
             "details": "1. 在 internal/usecase/command 目錄中建立 update_pet.go 檔案\n2. 定義 UpdatePetCommand 結構體，包含更新寵物所需的所有資料\n3. 實作 UpdatePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物更新邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 驗證輸入資料\n   - 檢查寵物是否存在\n   - 驗證使用者是否有權限更新該寵物\n   - 更新寵物資訊\n   - 調用儲存庫保存更新後的寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "編寫單元測試，覆蓋成功更新寵物和各種失敗情境，如無效輸入、寵物不存在、權限不足等"
           },
           {
@@ -207,7 +207,7 @@
               1
             ],
             "details": "1. 在 internal/usecase/command 目錄中建立 delete_pet.go 檔案\n2. 定義 DeletePetCommand 結構體，包含刪除寵物所需的資料（主要是寵物 ID）\n3. 實作 DeletePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物刪除邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 檢查寵物是否存在\n   - 驗證使用者是否有權限刪除該寵物\n   - 調用儲存庫刪除寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "編寫單元測試，覆蓋成功刪除寵物和各種失敗情境，如寵物不存在、權限不足等"
           },
           {
@@ -218,7 +218,7 @@
               1
             ],
             "details": "1. 在 internal/usecase/query 目錄中建立 get_pet_by_id.go 檔案\n2. 定義 GetPetByIDQuery 結構體，包含獲取寵物所需的資料（主要是寵物 ID）\n3. 實作 GetPetByIDHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理獲取寵物詳細資訊的邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 調用儲存庫獲取寵物\n   - 驗證使用者是否有權限查看該寵物\n   - 處理可能的錯誤，如寵物不存在\n   - 實作適當的日誌記錄",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "編寫單元測試，覆蓋成功獲取寵物和各種失敗情境，如寵物不存在、權限不足等"
           },
           {
@@ -229,7 +229,7 @@
               1
             ],
             "details": "1. 在 internal/usecase/query 目錄中建立 list_pets_by_owner.go 檔案\n2. 定義 ListPetsByOwnerQuery 結構體，可能包含分頁或過濾選項\n3. 實作 ListPetsByOwnerHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理列出使用者寵物的邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 調用儲存庫獲取該使用者的所有寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄\n   - 支援可能的分頁或過濾功能",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "編寫單元測試，覆蓋成功列出寵物和各種情境，如使用者沒有寵物、分頁功能等"
           },
           {
@@ -238,7 +238,7 @@
             "description": "在 behavior 目錄中實作可被 Command 和 Query Handlers 共用的驗證邏輯。",
             "dependencies": [],
             "details": "1. 在 internal/usecase/behavior 目錄中建立適當的檔案結構\n2. 實作寵物資料驗證函數，如檢查名稱、類型、年齡等\n3. 實作權限檢查邏輯，確保使用者只能操作自己的寵物\n4. 實作其他可能的共享邏輯，如格式化或轉換函數\n5. 設計易於重用的介面，讓 Command 和 Query Handlers 可以方便地使用這些驗證邏輯",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "為共享的驗證邏輯編寫單元測試，確保在各種情況下都能正確驗證輸入和權限"
           },
           {
@@ -254,7 +254,7 @@
               7
             ],
             "details": "1. 為每個 Command 和 Query Handler 建立對應的測試檔案\n2. 使用模擬 (mock) 來模擬 pet.Repository 的行為\n3. 測試正常路徑和各種錯誤情境\n4. 驗證業務邏輯的正確性\n5. 確保正確驗證輸入和權限\n6. 測試與共享驗證邏輯的整合",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "確保測試覆蓋率高，包括所有可能的分支和錯誤情境，使用模擬來隔離測試對象"
           }
         ]
@@ -487,7 +487,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-20T01:30:07.344Z",
+      "updated": "2025-06-20T01:32:39.422Z",
       "description": "Tasks for master context"
     }
   }
