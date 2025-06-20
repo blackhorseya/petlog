@@ -21,13 +21,13 @@ type PetEndpoints struct {
 
 // MakePetEndpoints returns a PetEndpoints struct where each endpoint invokes
 // the corresponding method on the provided service.
-func MakePetEndpoints(ch command.CreatePetHandler, uh command.UpdatePetHandler, dh command.DeletePetHandler, qh query.GetPetByIDHandler, lh query.ListPetsByOwnerHandler) PetEndpoints {
+func MakePetEndpoints(ch *command.CreatePetHandler, uh *command.UpdatePetHandler, dh *command.DeletePetHandler, qh *query.GetPetByIDHandler, lh *query.ListPetsByOwnerHandler) PetEndpoints {
 	return PetEndpoints{
-		CreatePetEndpoint: MakeCreatePetEndpoint(&ch),
-		UpdatePetEndpoint: MakeUpdatePetEndpoint(&uh),
-		DeletePetEndpoint: MakeDeletePetEndpoint(&dh),
-		GetPetEndpoint:    MakeGetPetEndpoint(&qh),
-		ListPetsEndpoint:  MakeListPetsEndpoint(&lh),
+		CreatePetEndpoint: MakeCreatePetEndpoint(ch),
+		UpdatePetEndpoint: MakeUpdatePetEndpoint(uh),
+		DeletePetEndpoint: MakeDeletePetEndpoint(dh),
+		GetPetEndpoint:    MakeGetPetEndpoint(qh),
+		ListPetsEndpoint:  MakeListPetsEndpoint(lh),
 	}
 }
 
