@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/blackhorseya/petlog/internal/config"
-	"github.com/blackhorseya/petlog/internal/domain/repository"
 	"github.com/blackhorseya/petlog/internal/endpoint"
 	"github.com/blackhorseya/petlog/internal/infra/mongodb"
 	"github.com/blackhorseya/petlog/internal/transport/gin"
@@ -24,7 +23,6 @@ func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, error) {
 	wire.Build(
 		// Database
 		provideMongoDatabase,
-		wire.Bind(new(repository.PetRepository), new(*mongodb.PetMongoRepo)),
 		mongodb.NewPetMongoRepo,
 
 		// Usecase Handlers
