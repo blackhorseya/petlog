@@ -511,16 +511,35 @@
         "id": 18,
         "title": "Implement API Documentation",
         "description": "Create comprehensive API documentation using OpenAPI/Swagger.",
-        "details": "1. Use swaggo/swag to generate OpenAPI specification\n2. Implement API annotations in Go code\n3. Set up Swagger UI for interactive documentation\n4. Create usage examples for each endpoint\n5. Document authentication and error responses\n6. Implement API versioning\n7. Generate client SDKs using OpenAPI Generator\n8. Create Postman collection for API testing",
-        "testStrategy": "Verify OpenAPI spec correctness. Test Swagger UI functionality. Validate generated client SDKs.",
-        "priority": "medium",
+        "status": "in-progress",
         "dependencies": [
           4,
           5,
           6
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "medium",
+        "details": "1. Use swaggo/swag to generate OpenAPI specification (completed for pet management APIs)\n2. Implement API annotations in Go code (completed for pet management endpoints)\n3. Set up Swagger UI for interactive documentation\n4. Validate and fine-tune the generated documentation\n5. Document authentication and error responses\n6. Implement API versioning\n7. Generate client SDKs using OpenAPI Generator\n8. Create Postman collection for API testing\n9. Extend Swagger annotations to remaining API endpoints",
+        "testStrategy": "Verify OpenAPI spec correctness and completeness. Test Swagger UI functionality. Validate that all pet management endpoints are properly documented. Ensure documentation reflects the refactored Gin Transport layer. Validate generated client SDKs.",
+        "subtasks": [
+          {
+            "id": "18.1",
+            "title": "Verify pet management API documentation",
+            "description": "Review the Swagger documentation generated for pet management endpoints to ensure accuracy and completeness.",
+            "status": "pending"
+          },
+          {
+            "id": "18.2",
+            "title": "Configure and deploy Swagger UI",
+            "description": "Set up Swagger UI to provide interactive documentation for the API endpoints.",
+            "status": "pending"
+          },
+          {
+            "id": "18.3",
+            "title": "Add Swagger annotations to remaining endpoints",
+            "description": "Extend the Swagger documentation to cover all API endpoints beyond pet management.",
+            "status": "pending"
+          }
+        ]
       },
       {
         "id": 19,
@@ -552,7 +571,7 @@
         "id": 21,
         "title": "實作寵物管理的 API 端點 (Endpoint) 與傳輸層 (Transport)",
         "description": "為任務 #4 中實作的寵物管理 usecase 建立 Go-kit endpoint 和 Gin HTTP transport 層。這將會把 Create, Update, Delete, GetByID, ListByOwner 等操作公開為 RESTful API。目前進度：Go-kit Endpoint 層的結構和 DTO (Data Transfer Objects) 皆已定義完成。下一步是實作 Gin HTTP Transport 層，將這些 Endpoints 透過具體的 HTTP Handlers 公開為 API。",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           2,
           4
@@ -565,7 +584,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-20T03:56:31.832Z",
+      "updated": "2025-06-20T04:53:55.528Z",
       "description": "Tasks for master context"
     }
   }

@@ -15,8 +15,11 @@ import (
 	"github.com/blackhorseya/petlog/internal/usecase/command"
 	"github.com/blackhorseya/petlog/internal/usecase/query"
 	http2 "github.com/go-kit/kit/transport/http"
-	"go.mongodb.org/mongo-driver/v2/mongo"
 	"net/http"
+)
+
+import (
+	_ "github.com/blackhorseya/petlog/api"
 )
 
 // Injectors from wire.go:
@@ -44,10 +47,3 @@ func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, func(), 
 var (
 	_wireValue = []http2.ServerOption{}
 )
-
-// wire.go:
-
-func provideMongoDatabase(cfg config.AppConfig) (*mongo.Database, error) {
-
-	return nil, nil
-}
