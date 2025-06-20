@@ -26,9 +26,11 @@ alwaysApply: true
 graph TD
     A[Transport (HTTP, gRPC)] --> B[Endpoint];
     B --> C[Usecase (Service)];
-    C --> D[Domain];
-    E[Repository Impl] -.-> D;
-    C --> E_IF[Repository Interface];
+    C --> D_MOD[Domain Model];
+    C --> D_REPO[Repository Interface];
+    E[Repository Impl] -.-> D_MOD;
+    E --> D_REPO;
+
 
     subgraph "Infrastructure"
         A
@@ -41,44 +43,56 @@ graph TD
     end
 
     subgraph "Domain"
-        D
-        E_IF
+        D_MOD
+        D_REPO
     end
 
-    style D fill:#f9f,stroke:#333,stroke-width:2px
-    style E_IF fill:#f9f,stroke:#333,stroke-width:2px
+    style D_MOD fill:#f9f,stroke:#333,stroke-width:2px
+    style D_REPO fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
 1.  **Domain Layer (領域層)**
 
-    - **核心**: 包含業務實體 (Entities)、值物件 (Value Objects)，以及倉儲介面 (Repository Interfaces)。
+    - **核心**: 包含業務實體 (Entities / Models)、值物件 (Value Objects)，以及倉儲介面 (Repository Interfaces)。這是您應用程式的核心。
     - **規則**:
       - **完全獨立**: 不依賴任何外部框架或函式庫 (如資料庫驅動、Web 框架)。
-      - **定義介面**: 定義倉儲和外部服務的介面，由外層（`repository`）來實現。
+      - **定義介面**: 定義倉儲和外部服務的介面，由外層（`repository` 實作層）來實現。
+      - **實體純淨 (Entity Purity)**: 領域模型**禁止**包含任何特定於資料庫的標籤，如 `bson` 或 `gorm`。它們應該是純粹的 Go 結構體。`json` 標籤是允許的，因為它們與 API 合約（傳輸層的一部分）有關，而不是持久化。
     - **✅ DO**:
 
       ```go
-      // internal/domain/pet/pet.go
-      package pet
+      // internal/domain/model/pet.go
+      package model
 
-      import "context"
+      import "time"
 
+      // Pet 是純粹的領域實體，不含任何基礎設施標籤。
       type Pet struct {
-          ID   string
-          Name string
+          ID   string    `json:"id"`
+          Name string    `json:"name"`
+          DOB  time.Time `json:"dob"`
       }
 
-      type Repository interface {
-          FindByID(c context.Context, id string) (*Pet, error)
+      // internal/domain/repository/pet.go
+      package repository
+
+      import (
+          "context"
+          "github.com/blackhorseya/petlog/internal/domain/model"
+      )
+
+      // PetRepository 定義了 Pet 資料的持久化介面。
+      type PetRepository interface {
+          FindByID(c context.Context, id string) (*model.Pet, error)
+          // ... 其他方法
       }
       ```
 
 2.  **Usecase Layer (應用層)**
 
-    - **核心**: 實現具體的業務使用案例，協調領域物件完成特定功能。在 Go-kit 中，這通常對應到 `service`。
+    - **核心**: 實現具體的業務使用案例，協調領域物件完成特定功能。
     - **規則**:
-      - 依賴 `domain` 層。
-      - 透過 `domain` 定義的倉儲介面與資料庫互動。
+      - 依賴 `domain` 層的 `model` 和 `repository` 介面。
       - **不包含**任何 HTTP、gRPC 或其他傳輸層的細節。
     - **✅ DO**:
 
@@ -88,15 +102,17 @@ graph TD
 
       import (
           "context"
-          "petlog/internal/domain/pet"
+          "github.com/blackhorseya/petlog/internal/domain/model"
+          "github.com/blackhorseya/petlog/internal/domain/repository"
       )
 
       type PetUsecase struct {
-          repo pet.Repository
+          petRepo repository.PetRepository
+          // ... 其他依賴
       }
 
-      func (uc *PetUsecase) GetPet(ctx context.Context, id string) (*pet.Pet, error) {
-          return uc.repo.FindByID(ctx, id)
+      func (uc *PetUsecase) GetPet(c context.Context, id string) (*model.Pet, error) {
+          return uc.petRepo.FindByID(c, id)
       }
       ```
 
@@ -116,6 +132,7 @@ graph TD
           "context"
           "github.com/go-kit/kit/endpoint"
           "petlog/internal/usecase"
+          "petlog/internal/domain/model"
       )
 
       type GetPetRequest struct {
@@ -123,19 +140,18 @@ graph TD
       }
 
       type GetPetResponse struct {
-          ID   string `json:"id"`
-          Name string `json:"name"`
-          Err error `json:"error,omitempty"`
+          Pet *model.Pet `json:"pet"`
+          Err error      `json:"error,omitempty"`
       }
 
       func MakeGetPetEndpoint(uc *usecase.PetUsecase) endpoint.Endpoint {
-          return func(ctx context.Context, request interface{}) (interface{}, error) {
+          return func(c context.Context, request interface{}) (interface{}, error) {
               req := request.(GetPetRequest)
-              p, err := uc.GetPet(ctx, req.ID)
+              p, err := uc.GetPet(c, req.ID)
               if err != nil {
                   return GetPetResponse{Err: err}, nil
               }
-              return GetPetResponse{ID: p.ID, Name: p.Name}, nil
+              return GetPetResponse{Pet: p}, nil
           }
       }
       ```
@@ -150,8 +166,8 @@ graph TD
     - **✅ DO**:
 
       ```go
-      // internal/transport/http/pet_handler.go
-      package http
+      // internal/transport/gin/pet_handler.go
+      package gin
 
       import (
           "github.com/go-kit/kit/transport/http"
@@ -174,29 +190,61 @@ graph TD
 
 5.  **Repository Layer (倉儲實作層)**
 
-    - **核心**: 實現 `domain` 層定義的倉儲介面。
+    - **核心**: 實現 `domain` 層定義的倉儲介面。這是基礎設施的一部分。
     - **規則**:
       - 包含所有與資料庫、外部 API 等基礎設施互動的程式碼。
       - 依賴具體的資料庫驅動 (e.g., `mongo-driver`, `sqlx`)。
+    - **模型轉換 (Model Mapping)**: 此層級負責在純粹的領域模型 (e.g., `model.Pet`) 和持久化專用的模型 (e.g., 一個帶有 `bson` 標籤的 `petMongo` 結構體) 之間進行轉換。這徹底地將領域與資料庫解耦。
     - **✅ DO**:
 
       ```go
       // internal/repository/pet_mongo.go
-      package repository
+      package repository // 這是實作層的 package
 
       import (
           "context"
+          "time"
           "go.mongodb.org/mongo-driver/mongo"
-          "petlog/internal/domain/pet"
+          "github.com/blackhorseya/petlog/internal/domain/model"
       )
+
+      // petMongo 是 Pet 的持久化模型，包含 DB 專用的標籤。
+      type petMongo struct {
+          ID   string    `bson:"_id,omitempty"`
+          Name string    `bson:"name"`
+          DOB  time.Time `bson:"dob"`
+          // ... 其他欄位
+      }
+
+      // toDomain 將持久化模型轉換為領域模型。
+      func (pm *petMongo) toDomain() *model.Pet {
+          return &model.Pet{
+              ID:   pm.ID,
+              Name: pm.Name,
+              DOB:  pm.DOB,
+          }
+      }
+
+      // fromDomain 將領域模型轉換為持久化模型。
+      func fromDomain(p *model.Pet) *petMongo {
+          return &petMongo{
+              ID:   p.ID,
+              Name: p.Name,
+              DOB:  p.DOB,
+          }
+      }
 
       type petMongoRepo struct {
           db *mongo.Database
       }
 
-      func (r *petMongoRepo) FindByID(c context.Context, id string) (*pet.Pet, error) {
-          // ... MongoDB query logic
-          return nil, nil
+      // FindByID 實作了 domain repository 的介面。
+      func (r *petMongoRepo) FindByID(c context.Context, id string) (*model.Pet, error) {
+          var result petMongo
+          // 1. 使用 `petMongo` 結構體進行 MongoDB 查詢...
+          // 2. 將查詢結果從 petMongo 轉換為 model.Pet
+          // 3. 返回領域模型
+          return result.toDomain(), nil
       }
       ```
 
@@ -404,6 +452,25 @@ graph TD
   - 應在 `cmd` 目錄下的 `main.go` 或相關的 `wire.go` 檔案中定義 `wire provider`。
 
 - **Mock 測試**:
+
   - **必須** 使用 [uber-go/mock](mdc:https:/github.com/uber-go/mock) 來生成介面的 mock 實作。
   - **嚴禁** 使用已封存的 [golang/mock](mdc:https:/github.com/golang/mock)。
-  - Mock 檔案應使用 `_mock.go` 作為後綴，例如 `pet_repository_mock.go`。
+  - **`go:generate`**: 所有包含倉儲介面的檔案，都應在檔案頂部加入 `go:generate` 指令，以自動化 mock 檔案的產生。
+  - **Mock 工具**: **必須** 使用 [uber-go/mock](mdc:https:/github.com/uber-go/mock) 來生成介面的 mock 實作。**嚴禁**使用已封存的 [golang/mock](mdc:https:/github.com/golang/mock)。
+  - **Mock 檔案命名**: Mock 檔案應使用 `mock_` 作為**前綴**，例如 `mock_pet.go`。
+  - **✅ DO**:
+
+    ```go
+    //go:generate mockgen -destination=./mock_${GOFILE} -package=${GOPACKAGE} -source=${GOFILE}
+    package repository
+
+    import (
+        "context"
+        "github.com/blackhorseya/petlog/internal/domain/model"
+    )
+
+    type PetRepository interface {
+        FindByID(c context.Context, id string) (*model.Pet, error)
+        // ...
+    }
+    ```

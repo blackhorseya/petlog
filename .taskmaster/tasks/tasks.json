@@ -68,7 +68,7 @@
         "id": 2,
         "title": "Implement User Authentication",
         "description": "Implement user authentication using Auth0 for both backend and frontend integration.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1
         ],
@@ -126,7 +126,7 @@
               4
             ],
             "details": "Retrieve and display user profile information from Auth0. Implement proper token storage and renewal. Handle session expiration gracefully. Create user profile components to display user information.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test user profile retrieval and display. Verify token renewal functionality. Test session expiration handling."
           },
           {
@@ -137,49 +137,49 @@
               1
             ],
             "details": "Evaluate requirements for custom authentication logic. Implement Auth0 Rules or Actions for custom claims or additional validation. Test and verify custom logic works as expected.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test custom Rules or Actions to ensure they properly modify tokens or authentication behavior as expected."
           }
         ]
       },
       {
         "id": 3,
-        "title": "Design and Implement MongoDB Schema",
-        "description": "Create MongoDB schema for pets, health logs, and medical records collections.",
-        "details": "1. Set up MongoDB Atlas cluster\n2. Design schemas for collections:\n   - pets: {id, ownerId, name, avatarURL, dob, breed, microchipId}\n   - health_logs: {id, petId, date, weightKg, foodGram, litterNotes, behaviourNotes}\n   - medical_records: {id, petId, type, description, date, nextDueDate, dosage}\n3. Create indexes for frequent queries:\n   - Create compound index on health_logs: {petId: 1, date: -1}\n   - Create index on pets: {ownerId: 1}\n4. Implement MongoDB connection in Go using 'go.mongodb.org/mongo-driver/mongo'\n5. Create CRUD operations for each collection\n6. Implement data validation using MongoDB schema validation",
-        "testStrategy": "Write unit tests for CRUD operations. Verify index performance with large datasets. Test data integrity constraints.",
-        "priority": "high",
+        "title": "定義領域模型 (Domain Models) 與倉儲介面 (Repository Interfaces)",
+        "description": "在 `internal/domain` 套件中，為 `Pet`、`HealthLog` 和 `MedicalRecord` 建立 Go 的 struct。為每個模型定義一個 `Repository` 介面，並明確指定所需的 CRUD 方法簽名 (例如：Create, FindByID, Update, Delete)。此層級必須保持純淨，不依賴任何特定的資料庫驅動程式或其他基礎設施。",
+        "status": "done",
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "priority": "high",
+        "details": "1. 在 `internal/domain` 套件中建立領域模型：\n   - Pet: {ID, OwnerID, Name, AvatarURL, DOB, Breed, MicrochipID}\n   - HealthLog: {ID, PetID, Date, WeightKg, FoodGram, LitterNotes, BehaviourNotes}\n   - MedicalRecord: {ID, PetID, Type, Description, Date, NextDueDate, Dosage}\n\n2. 為每個模型定義倉儲介面：\n   ```go\n   type PetRepository interface {\n     Create(ctx context.Context, pet *Pet) error\n     FindByID(ctx context.Context, id string) (*Pet, error)\n     FindByOwnerID(ctx context.Context, ownerID string) ([]*Pet, error)\n     Update(ctx context.Context, pet *Pet) error\n     Delete(ctx context.Context, id string) error\n   }\n   ```\n   (為 HealthLogRepository 和 MedicalRecordRepository 建立類似的介面)\n\n3. 確保領域模型和倉儲介面不依賴 MongoDB 或其他基礎設施\n\n4. 記錄每個倉儲方法的預期行為\n\n5. 為後續任務準備 MongoDB 的實作 (將在基礎設施層實作)",
+        "testStrategy": "為領域模型編寫單元測試，以驗證它們包含所有必要的欄位。建立倉儲介面的模擬實作以進行測試。在測試中使用依賴注入，以確保領域層保持純淨。",
         "subtasks": []
       },
       {
         "id": 4,
-        "title": "Implement Pet Profile CRUD API",
-        "description": "Create REST API endpoints for managing pet profiles.",
-        "details": "1. Use Gin framework (github.com/gin-gonic/gin) for routing\n2. Implement endpoints:\n   - GET /v1/pets (list all pets for authenticated user)\n   - POST /v1/pets (create new pet)\n   - GET /v1/pets/{id} (get pet details)\n   - PUT /v1/pets/{id} (update pet details)\n   - DELETE /v1/pets/{id} (delete pet)\n3. Implement request validation using go-playground/validator\n4. Use Clean Architecture pattern:\n   - Create use cases in internal/usecase\n   - Implement repository pattern for MongoDB interactions\n5. Implement error handling and logging using uber-go/zap\n6. Generate OpenAPI specification using swaggo/swag",
-        "testStrategy": "Write unit tests for each use case. Implement integration tests for API endpoints. Verify OpenAPI spec correctness.",
-        "priority": "high",
+        "title": "實作寵物管理的 Usecase/Service",
+        "description": "在 `internal/usecase` 套件中，建立 `PetUsecase`。此服務將透過其建構函式，接收 `pet.Repository` 介面 (在任務 #3 中定義) 作為依賴。它應實作寵物資料的 CRUD 核心業務邏輯，並由 `Endpoint` 層呼叫。此任務不應包含任何傳輸層或特定資料庫的程式碼。",
+        "status": "pending",
         "dependencies": [
           2,
           3
         ],
-        "status": "pending",
+        "priority": "high",
+        "details": "1. 在 internal/usecase/pet.go 中建立 PetUsecase 結構體\n2. 實作接收 pet.Repository 作為依賴的建構函式\n3. 實作核心業務邏輯方法：\n   - GetPets() - 列出已認證使用者的所有寵物\n   - CreatePet() - 建立新寵物\n   - GetPetByID() - 獲取寵物詳細資訊\n   - UpdatePet() - 更新寵物詳細資訊\n   - DeletePet() - 刪除寵物\n4. 實作適當的錯誤處理和驗證邏輯\n5. 遵循乾淨架構原則：\n   - 無傳輸層依賴 (HTTP、gRPC 等)\n   - 無特定資料庫程式碼\n   - 專注於業務規則和使用案例\n6. 使用 internal/domain 中定義的領域模型\n7. 使用 uber-go/zap 實作適當的日誌記錄",
+        "testStrategy": "1. 為每個使用案例方法編寫全面的單元測試\n2. 為儲存庫介面使用模擬 (mock)\n3. 測試正常路徑和錯誤情境\n4. 驗證業務邏輯正確性\n5. 確保正確驗證輸入",
         "subtasks": []
       },
       {
         "id": 5,
-        "title": "Implement Health Log CRUD API",
-        "description": "Create REST API endpoints for managing pet health logs.",
-        "details": "1. Implement endpoints:\n   - GET /v1/pets/{id}/logs (list logs with pagination)\n   - POST /v1/pets/{id}/logs (create new log)\n   - PUT /v1/pets/{id}/logs/{logId} (update log)\n   - DELETE /v1/pets/{id}/logs/{logId} (delete log)\n2. Implement pagination using cursor-based pagination for efficiency\n3. Add filtering options (date range, log type)\n4. Implement bulk insert for multiple logs\n5. Use go-kit for service layer implementation\n6. Implement caching using Redis for frequently accessed data",
-        "testStrategy": "Write unit tests for log-related use cases. Test pagination and filtering. Perform load testing for bulk inserts.",
-        "priority": "high",
-        "dependencies": [
-          4
-        ],
+        "title": "實作 MongoDB 倉儲 (Repositories)",
+        "description": "使用 `mongo-driver` 實作在任務 #3 中定義的 `Repository` 介面。這包括在 `internal/repository` 套件中建立資料庫連線邏輯，並為所有領域模型 (Pet, HealthLog, MedicalRecord) 實作 CRUD 方法。此層級負責所有直接的資料庫互動。",
         "status": "pending",
+        "dependencies": [
+          3
+        ],
+        "priority": "high",
+        "details": "1. 在 `internal/repository` 中建立 MongoDB 連線邏輯\n2. 為以下模型實作 Repository 介面：\n   - Pet 模型\n   - HealthLog 模型\n   - MedicalRecord 模型\n3. 為每個模型實作 CRUD 操作：\n   - 建立 (Create)\n   - 讀取 (Read，單一項目及帶分頁的列表)\n   - 更新 (Update)\n   - 刪除 (Delete)\n4. 為列表操作實作基於游標的分頁功能\n5. 新增過濾功能（例如：日期範圍、類型）\n6. 在適當情況下支援批次操作\n7. 確保適當的錯誤處理和 MongoDB 特定的最佳化",
+        "testStrategy": "1. 為每個倉儲實作撰寫單元測試\n2. 建立驗證 MongoDB 互動的整合測試\n3. 測試分頁和過濾功能\n4. 測試錯誤處理情境（連線問題、驗證失敗）\n5. 對批次操作進行效能基準測試",
         "subtasks": []
       },
       {
@@ -397,7 +397,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-20T00:00:40.586Z",
+      "updated": "2025-06-20T01:00:05.535Z",
       "description": "Tasks for master context"
     }
   }

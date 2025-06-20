@@ -3,6 +3,9 @@ description: Guidelines for creating and maintaining Cursor rules to ensure cons
 globs: .cursor/rules/*.mdc
 alwaysApply: true
 ---
+一律用繁體中文
+
+---
 
 - **Required Rule Structure:**
   ```markdown
