@@ -15,14 +15,13 @@ import (
 	"github.com/blackhorseya/petlog/internal/usecase/query"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/google/wire"
-	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 // initPetAPI initializes the pet API.
-func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, error) {
+func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, func(), error) {
 	wire.Build(
 		// Database
-		provideMongoDatabase,
+		mongodb.ProviderSet,
 		mongodb.NewPetMongoRepo,
 
 		// Usecase Handlers
@@ -37,11 +36,5 @@ func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, error) {
 		gin.NewPetHandler,
 		wire.Value([]kithttp.ServerOption{}),
 	)
-	return nil, nil
-}
-
-func provideMongoDatabase(cfg config.AppConfig) (*mongo.Database, error) {
-	// This is a placeholder. In a real application, you would use the
-	// configuration (cfg) to connect to MongoDB and return the database instance.
-	return nil, nil
+	return nil, nil, nil
 }

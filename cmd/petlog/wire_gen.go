@@ -22,10 +22,10 @@ import (
 // Injectors from wire.go:
 
 // initPetAPI initializes the pet API.
-func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, error) {
-	database, err := provideMongoDatabase(cfg)
+func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, func(), error) {
+	database, cleanup, err := mongodb.NewDatabase(cfg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	petRepository := mongodb.NewPetMongoRepo(database)
 	createPetHandler := command.NewCreatePetHandler(petRepository)
@@ -36,7 +36,9 @@ func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, error) {
 	petEndpoints := endpoint.MakePetEndpoints(createPetHandler, updatePetHandler, deletePetHandler, getPetByIDHandler, listPetsByOwnerHandler)
 	v := _wireValue
 	handler := gin.NewPetHandler(cfg, petEndpoints, v...)
-	return handler, nil
+	return handler, func() {
+		cleanup()
+	}, nil
 }
 
 var (

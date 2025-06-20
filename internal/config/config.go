@@ -10,6 +10,8 @@ import (
 type AppConfig struct {
 	Auth0Domain   string `mapstructure:"AUTH0_DOMAIN"`
 	Auth0Audience string `mapstructure:"AUTH0_AUDIENCE"`
+	MongoURI      string `mapstructure:"MONGO_URI"`
+	MongoDatabase string `mapstructure:"MONGO_DATABASE"`
 }
 
 // LoadConfig loads configuration from file and environment variables
