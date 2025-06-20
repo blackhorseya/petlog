@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/blackhorseya/petlog/internal/domain"
 	"github.com/blackhorseya/petlog/internal/domain/model"
 	"github.com/blackhorseya/petlog/internal/domain/repository"
 	"github.com/blackhorseya/petlog/pkg/contextx"
@@ -34,8 +35,13 @@ func (r *petMongoRepo) Create(c context.Context, pet *model.Pet) error {
 	ctx := contextx.WithContext(c)
 	ctx.Info("開始建立新寵物", "pet_name", pet.Name, "owner_id", pet.OwnerID)
 
-	// 將領域模型轉換為持久化模型
-	petDoc := fromDomain(pet)
+	// 將領域模型轉換為持久化模型。
+	// 因為是新建立，所以傳入的 pet.ID 是空的，fromDomain 會回傳一個沒有 _id 的 petDoc。
+	petDoc, err := fromDomain(pet)
+	if err != nil {
+		ctx.Error("領域模型轉換失敗", "error", err)
+		return err
+	}
 
 	// 設定時間戳記
 	now := time.Now()
@@ -46,13 +52,14 @@ func (r *petMongoRepo) Create(c context.Context, pet *model.Pet) error {
 	collection := r.db.Collection(petCollection)
 	result, err := collection.InsertOne(ctx, petDoc)
 	if err != nil {
+		// 這裡可以加入對 MongoDB 特定錯誤的判斷，例如唯一索引衝突
 		ctx.Error("建立寵物失敗", "error", err, "pet_name", pet.Name)
 		return fmt.Errorf("建立寵物失敗: %w", err)
 	}
 
-	// 更新領域模型的 ID
-	if oid, ok := result.InsertedID.(string); ok {
-		pet.ID = oid
+	// 將 MongoDB 生成的新 ID 回寫到傳入的 pet model 中
+	if oid, ok := result.InsertedID.(bson.ObjectID); ok {
+		pet.ID = oid.Hex()
 	}
 
 	ctx.Info("成功建立寵物", "pet_id", pet.ID, "pet_name", pet.Name)
@@ -64,17 +71,24 @@ func (r *petMongoRepo) FindByID(c context.Context, id string) (*model.Pet, error
 	ctx := contextx.WithContext(c)
 	ctx.Info("開始根據 ID 查找寵物", "pet_id", id)
 
+	// 將 string ID 轉換為 ObjectID
+	objectID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		ctx.Warn("無效的 ID 格式", "pet_id", id, "error", err)
+		return nil, domain.ErrInvalidID
+	}
+
 	// 建立查詢過濾器
-	filter := bson.D{{Key: "_id", Value: id}}
+	filter := bson.D{{Key: "_id", Value: objectID}}
 
 	// 執行查詢操作
 	collection := r.db.Collection(petCollection)
 	var petDoc petMongo
-	err := collection.FindOne(ctx, filter).Decode(&petDoc)
+	err = collection.FindOne(ctx, filter).Decode(&petDoc)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			ctx.Warn("找不到指定的寵物", "pet_id", id)
-			return nil, fmt.Errorf("找不到 ID 為 %s 的寵物", id)
+			return nil, domain.ErrNotFound // 返回標準的領域錯誤
 		}
 		ctx.Error("查找寵物時發生錯誤", "error", err, "pet_id", id)
 		return nil, fmt.Errorf("查找寵物失敗: %w", err)
@@ -114,8 +128,7 @@ func (r *petMongoRepo) FindByOwnerID(c context.Context, ownerID string) ([]*mode
 		}
 
 		// 轉換為領域模型並加入結果列表
-		pet := petDoc.toDomain()
-		pets = append(pets, pet)
+		pets = append(pets, petDoc.toDomain())
 	}
 
 	// 檢查 cursor 是否有錯誤
@@ -133,23 +146,25 @@ func (r *petMongoRepo) Update(c context.Context, pet *model.Pet) error {
 	ctx := contextx.WithContext(c)
 	ctx.Info("開始更新寵物資訊", "pet_id", pet.ID, "pet_name", pet.Name)
 
-	// 建立查詢過濾器
-	filter := bson.D{{Key: "_id", Value: pet.ID}}
-
-	// 將領域模型轉換為持久化模型
-	petDoc := fromDomain(pet)
-
-	// 保留原始的 CreatedAt，更新 UpdatedAt
-	petDoc.UpdatedAt = time.Now()
-	// 注意：CreatedAt 應該從現有文件中保留，這裡先設定為當前時間
-	// 在實際應用中，可能需要先查詢現有文件來保留 CreatedAt
-	if petDoc.CreatedAt.IsZero() {
-		petDoc.CreatedAt = petDoc.UpdatedAt
+	// 將領域模型轉換為持久化模型，這會處理 ID 字串到 ObjectID 的轉換
+	petDoc, err := fromDomain(pet)
+	if err != nil {
+		ctx.Error("領域模型轉換失敗", "error", err, "pet_id", pet.ID)
+		return err
 	}
 
-	// 執行替換操作
+	// 建立查詢過濾器
+	filter := bson.D{{Key: "_id", Value: petDoc.ID}}
+
+	// 設定更新內容
+	petDoc.UpdatedAt = time.Now()
+	update := bson.D{
+		{Key: "$set", Value: petDoc},
+	}
+
+	// 執行更新操作
 	collection := r.db.Collection(petCollection)
-	result, err := collection.ReplaceOne(ctx, filter, petDoc)
+	result, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		ctx.Error("更新寵物失敗", "error", err, "pet_id", pet.ID)
 		return fmt.Errorf("更新寵物失敗: %w", err)
@@ -158,7 +173,7 @@ func (r *petMongoRepo) Update(c context.Context, pet *model.Pet) error {
 	// 檢查是否有文件被更新
 	if result.MatchedCount == 0 {
 		ctx.Warn("找不到要更新的寵物", "pet_id", pet.ID)
-		return fmt.Errorf("找不到 ID 為 %s 的寵物", pet.ID)
+		return domain.ErrNotFound // 返回標準的領域錯誤
 	}
 
 	ctx.Info("成功更新寵物", "pet_id", pet.ID, "pet_name", pet.Name, "modified_count", result.ModifiedCount)
@@ -170,8 +185,15 @@ func (r *petMongoRepo) Delete(c context.Context, id string) error {
 	ctx := contextx.WithContext(c)
 	ctx.Info("開始刪除寵物", "pet_id", id)
 
+	// 將 string ID 轉換為 ObjectID
+	objectID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		ctx.Warn("無效的 ID 格式", "pet_id", id, "error", err)
+		return domain.ErrInvalidID
+	}
+
 	// 建立查詢過濾器
-	filter := bson.D{{Key: "_id", Value: id}}
+	filter := bson.D{{Key: "_id", Value: objectID}}
 
 	// 執行刪除操作
 	collection := r.db.Collection(petCollection)
@@ -184,7 +206,7 @@ func (r *petMongoRepo) Delete(c context.Context, id string) error {
 	// 檢查是否有文件被刪除
 	if result.DeletedCount == 0 {
 		ctx.Warn("找不到要刪除的寵物", "pet_id", id)
-		return fmt.Errorf("找不到 ID 為 %s 的寵物", id)
+		return domain.ErrNotFound // 返回標準的領域錯誤
 	}
 
 	ctx.Info("成功刪除寵物", "pet_id", id, "deleted_count", result.DeletedCount)
