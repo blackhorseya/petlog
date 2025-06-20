@@ -167,7 +167,63 @@
         "priority": "high",
         "details": "1. 在 internal/usecase/pet.go 中建立 PetUsecase 結構體\n2. 實作接收 pet.Repository 作為依賴的建構函式\n3. 實作核心業務邏輯方法：\n   - GetPets() - 列出已認證使用者的所有寵物\n   - CreatePet() - 建立新寵物\n   - GetPetByID() - 獲取寵物詳細資訊\n   - UpdatePet() - 更新寵物詳細資訊\n   - DeletePet() - 刪除寵物\n4. 實作適當的錯誤處理和驗證邏輯\n5. 遵循乾淨架構原則：\n   - 無傳輸層依賴 (HTTP、gRPC 等)\n   - 無特定資料庫程式碼\n   - 專注於業務規則和使用案例\n6. 使用 internal/domain 中定義的領域模型\n7. 使用 uber-go/zap 實作適當的日誌記錄",
         "testStrategy": "1. 為每個使用案例方法編寫全面的單元測試\n2. 為儲存庫介面使用模擬 (mock)\n3. 測試正常路徑和錯誤情境\n4. 驗證業務邏輯正確性\n5. 確保正確驗證輸入",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "定義 PetUsecase 結構體和建構函式",
+            "description": "在 internal/usecase/pet.go 中定義 PetUsecase 結構體，並實作接收 pet.Repository 作為依賴的建構函式。",
+            "dependencies": [],
+            "details": "1. 創建 internal/usecase/pet.go 文件\n2. 定義 PetUsecase 結構體，包含 pet.Repository 字段\n3. 實作 NewPetUsecase 函式，接收 pet.Repository 並返回 PetUsecase 實例\n4. 使用 uber-go/zap 初始化日誌記錄器",
+            "status": "pending",
+            "testStrategy": "編寫單元測試，確保 NewPetUsecase 正確初始化 PetUsecase 實例"
+          },
+          {
+            "id": 2,
+            "title": "實作 GetPets 和 CreatePet 方法",
+            "description": "為 PetUsecase 實作 GetPets 和 CreatePet 方法，包含核心業務邏輯和錯誤處理。",
+            "dependencies": [
+              1
+            ],
+            "details": "1. 實作 GetPets 方法，調用 repository 獲取已認證使用者的所有寵物\n2. 實作 CreatePet 方法，驗證輸入並調用 repository 創建新寵物\n3. 實作適當的錯誤處理和日誌記錄\n4. 確保使用 internal/domain 中定義的領域模型",
+            "status": "pending",
+            "testStrategy": "編寫單元測試，覆蓋成功和失敗場景，模擬 repository 行為"
+          },
+          {
+            "id": 3,
+            "title": "實作 GetPetByID 和 UpdatePet 方法",
+            "description": "為 PetUsecase 實作 GetPetByID 和 UpdatePet 方法，包含核心業務邏輯和錯誤處理。",
+            "dependencies": [
+              1
+            ],
+            "details": "1. 實作 GetPetByID 方法，調用 repository 獲取特定寵物詳細資訊\n2. 實作 UpdatePet 方法，驗證輸入並調用 repository 更新寵物資訊\n3. 實作適當的錯誤處理和日誌記錄\n4. 確保使用 internal/domain 中定義的領域模型",
+            "status": "pending",
+            "testStrategy": "編寫單元測試，覆蓋成功和失敗場景，包括無效 ID 和更新衝突"
+          },
+          {
+            "id": 4,
+            "title": "實作 DeletePet 方法",
+            "description": "為 PetUsecase 實作 DeletePet 方法，包含核心業務邏輯和錯誤處理。",
+            "dependencies": [
+              1
+            ],
+            "details": "1. 實作 DeletePet 方法，調用 repository 刪除指定寵物\n2. 實作適當的錯誤處理，如寵物不存在或無權限刪除\n3. 實作日誌記錄，記錄刪除操作的結果\n4. 確保使用 internal/domain 中定義的領域模型",
+            "status": "pending",
+            "testStrategy": "編寫單元測試，覆蓋成功刪除、寵物不存在和無權限刪除的場景"
+          },
+          {
+            "id": 5,
+            "title": "實作驗證邏輯和確保乾淨架構",
+            "description": "為所有方法實作適當的驗證邏輯，並確保遵循乾淨架構原則。",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "1. 實作輸入驗證邏輯，如檢查必填字段、格式等\n2. 確保所有方法不依賴於特定的傳輸層或資料庫實現\n3. 檢查並移除任何可能違反乾淨架構的程式碼\n4. 優化錯誤處理和日誌記錄，確保一致性和可讀性",
+            "status": "pending",
+            "testStrategy": "編寫整合測試，確保 PetUsecase 可以與模擬的 Repository 正確協作，並驗證乾淨架構原則的遵守"
+          }
+        ]
       },
       {
         "id": 5,

@@ -43,14 +43,15 @@ petlog/
 ## 3. `internal/` 詳細結構
 
 internal/
-├── domain/ // Entity / Value Object / Repository 介面
-│ ├── pet/
-│ ├── healthlog/
-│ └── shared/
-├── usecase/ // 應用層（Go-kit service 改名 usecase）
-│ ├── pet_usecase.go
-│ └── healthlog_usecase.go
-├── endpoint/ // Go-kit endpoint（ctx→in / out→struct）
+├── domain/ // 核心領域模型與倉儲介面
+│   ├── model/                # 存放純粹的領域實體 (e.g., pet.go)
+│   └── repository/           # 存放倉儲介面 (e.g., pet.go)
+├── usecase/ // 應用層，建議採用 CQRS 模式
+│   ├── command/              # 處理寫入操作 (Create, Update, Delete)
+│   ├── query/                # 處理讀取操作 (Get, List)
+│   ├── event/                # 處理領域事件 (可選)
+│   └── behavior/             # 存放共享的業務邏輯或驗證規則
+├── endpoint/ // Go-kit endpoint (DTO 轉換層)
 │ ├── pet_endpoint.go
 │ └── healthlog_endpoint.go
 ├── transport/ // 轉接層（Gin HTTP、gRPC…）
