@@ -263,14 +263,69 @@
         "id": 5,
         "title": "實作 MongoDB 倉儲 (Repositories)",
         "description": "在 `internal/infra/mongodb` 目錄下，為 Pet, HealthLog, 和 MedicalRecord 這三個領域模型實作完整的 Repository 介面。這將取代所有臨時的存根 (stub) 實作，並包含所有必要的 CRUD (Create, Read, Update, Delete) 操作。",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [
           3
         ],
         "priority": "high",
         "details": "1. 在 `internal/infra/mongodb` 中建立 MongoDB 連線邏輯\n   - 實作連線池管理\n   - 設定連線參數（URI、認證、超時等）\n   - 實作健康檢查功能\n\n2. 為每個領域模型建立對應的 Repository 實作：\n   - `pet_repository_impl.go`\n   - `health_log_repository_impl.go`\n   - `medical_record_repository_impl.go`\n\n3. 為每個模型實作完整的 CRUD 操作：\n   - 建立 (Create)：將領域模型轉換為 MongoDB 文件並儲存\n   - 讀取 (Read)：支援單一項目查詢和列表查詢\n   - 更新 (Update)：支援完整更新和部分更新\n   - 刪除 (Delete)：支援軟刪除和硬刪除\n\n4. 實作資料轉換層：\n   - 建立領域模型與 MongoDB 文件之間的轉換函數\n   - 處理 MongoDB 特有的 ID 類型 (ObjectID) 轉換\n   - 確保日期時間格式正確處理\n\n5. 實作進階查詢功能：\n   - 基於游標的分頁功能\n   - 多條件過濾（日期範圍、類型、狀態等）\n   - 排序功能\n\n6. 實作索引管理：\n   - 為常用查詢建立適當的索引\n   - 實作索引初始化和更新機制\n\n7. 錯誤處理與日誌：\n   - 將 MongoDB 錯誤轉換為應用程式定義的錯誤類型\n   - 實作詳細的操作日誌\n   - 處理連線失敗、超時等異常情況\n\n8. 效能最佳化：\n   - 實作批次操作支援\n   - 最佳化查詢（投影、限制返回欄位）\n   - 實作適當的快取策略",
         "testStrategy": "1. 單元測試：\n   - 為每個 Repository 實作撰寫完整的單元測試\n   - 使用模擬 (mock) MongoDB 驅動進行測試\n   - 測試所有 CRUD 操作的正常和異常路徑\n\n2. 整合測試：\n   - 使用 Docker 容器啟動測試用 MongoDB 實例\n   - 測試實際資料庫連線和操作\n   - 驗證資料持久化和查詢結果\n\n3. 功能測試：\n   - 測試分頁功能（驗證結果集大小、游標行為）\n   - 測試過濾功能（多條件組合、邊界條件）\n   - 測試排序功能\n\n4. 錯誤處理測試：\n   - 模擬連線失敗情境\n   - 測試無效輸入處理\n   - 測試並發操作下的行為\n\n5. 效能測試：\n   - 對批次操作進行基準測試\n   - 測試大數據集下的查詢效能\n   - 驗證索引效果\n\n6. 測試資料管理：\n   - 建立測試資料生成器\n   - 確保測試前後資料庫狀態一致性\n   - 實作測試資料清理機制",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "實作 Pet Repository",
+            "description": "在 `internal/infra/mongodb` 目錄下實作 Pet 模型的 Repository 介面",
+            "dependencies": [],
+            "details": "建立 `pet_repository_impl.go` 文件，實作 CRUD 操作，包括建立、讀取（單一和列表）、更新和刪除功能。實作資料轉換層，處理領域模型與 MongoDB 文件之間的轉換。\n<info added on 2025-06-20T03:20:28.550Z>\n已完成 Pet Repository 的基礎結構和 Create 方法實作：\n\n## 完成的工作\n1. **更新到 MongoDB Go Driver v2**: 修正了 import 路徑使用 `go.mongodb.org/mongo-driver/v2/mongo`\n2. **完成 petMongo struct**: 定義了包含所有必要欄位的持久化模型，使用正確的 `bson` 標籤\n3. **實作模型轉換函式**: \n   - `toDomain()`: 將 petMongo 轉換為 model.Pet\n   - `fromDomain()`: 將 model.Pet 轉換為 petMongo\n4. **實作 Create 方法**: \n   - 使用 contextx 進行日誌記錄（正體中文）\n   - 正確設定 CreatedAt 和 UpdatedAt 時間戳記\n   - 使用 MongoDB v2 API 進行 InsertOne 操作\n   - 完整的錯誤處理和日誌記錄\n   - 將插入後的 ID 回填到領域模型\n\n## 技術細節\n- 遵循 Clean Architecture 原則，將持久化邏輯與領域邏輯分離\n- 使用正體中文撰寫所有註解、日誌訊息和錯誤訊息\n- 採用 contextx 套件進行結構化日誌記錄\n- 正確處理 MongoDB v2 的 API 變化\n\n## 下一步\n需要繼續實作其他 CRUD 方法：FindByID, FindByOwnerID, Update, Delete\n</info added on 2025-06-20T03:20:28.550Z>\n<info added on 2025-06-20T03:23:13.510Z>\n## 程式碼重構與規範更新\n\n### 程式碼重構\n1. **分離持久化模型**: 將 `petMongo` struct 和轉換函式從 `pet_repository_impl.go` 移動到新的 `pet_repository_model.go` 檔案中\n2. **改善程式碼組織**: \n   - `pet_repository_model.go`: 專門存放持久化模型和轉換邏輯\n   - `pet_repository_impl.go`: 專注於實際的 Repository CRUD 操作\n3. **遵循單一職責原則**: 每個檔案都有明確的職責分工\n\n### 規範更新\n更新了 `.cursor/rules/clean_architecture.mdc` 規則，新增了「Repository 持久化模型分離」的最佳實踐：\n- 持久化模型應使用 `*_repository_model.go` 命名\n- 模型檔案包含持久化 struct、`toDomain()` 方法和 `fromDomain()` 函式\n- Repository 實作檔案專注於 CRUD 操作邏輯\n\n### 技術效益\n- **更好的可維護性**: 模型邏輯和業務邏輯分離\n- **更清晰的職責**: 每個檔案職責單一且明確\n- **更易於測試**: 可以獨立測試模型轉換和 Repository 操作\n- **符合團隊規範**: 建立了可重複使用的檔案組織模式\n\n### 下一步\n繼續實作其他 CRUD 方法：FindByID, FindByOwnerID, Update, Delete\n</info added on 2025-06-20T03:23:13.510Z>",
+            "status": "in-progress",
+            "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。"
+          },
+          {
+            "id": 2,
+            "title": "實作 HealthLog Repository",
+            "description": "在 `internal/infra/mongodb` 目錄下實作 HealthLog 模型的 Repository 介面",
+            "dependencies": [],
+            "details": "建立 `health_log_repository_impl.go` 文件，實作 CRUD 操作，包括建立、讀取（單一和列表）、更新和刪除功能。實作資料轉換層，處理領域模型與 MongoDB 文件之間的轉換。",
+            "status": "pending",
+            "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。"
+          },
+          {
+            "id": 3,
+            "title": "實作 MedicalRecord Repository",
+            "description": "在 `internal/infra/mongodb` 目錄下實作 MedicalRecord 模型的 Repository 介面",
+            "dependencies": [],
+            "details": "建立 `medical_record_repository_impl.go` 文件，實作 CRUD 操作，包括建立、讀取（單一和列表）、更新和刪除功能。實作資料轉換層，處理領域模型與 MongoDB 文件之間的轉換。",
+            "status": "pending",
+            "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。"
+          },
+          {
+            "id": 4,
+            "title": "實作進階查詢功能",
+            "description": "為所有 Repository 實作進階查詢功能，包括分頁、過濾和排序",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "在每個 Repository 實作中添加基於游標的分頁功能、多條件過濾（如日期範圍、類型、狀態等）和排序功能。確保這些功能適用於所有三個模型（Pet、HealthLog 和 MedicalRecord）。",
+            "status": "pending",
+            "testStrategy": "編寫整合測試，驗證進階查詢功能在實際 MongoDB 環境中的正確性。"
+          },
+          {
+            "id": 5,
+            "title": "實作錯誤處理和效能最佳化",
+            "description": "為所有 Repository 實作添加錯誤處理、日誌記錄和效能最佳化",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "實作統一的錯誤處理機制，將 MongoDB 錯誤轉換為應用程式定義的錯誤類型。添加詳細的操作日誌。實作批次操作支援和查詢最佳化。建立適當的索引以提高查詢效能。",
+            "status": "pending",
+            "testStrategy": "進行效能測試，確保批次操作和索引改善了查詢效能。測試錯誤處理機制，確保異常情況被正確捕獲和處理。"
+          }
+        ]
       },
       {
         "id": 6,
@@ -501,7 +556,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-20T01:46:26.424Z",
+      "updated": "2025-06-20T03:15:17.563Z",
       "description": "Tasks for master context"
     }
   }

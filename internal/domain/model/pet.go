@@ -11,4 +11,6 @@ type Pet struct {
 	DOB         time.Time `json:"dob"`
 	Breed       string    `json:"breed"`
 	MicrochipID string    `json:"microchip_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
