@@ -2,6 +2,7 @@ package contextx
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 )
 
@@ -39,4 +40,23 @@ func GetLogger(c context.Context) *slog.Logger {
 	}
 
 	return slog.Default()
+}
+
+type userIDKeyType struct{}
+
+var userIDKey = userIDKeyType{}
+
+// WithUserID attaches the user ID to the context.
+func WithUserID(c context.Context, userID string) context.Context {
+	return context.WithValue(c, userIDKey, userID)
+}
+
+// GetUserID retrieves the user ID from the context.
+// Returns an error if user ID is not found.
+func GetUserID(c context.Context) (string, error) {
+	userID, ok := c.Value(userIDKey).(string)
+	if !ok || userID == "" {
+		return "", errors.New("user_id not found in context")
+	}
+	return userID, nil
 }
