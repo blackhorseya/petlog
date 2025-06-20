@@ -262,14 +262,14 @@
       {
         "id": 5,
         "title": "實作 MongoDB 倉儲 (Repositories)",
-        "description": "使用 `mongo-driver` 實作在任務 #3 中定義的 `Repository` 介面。這包括在 `internal/repository` 套件中建立資料庫連線邏輯，並為所有領域模型 (Pet, HealthLog, MedicalRecord) 實作 CRUD 方法。此層級負責所有直接的資料庫互動。",
+        "description": "在 `internal/infra/mongodb` 目錄下，為 Pet, HealthLog, 和 MedicalRecord 這三個領域模型實作完整的 Repository 介面。這將取代所有臨時的存根 (stub) 實作，並包含所有必要的 CRUD (Create, Read, Update, Delete) 操作。",
         "status": "pending",
         "dependencies": [
           3
         ],
         "priority": "high",
-        "details": "1. 在 `internal/repository` 中建立 MongoDB 連線邏輯\n2. 為以下模型實作 Repository 介面：\n   - Pet 模型\n   - HealthLog 模型\n   - MedicalRecord 模型\n3. 為每個模型實作 CRUD 操作：\n   - 建立 (Create)\n   - 讀取 (Read，單一項目及帶分頁的列表)\n   - 更新 (Update)\n   - 刪除 (Delete)\n4. 為列表操作實作基於游標的分頁功能\n5. 新增過濾功能（例如：日期範圍、類型）\n6. 在適當情況下支援批次操作\n7. 確保適當的錯誤處理和 MongoDB 特定的最佳化",
-        "testStrategy": "1. 為每個倉儲實作撰寫單元測試\n2. 建立驗證 MongoDB 互動的整合測試\n3. 測試分頁和過濾功能\n4. 測試錯誤處理情境（連線問題、驗證失敗）\n5. 對批次操作進行效能基準測試",
+        "details": "1. 在 `internal/infra/mongodb` 中建立 MongoDB 連線邏輯\n   - 實作連線池管理\n   - 設定連線參數（URI、認證、超時等）\n   - 實作健康檢查功能\n\n2. 為每個領域模型建立對應的 Repository 實作：\n   - `pet_repository_impl.go`\n   - `health_log_repository_impl.go`\n   - `medical_record_repository_impl.go`\n\n3. 為每個模型實作完整的 CRUD 操作：\n   - 建立 (Create)：將領域模型轉換為 MongoDB 文件並儲存\n   - 讀取 (Read)：支援單一項目查詢和列表查詢\n   - 更新 (Update)：支援完整更新和部分更新\n   - 刪除 (Delete)：支援軟刪除和硬刪除\n\n4. 實作資料轉換層：\n   - 建立領域模型與 MongoDB 文件之間的轉換函數\n   - 處理 MongoDB 特有的 ID 類型 (ObjectID) 轉換\n   - 確保日期時間格式正確處理\n\n5. 實作進階查詢功能：\n   - 基於游標的分頁功能\n   - 多條件過濾（日期範圍、類型、狀態等）\n   - 排序功能\n\n6. 實作索引管理：\n   - 為常用查詢建立適當的索引\n   - 實作索引初始化和更新機制\n\n7. 錯誤處理與日誌：\n   - 將 MongoDB 錯誤轉換為應用程式定義的錯誤類型\n   - 實作詳細的操作日誌\n   - 處理連線失敗、超時等異常情況\n\n8. 效能最佳化：\n   - 實作批次操作支援\n   - 最佳化查詢（投影、限制返回欄位）\n   - 實作適當的快取策略",
+        "testStrategy": "1. 單元測試：\n   - 為每個 Repository 實作撰寫完整的單元測試\n   - 使用模擬 (mock) MongoDB 驅動進行測試\n   - 測試所有 CRUD 操作的正常和異常路徑\n\n2. 整合測試：\n   - 使用 Docker 容器啟動測試用 MongoDB 實例\n   - 測試實際資料庫連線和操作\n   - 驗證資料持久化和查詢結果\n\n3. 功能測試：\n   - 測試分頁功能（驗證結果集大小、游標行為）\n   - 測試過濾功能（多條件組合、邊界條件）\n   - 測試排序功能\n\n4. 錯誤處理測試：\n   - 模擬連線失敗情境\n   - 測試無效輸入處理\n   - 測試並發操作下的行為\n\n5. 效能測試：\n   - 對批次操作進行基準測試\n   - 測試大數據集下的查詢效能\n   - 驗證索引效果\n\n6. 測試資料管理：\n   - 建立測試資料生成器\n   - 確保測試前後資料庫狀態一致性\n   - 實作測試資料清理機制",
         "subtasks": []
       },
       {
@@ -487,15 +487,15 @@
       {
         "id": 21,
         "title": "實作寵物管理的 API 端點 (Endpoint) 與傳輸層 (Transport)",
-        "description": "為任務 #4 中實作的寵物管理 usecase 建立 Go-kit endpoint 和 Gin HTTP transport 層。這將會把 Create, Update, Delete, GetByID, ListByOwner 等操作公開為 RESTful API。",
-        "details": "1. 在 `internal/endpoint` 目錄中實作 Go-kit endpoints：\n   - 為每個 usecase 建立對應的 endpoint 函數：\n     - `MakePetCreateEndpoint`\n     - `MakePetUpdateEndpoint`\n     - `MakePetDeleteEndpoint`\n     - `MakePetGetByIDEndpoint`\n     - `MakePetListByOwnerEndpoint`\n   - 每個 endpoint 應接收對應的 usecase handler 作為依賴\n   - 實作請求/回應 DTO 結構體，用於序列化和反序列化\n\n2. 在 `internal/transport/http` 目錄中實作 Gin HTTP handlers：\n   - 建立 RESTful API 路由：\n     - `POST /v1/pets` - 建立寵物\n     - `PUT /v1/pets/:id` - 更新寵物\n     - `DELETE /v1/pets/:id` - 刪除寵物\n     - `GET /v1/pets/:id` - 獲取寵物詳情\n     - `GET /v1/pets` - 列出使用者的寵物（需要認證）\n   - 實作 HTTP 請求驗證和錯誤處理\n   - 整合 Auth0 JWT 驗證中間件，確保適當的授權\n   - 實作適當的 HTTP 狀態碼和回應格式\n\n3. 實作請求和回應的驗證：\n   - 使用 go-playground/validator 進行請求驗證\n   - 建立自定義驗證函數（如需要）\n   - 實作統一的錯誤回應格式\n\n4. 實作跨域資源共享 (CORS) 支援：\n   - 設定允許的來源、方法和標頭\n   - 處理預檢請求 (preflight requests)\n\n5. 實作 API 版本控制策略：\n   - 在 URL 路徑中包含版本號（如 `/v1/`）\n   - 為未來版本升級做準備\n\n6. 實作請求日誌記錄：\n   - 使用 uber-go/zap 記錄 API 請求和回應\n   - 包含請求 ID、用戶 ID、請求時間等關鍵資訊\n\n7. 實作速率限制：\n   - 使用 golang.org/x/time/rate 實作基本速率限制\n   - 根據 IP 或用戶 ID 進行限制\n\n8. 實作健康檢查端點：\n   - 建立 `/health` 端點以供監控系統使用\n\n9. 整合 Swagger/OpenAPI 文檔：\n   - 使用 swaggo/gin-swagger 生成 API 文檔\n   - 為每個端點添加適當的註釋",
-        "testStrategy": "1. 為每個 endpoint 編寫單元測試：\n   - 測試正常路徑和錯誤情境\n   - 使用模擬 (mock) 替代 usecase 層\n   - 驗證請求處理和回應格式\n\n2. 為 HTTP transport handlers 編寫單元測試：\n   - 使用 `net/http/httptest` 和 Gin 的測試工具\n   - 測試路由註冊和請求處理\n   - 驗證 HTTP 狀態碼和回應內容\n   - 測試錯誤處理和邊界情況\n\n3. 編寫整合測試：\n   - 使用 HTTP 客戶端（如 Postman 或 curl）測試 API\n   - 建立測試腳本以自動化測試流程\n   - 測試完整的 CRUD 操作流程\n   - 驗證認證和授權機制\n\n4. 效能測試：\n   - 使用 Apache Bench 或 wrk 等工具進行負載測試\n   - 測試 API 在高負載下的表現\n   - 驗證速率限制功能\n\n5. 安全性測試：\n   - 測試未授權訪問的處理\n   - 驗證 CORS 設定\n   - 測試輸入驗證和防止注入攻擊\n\n6. 文檔驗證：\n   - 確保 Swagger 文檔準確反映 API 功能\n   - 驗證 API 文檔中的範例請求和回應",
+        "description": "為任務 #4 中實作的寵物管理 usecase 建立 Go-kit endpoint 和 Gin HTTP transport 層。這將會把 Create, Update, Delete, GetByID, ListByOwner 等操作公開為 RESTful API。目前進度：Go-kit Endpoint 層的結構和 DTO (Data Transfer Objects) 皆已定義完成。下一步是實作 Gin HTTP Transport 層，將這些 Endpoints 透過具體的 HTTP Handlers 公開為 API。",
         "status": "pending",
         "dependencies": [
           2,
           4
         ],
         "priority": "high",
+        "details": "1. [已完成] 在 `internal/endpoint` 目錄中實作 Go-kit endpoints：\n   - 為每個 usecase 建立對應的 endpoint 函數：\n     - `MakePetCreateEndpoint`\n     - `MakePetUpdateEndpoint`\n     - `MakePetDeleteEndpoint`\n     - `MakePetGetByIDEndpoint`\n     - `MakePetListByOwnerEndpoint`\n   - 每個 endpoint 應接收對應的 usecase handler 作為依賴\n   - 實作請求/回應 DTO 結構體，用於序列化和反序列化\n\n2. [待辦] 在 `internal/transport/http` 目錄中實作 Gin HTTP handlers：\n   - 建立 RESTful API 路由：\n     - `POST /v1/pets` - 建立寵物\n     - `PUT /v1/pets/:id` - 更新寵物\n     - `DELETE /v1/pets/:id` - 刪除寵物\n     - `GET /v1/pets/:id` - 獲取寵物詳情\n     - `GET /v1/pets` - 列出使用者的寵物（需要認證）\n   - 實作 HTTP 請求驗證和錯誤處理\n   - 整合 Auth0 JWT 驗證中間件，確保適當的授權\n   - 實作適當的 HTTP 狀態碼和回應格式\n\n3. [待辦] 實作請求和回應的驗證：\n   - 使用 go-playground/validator 進行請求驗證\n   - 建立自定義驗證函數（如需要）\n   - 實作統一的錯誤回應格式\n\n4. [待辦] 實作跨域資源共享 (CORS) 支援：\n   - 設定允許的來源、方法和標頭\n   - 處理預檢請求 (preflight requests)\n\n5. [待辦] 實作 API 版本控制策略：\n   - 在 URL 路徑中包含版本號（如 `/v1/`）\n   - 為未來版本升級做準備\n\n6. [待辦] 實作請求日誌記錄：\n   - 使用 uber-go/zap 記錄 API 請求和回應\n   - 包含請求 ID、用戶 ID、請求時間等關鍵資訊\n\n7. [待辦] 實作速率限制：\n   - 使用 golang.org/x/time/rate 實作基本速率限制\n   - 根據 IP 或用戶 ID 進行限制\n\n8. [待辦] 實作健康檢查端點：\n   - 建立 `/health` 端點以供監控系統使用\n\n9. [待辦] 整合 Swagger/OpenAPI 文檔：\n   - 使用 swaggo/gin-swagger 生成 API 文檔\n   - 為每個端點添加適當的註釋",
+        "testStrategy": "1. 為每個 endpoint 編寫單元測試：\n   - 測試正常路徑和錯誤情境\n   - 使用模擬 (mock) 替代 usecase 層\n   - 驗證請求處理和回應格式\n\n2. 為 HTTP transport handlers 編寫單元測試：\n   - 使用 `net/http/httptest` 和 Gin 的測試工具\n   - 測試路由註冊和請求處理\n   - 驗證 HTTP 狀態碼和回應內容\n   - 測試錯誤處理和邊界情況\n\n3. 編寫整合測試：\n   - 使用 HTTP 客戶端（如 Postman 或 curl）測試 API\n   - 建立測試腳本以自動化測試流程\n   - 測試完整的 CRUD 操作流程\n   - 驗證認證和授權機制\n\n4. 效能測試：\n   - 使用 Apache Bench 或 wrk 等工具進行負載測試\n   - 測試 API 在高負載下的表現\n   - 驗證速率限制功能\n\n5. 安全性測試：\n   - 測試未授權訪問的處理\n   - 驗證 CORS 設定\n   - 測試輸入驗證和防止注入攻擊\n\n6. 文檔驗證：\n   - 確保 Swagger 文檔準確反映 API 功能\n   - 驗證 API 文檔中的範例請求和回應",
         "subtasks": []
       }
     ],
