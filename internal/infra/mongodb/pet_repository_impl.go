@@ -1,11 +1,10 @@
-package repository
+package mongodb
 
 import (
 	"context"
 
-	"go.mongodb.org/mongo-driver/mongo"
-
 	"github.com/blackhorseya/petlog/internal/domain/model"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 // PetMongoRepo implements the repository.PetRepository interface.
