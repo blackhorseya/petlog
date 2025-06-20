@@ -9,14 +9,9 @@ import (
 	"github.com/blackhorseya/petlog/pkg/contextx"
 )
 
-// GetPetByIDRequest represents the request for getting a pet by ID.
-type GetPetByIDRequest struct {
+// GetPetByIDQuery represents the request for getting a pet by ID.
+type GetPetByIDQuery struct {
 	ID string
-}
-
-// GetPetByIDResponse represents the response for getting a pet by ID.
-type GetPetByIDResponse struct {
-	*model.Pet
 }
 
 // GetPetByIDHandler handles the get pet by ID query.
@@ -35,25 +30,25 @@ func NewGetPetByIDHandler(petRepo repository.PetRepository) *GetPetByIDHandler {
 }
 
 // Handle executes the get pet by ID query.
-func (h *GetPetByIDHandler) Handle(c context.Context, req GetPetByIDRequest) (*GetPetByIDResponse, error) {
+func (h *GetPetByIDHandler) Handle(c context.Context, qry GetPetByIDQuery) (*model.Pet, error) {
 	ctx := contextx.WithContext(c)
 
-	userID, err := contextx.GetUserID(c)
+	userID, err := contextx.GetUserID(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user ID: %w", err)
+		return nil, fmt.Errorf("user ID not found in context: %w", err)
 	}
 
-	ctx.Info("handling get pet by id request", "user_id", userID, "pet_id", req.ID)
+	ctx.Info("handling get pet by id request", "user_id", userID, "pet_id", qry.ID)
 
-	pet, err := h.petRepo.FindByID(c, req.ID)
+	pet, err := h.petRepo.FindByID(ctx, qry.ID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find pet with id %s: %w", req.ID, err)
+		return nil, fmt.Errorf("failed to find pet with id %s: %w", qry.ID, err)
 	}
 
 	// Authorization check
 	if pet.OwnerID != userID {
-		return nil, fmt.Errorf("user %s is not authorized to view pet %s", userID, req.ID)
+		return nil, fmt.Errorf("user %s is not authorized to view pet %s", userID, qry.ID)
 	}
 
-	return &GetPetByIDResponse{Pet: pet}, nil
+	return pet, nil
 }

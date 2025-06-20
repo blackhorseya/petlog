@@ -6,9 +6,12 @@ import (
 	"log/slog"
 )
 
-type loggerKeyType struct{}
+type contextKey string
 
-var loggerKey = loggerKeyType{}
+const (
+	loggerKey contextKey = "logger"
+	userIDKey contextKey = "userID"
+)
 
 // Contextx is a struct that holds the context of the request
 type Contextx struct {
@@ -18,12 +21,10 @@ type Contextx struct {
 
 // WithContext creates a new Contextx using the logger from the given context,
 // or the default logger if none is found.
-func WithContext(c context.Context) Contextx {
-	logger := GetLogger(c)
-	newCtx := WithLogger(c, logger)
-	return Contextx{
-		Context: newCtx,
-		Logger:  logger,
+func WithContext(c context.Context) *Contextx {
+	return &Contextx{
+		Context: c,
+		Logger:  GetLogger(c),
 	}
 }
 
@@ -41,10 +42,6 @@ func GetLogger(c context.Context) *slog.Logger {
 
 	return slog.Default()
 }
-
-type userIDKeyType struct{}
-
-var userIDKey = userIDKeyType{}
 
 // WithUserID attaches the user ID to the context.
 func WithUserID(c context.Context, userID string) context.Context {

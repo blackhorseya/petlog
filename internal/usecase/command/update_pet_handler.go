@@ -5,25 +5,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/blackhorseya/petlog/internal/domain/model"
 	"github.com/blackhorseya/petlog/internal/domain/repository"
 	"github.com/blackhorseya/petlog/internal/usecase/behavior"
 	"github.com/blackhorseya/petlog/pkg/contextx"
 )
 
-// UpdatePetRequest represents the request for updating a pet.
-type UpdatePetRequest struct {
+// UpdatePetCommand represents the request for updating a pet.
+type UpdatePetCommand struct {
 	ID          string
 	Name        string    `json:"name"`
 	AvatarURL   string    `json:"avatar_url"`
 	DOB         time.Time `json:"dob"`
 	Breed       string    `json:"breed"`
 	MicrochipID string    `json:"microchip_id"`
-}
-
-// UpdatePetResponse represents the response for updating a pet.
-type UpdatePetResponse struct {
-	*model.Pet
 }
 
 // UpdatePetHandler handles the pet update command.
@@ -42,44 +36,44 @@ func NewUpdatePetHandler(petRepo repository.PetRepository) *UpdatePetHandler {
 }
 
 // Handle executes the update pet command.
-func (h *UpdatePetHandler) Handle(c context.Context, req UpdatePetRequest) (*UpdatePetResponse, error) {
+func (h *UpdatePetHandler) Handle(c context.Context, cmd UpdatePetCommand) error {
 	ctx := contextx.WithContext(c)
 
-	userID, err := contextx.GetUserID(c)
+	userID, err := contextx.GetUserID(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user ID: %w", err)
+		return fmt.Errorf("user ID not found in context: %w", err)
 	}
 
-	ctx.Info("handling update pet request", "user_id", userID, "pet_id", req.ID)
+	ctx.Info("handling update pet request", "user_id", userID, "pet_id", cmd.ID)
 
 	// Fetch existing pet
-	pet, err := h.petRepo.FindByID(c, req.ID)
+	pet, err := h.petRepo.FindByID(ctx, cmd.ID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find pet with id %s: %w", req.ID, err)
+		return fmt.Errorf("failed to find pet with id %s: %w", cmd.ID, err)
 	}
 
 	// Authorization check
 	if pet.OwnerID != userID {
-		return nil, fmt.Errorf("user %s is not authorized to update pet %s", userID, req.ID)
+		return fmt.Errorf("user %s is not authorized to update pet %s", userID, cmd.ID)
 	}
 
 	// Update fields
-	pet.Name = req.Name
-	pet.AvatarURL = req.AvatarURL
-	pet.DOB = req.DOB
-	pet.Breed = req.Breed
-	pet.MicrochipID = req.MicrochipID
+	pet.Name = cmd.Name
+	pet.AvatarURL = cmd.AvatarURL
+	pet.DOB = cmd.DOB
+	pet.Breed = cmd.Breed
+	pet.MicrochipID = cmd.MicrochipID
 
 	if err := behavior.ValidatePet(pet); err != nil {
-		return nil, fmt.Errorf("pet validation failed: %w", err)
+		return fmt.Errorf("pet validation failed: %w", err)
 	}
 
-	if err := h.petRepo.Update(c, pet); err != nil {
+	if err := h.petRepo.Update(ctx, pet); err != nil {
 		ctx.Error("failed to update pet in repository", "error", err)
-		return nil, fmt.Errorf("failed to update pet: %w", err)
+		return fmt.Errorf("failed to update pet: %w", err)
 	}
 
 	ctx.Info("pet updated successfully", "pet_id", pet.ID, "user_id", userID)
 
-	return &UpdatePetResponse{Pet: pet}, nil
+	return nil
 }
