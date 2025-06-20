@@ -20,3 +20,19 @@ tasks:
     desc: 清理 ./bin 內所有編譯檔
     cmds:
       - rm -rf ./bin
+
+  dev:backend:
+    desc: 編譯並啟動後端
+    cmds:
+      - go run ./cmd/petlog
+
+  dev:frontend:
+    desc: 啟動前端
+    cmds:
+      - cd web && pnpm dev
+
+  dev:
+    desc: 同時啟動前後端
+    deps:
+      - dev:backend
+      - dev:frontend

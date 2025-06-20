@@ -9,7 +9,7 @@
         "testStrategy": "Verify that the development environment can be started with Docker Compose and that Next.js, Go API, and MongoDB services are running correctly.",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -67,15 +67,80 @@
       {
         "id": 2,
         "title": "Implement User Authentication",
-        "description": "Create user registration and login functionality using Email and password with JWT for authentication.",
-        "details": "1. Set up Go-kit for the authentication service\n2. Implement user registration endpoint:\n   - Validate email and password\n   - Hash password using bcrypt (use latest version, e.g., 'golang.org/x/crypto/bcrypt')\n   - Store user in MongoDB\n3. Implement login endpoint:\n   - Verify credentials\n   - Generate JWT token using 'github.com/golang-jwt/jwt/v4'\n4. Create middleware for JWT verification\n5. Implement logout functionality (token invalidation)\n6. Create frontend components for registration and login forms\n7. Implement client-side form validation using react-hook-form\n8. Store JWT in HttpOnly cookie for security",
-        "testStrategy": "Write unit tests for authentication logic. Implement integration tests for registration and login flows. Test token expiration and refresh mechanisms.",
-        "priority": "high",
+        "description": "Implement user authentication using Auth0 for both backend and frontend integration.",
+        "status": "pending",
         "dependencies": [
           1
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "high",
+        "details": "1. Set up Auth0 account and configure application settings\n2. Integrate Auth0 SDK with Go backend:\n   - Configure Auth0 application settings for API\n   - Implement JWT verification middleware using Auth0 libraries\n   - Set up necessary environment variables and configuration\n3. Integrate Auth0 SDK with Next.js frontend:\n   - Install and configure Auth0 React SDK\n   - Implement login, logout, and user profile functionality\n   - Handle authentication state and protected routes\n4. Implement proper error handling for authentication failures\n5. Set up proper CORS and security configurations\n6. Configure Auth0 Rules or Actions for custom claims if needed",
+        "testStrategy": "Write unit tests for Auth0 integration. Implement integration tests for authentication flows. Test token verification middleware. Create end-to-end tests for login, logout, and protected routes.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up Auth0 Account and Application",
+            "description": "Create and configure Auth0 account with appropriate application settings for our project.",
+            "dependencies": [],
+            "details": "Create Auth0 account. Set up a new application in Auth0 dashboard. Configure callback URLs, logout URLs, and allowed web origins. Set up API settings and permissions. Document all credentials and configuration details securely.",
+            "status": "done",
+            "testStrategy": "Verify that the Auth0 application is properly configured by testing login flow manually before implementation."
+          },
+          {
+            "id": 2,
+            "title": "Integrate Auth0 with Go Backend",
+            "description": "Implement Auth0 integration with the Go backend for JWT verification and protected routes.",
+            "dependencies": [
+              1
+            ],
+            "details": "Install Auth0 Go SDK or appropriate JWT libraries. Configure middleware to validate Auth0-issued JWTs. Set up environment variables for Auth0 domain, audience, and other required settings. Implement error handling for authentication failures.",
+            "status": "done",
+            "testStrategy": "Write unit tests for JWT verification middleware. Create integration tests to ensure protected routes properly validate Auth0 tokens."
+          },
+          {
+            "id": 3,
+            "title": "Implement JWT Verification Middleware",
+            "description": "Create middleware to verify Auth0-issued JWT tokens for protected routes.",
+            "dependencies": [
+              2
+            ],
+            "details": "Develop middleware that extracts JWT from the Authorization header. Verify token signature and expiration using Auth0 public keys. Attach user information to the request context. Handle various authentication error scenarios gracefully.",
+            "status": "done",
+            "testStrategy": "Write unit tests for token extraction and verification. Create integration tests with protected routes to ensure proper middleware functionality."
+          },
+          {
+            "id": 4,
+            "title": "Integrate Auth0 with Next.js Frontend",
+            "description": "Implement Auth0 authentication in the Next.js frontend application.",
+            "dependencies": [
+              1
+            ],
+            "details": "Install Auth0 React SDK (@auth0/auth0-react). Configure Auth0Provider with appropriate settings. Create login and logout buttons. Implement protected routes using authentication state. Handle authentication callbacks and redirects.",
+            "status": "done",
+            "testStrategy": "Write unit tests for authentication components. Create integration tests to verify login, logout, and protected route functionality."
+          },
+          {
+            "id": 5,
+            "title": "Implement User Profile and Token Management",
+            "description": "Handle user profile information and token management in the frontend application.",
+            "dependencies": [
+              4
+            ],
+            "details": "Retrieve and display user profile information from Auth0. Implement proper token storage and renewal. Handle session expiration gracefully. Create user profile components to display user information.",
+            "status": "pending",
+            "testStrategy": "Test user profile retrieval and display. Verify token renewal functionality. Test session expiration handling."
+          },
+          {
+            "id": 6,
+            "title": "Configure Auth0 Rules or Actions",
+            "description": "Set up custom Auth0 Rules or Actions for additional authentication logic if needed.",
+            "dependencies": [
+              1
+            ],
+            "details": "Evaluate requirements for custom authentication logic. Implement Auth0 Rules or Actions for custom claims or additional validation. Test and verify custom logic works as expected.",
+            "status": "pending",
+            "testStrategy": "Test custom Rules or Actions to ensure they properly modify tokens or authentication behavior as expected."
+          }
+        ]
       },
       {
         "id": 3,
@@ -332,7 +397,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-19T23:45:53.891Z",
+      "updated": "2025-06-20T00:00:40.586Z",
       "description": "Tasks for master context"
     }
   }
