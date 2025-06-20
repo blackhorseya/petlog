@@ -158,70 +158,104 @@
       {
         "id": 4,
         "title": "實作寵物管理的 Usecase/Service",
-        "description": "在 `internal/usecase` 套件中，建立 `PetUsecase`。此服務將透過其建構函式，接收 `pet.Repository` 介面 (在任務 #3 中定義) 作為依賴。它應實作寵物資料的 CRUD 核心業務邏輯，並由 `Endpoint` 層呼叫。此任務不應包含任何傳輸層或特定資料庫的程式碼。",
-        "status": "pending",
+        "description": "在 `internal/usecase` 套件中，採用 CQRS (Command Query Responsibility Segregation) 架構實作寵物管理服務。將分離讀取操作 (Query) 和寫入操作 (Command)，並將共享的驗證邏輯放在 behavior 中。所有處理器將透過其建構函式，接收 `pet.Repository` 介面 (在任務 #3 中定義) 作為依賴。它們應實作寵物資料的 CRUD 核心業務邏輯，並由 `Endpoint` 層呼叫。此任務不應包含任何傳輸層或特定資料庫的程式碼。",
+        "status": "done",
         "dependencies": [
           2,
           3
         ],
         "priority": "high",
-        "details": "1. 在 internal/usecase/pet.go 中建立 PetUsecase 結構體\n2. 實作接收 pet.Repository 作為依賴的建構函式\n3. 實作核心業務邏輯方法：\n   - GetPets() - 列出已認證使用者的所有寵物\n   - CreatePet() - 建立新寵物\n   - GetPetByID() - 獲取寵物詳細資訊\n   - UpdatePet() - 更新寵物詳細資訊\n   - DeletePet() - 刪除寵物\n4. 實作適當的錯誤處理和驗證邏輯\n5. 遵循乾淨架構原則：\n   - 無傳輸層依賴 (HTTP、gRPC 等)\n   - 無特定資料庫程式碼\n   - 專注於業務規則和使用案例\n6. 使用 internal/domain 中定義的領域模型\n7. 使用 uber-go/zap 實作適當的日誌記錄",
-        "testStrategy": "1. 為每個使用案例方法編寫全面的單元測試\n2. 為儲存庫介面使用模擬 (mock)\n3. 測試正常路徑和錯誤情境\n4. 驗證業務邏輯正確性\n5. 確保正確驗證輸入",
+        "details": "1. 在 internal/usecase 中建立以下目錄結構：\n   - command/ - 處理寫入操作\n   - query/ - 處理讀取操作\n   - behavior/ - 共享的驗證邏輯\n\n2. 實作 Command Handlers：\n   - CreatePetHandler - 建立新寵物\n   - UpdatePetHandler - 更新寵物詳細資訊\n   - DeletePetHandler - 刪除寵物\n\n3. 實作 Query Handlers：\n   - GetPetByIDHandler - 獲取寵物詳細資訊\n   - ListPetsByOwnerHandler - 列出已認證使用者的所有寵物\n\n4. 在 behavior/ 中實作共享的驗證邏輯\n\n5. 每個 Handler 應：\n   - 接收 pet.Repository 作為依賴\n   - 實作適當的錯誤處理\n   - 使用 uber-go/zap 實作適當的日誌記錄\n\n6. 遵循乾淨架構原則：\n   - 無傳輸層依賴 (HTTP、gRPC 等)\n   - 無特定資料庫程式碼\n   - 專注於業務規則和使用案例\n\n7. 使用 internal/domain 中定義的領域模型",
+        "testStrategy": "1. 為每個 Command 和 Query Handler 編寫全面的單元測試\n2. 為儲存庫介面使用模擬 (mock)\n3. 測試正常路徑和錯誤情境\n4. 驗證業務邏輯正確性\n5. 確保正確驗證輸入\n6. 測試 behavior 中的共享驗證邏輯",
         "subtasks": [
           {
             "id": 1,
-            "title": "定義 PetUsecase 結構體和建構函式",
-            "description": "在 internal/usecase/pet.go 中定義 PetUsecase 結構體，並實作接收 pet.Repository 作為依賴的建構函式。",
+            "title": "擴展 contextx 以支援 User ID",
+            "description": "擴展 contextx 套件，使其能夠在上下文中攜帶和提取使用者 ID，以便在 CQRS 處理器中識別當前使用者。",
             "dependencies": [],
-            "details": "1. 創建 internal/usecase/pet.go 文件\n2. 定義 PetUsecase 結構體，包含 pet.Repository 字段\n3. 實作 NewPetUsecase 函式，接收 pet.Repository 並返回 PetUsecase 實例\n4. 使用 uber-go/zap 初始化日誌記錄器",
-            "status": "pending",
-            "testStrategy": "編寫單元測試，確保 NewPetUsecase 正確初始化 PetUsecase 實例"
+            "details": "1. 在 internal/contextx 套件中新增支援使用者 ID 的功能\n2. 實作 WithUserID 函數，將使用者 ID 添加到上下文中\n3. 實作 GetUserID 函數，從上下文中提取使用者 ID\n4. 確保這些函數具有適當的錯誤處理，例如當上下文中沒有使用者 ID 時",
+            "status": "done",
+            "testStrategy": "編寫單元測試，確保 WithUserID 和 GetUserID 函數在各種情況下都能正確工作，包括正常情況和錯誤情況"
           },
           {
             "id": 2,
-            "title": "實作 GetPets 和 CreatePet 方法",
-            "description": "為 PetUsecase 實作 GetPets 和 CreatePet 方法，包含核心業務邏輯和錯誤處理。",
+            "title": "實作 CreatePet Command Handler",
+            "description": "在 command 目錄中實作 CreatePet 命令處理器，負責建立新寵物的業務邏輯。",
             "dependencies": [
               1
             ],
-            "details": "1. 實作 GetPets 方法，調用 repository 獲取已認證使用者的所有寵物\n2. 實作 CreatePet 方法，驗證輸入並調用 repository 創建新寵物\n3. 實作適當的錯誤處理和日誌記錄\n4. 確保使用 internal/domain 中定義的領域模型",
-            "status": "pending",
-            "testStrategy": "編寫單元測試，覆蓋成功和失敗場景，模擬 repository 行為"
+            "details": "1. 在 internal/usecase/command 目錄中建立 create_pet.go 檔案\n2. 定義 CreatePetCommand 結構體，包含建立寵物所需的所有資料\n3. 實作 CreatePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物建立邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 驗證輸入資料\n   - 建立新的寵物實體\n   - 調用儲存庫保存寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
+            "status": "done",
+            "testStrategy": "編寫單元測試，覆蓋成功建立寵物和各種失敗情境，如無效輸入、儲存庫錯誤等"
           },
           {
             "id": 3,
-            "title": "實作 GetPetByID 和 UpdatePet 方法",
-            "description": "為 PetUsecase 實作 GetPetByID 和 UpdatePet 方法，包含核心業務邏輯和錯誤處理。",
+            "title": "實作 UpdatePet Command Handler",
+            "description": "在 command 目錄中實作 UpdatePet 命令處理器，負責更新現有寵物資訊的業務邏輯。",
             "dependencies": [
               1
             ],
-            "details": "1. 實作 GetPetByID 方法，調用 repository 獲取特定寵物詳細資訊\n2. 實作 UpdatePet 方法，驗證輸入並調用 repository 更新寵物資訊\n3. 實作適當的錯誤處理和日誌記錄\n4. 確保使用 internal/domain 中定義的領域模型",
-            "status": "pending",
-            "testStrategy": "編寫單元測試，覆蓋成功和失敗場景，包括無效 ID 和更新衝突"
+            "details": "1. 在 internal/usecase/command 目錄中建立 update_pet.go 檔案\n2. 定義 UpdatePetCommand 結構體，包含更新寵物所需的所有資料\n3. 實作 UpdatePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物更新邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 驗證輸入資料\n   - 檢查寵物是否存在\n   - 驗證使用者是否有權限更新該寵物\n   - 更新寵物資訊\n   - 調用儲存庫保存更新後的寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
+            "status": "done",
+            "testStrategy": "編寫單元測試，覆蓋成功更新寵物和各種失敗情境，如無效輸入、寵物不存在、權限不足等"
           },
           {
             "id": 4,
-            "title": "實作 DeletePet 方法",
-            "description": "為 PetUsecase 實作 DeletePet 方法，包含核心業務邏輯和錯誤處理。",
+            "title": "實作 DeletePet Command Handler",
+            "description": "在 command 目錄中實作 DeletePet 命令處理器，負責刪除寵物的業務邏輯。",
             "dependencies": [
               1
             ],
-            "details": "1. 實作 DeletePet 方法，調用 repository 刪除指定寵物\n2. 實作適當的錯誤處理，如寵物不存在或無權限刪除\n3. 實作日誌記錄，記錄刪除操作的結果\n4. 確保使用 internal/domain 中定義的領域模型",
-            "status": "pending",
-            "testStrategy": "編寫單元測試，覆蓋成功刪除、寵物不存在和無權限刪除的場景"
+            "details": "1. 在 internal/usecase/command 目錄中建立 delete_pet.go 檔案\n2. 定義 DeletePetCommand 結構體，包含刪除寵物所需的資料（主要是寵物 ID）\n3. 實作 DeletePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物刪除邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 檢查寵物是否存在\n   - 驗證使用者是否有權限刪除該寵物\n   - 調用儲存庫刪除寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
+            "status": "done",
+            "testStrategy": "編寫單元測試，覆蓋成功刪除寵物和各種失敗情境，如寵物不存在、權限不足等"
           },
           {
             "id": 5,
-            "title": "實作驗證邏輯和確保乾淨架構",
-            "description": "為所有方法實作適當的驗證邏輯，並確保遵循乾淨架構原則。",
+            "title": "實作 GetPetByID Query Handler",
+            "description": "在 query 目錄中實作 GetPetByID 查詢處理器，負責獲取特定寵物詳細資訊的業務邏輯。",
+            "dependencies": [
+              1
+            ],
+            "details": "1. 在 internal/usecase/query 目錄中建立 get_pet_by_id.go 檔案\n2. 定義 GetPetByIDQuery 結構體，包含獲取寵物所需的資料（主要是寵物 ID）\n3. 實作 GetPetByIDHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理獲取寵物詳細資訊的邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 調用儲存庫獲取寵物\n   - 驗證使用者是否有權限查看該寵物\n   - 處理可能的錯誤，如寵物不存在\n   - 實作適當的日誌記錄",
+            "status": "done",
+            "testStrategy": "編寫單元測試，覆蓋成功獲取寵物和各種失敗情境，如寵物不存在、權限不足等"
+          },
+          {
+            "id": 6,
+            "title": "實作 ListPetsByOwner Query Handler",
+            "description": "在 query 目錄中實作 ListPetsByOwner 查詢處理器，負責列出使用者所有寵物的業務邏輯。",
+            "dependencies": [
+              1
+            ],
+            "details": "1. 在 internal/usecase/query 目錄中建立 list_pets_by_owner.go 檔案\n2. 定義 ListPetsByOwnerQuery 結構體，可能包含分頁或過濾選項\n3. 實作 ListPetsByOwnerHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理列出使用者寵物的邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 調用儲存庫獲取該使用者的所有寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄\n   - 支援可能的分頁或過濾功能",
+            "status": "done",
+            "testStrategy": "編寫單元測試，覆蓋成功列出寵物和各種情境，如使用者沒有寵物、分頁功能等"
+          },
+          {
+            "id": 7,
+            "title": "實作共享的驗證邏輯",
+            "description": "在 behavior 目錄中實作可被 Command 和 Query Handlers 共用的驗證邏輯。",
+            "dependencies": [],
+            "details": "1. 在 internal/usecase/behavior 目錄中建立適當的檔案結構\n2. 實作寵物資料驗證函數，如檢查名稱、類型、年齡等\n3. 實作權限檢查邏輯，確保使用者只能操作自己的寵物\n4. 實作其他可能的共享邏輯，如格式化或轉換函數\n5. 設計易於重用的介面，讓 Command 和 Query Handlers 可以方便地使用這些驗證邏輯",
+            "status": "done",
+            "testStrategy": "為共享的驗證邏輯編寫單元測試，確保在各種情況下都能正確驗證輸入和權限"
+          },
+          {
+            "id": 8,
+            "title": "為所有新的 Handlers 撰寫單元測試",
+            "description": "為所有實作的 Command 和 Query Handlers 撰寫全面的單元測試，確保它們在各種情況下都能正確工作。",
             "dependencies": [
               2,
               3,
-              4
+              4,
+              5,
+              6,
+              7
             ],
-            "details": "1. 實作輸入驗證邏輯，如檢查必填字段、格式等\n2. 確保所有方法不依賴於特定的傳輸層或資料庫實現\n3. 檢查並移除任何可能違反乾淨架構的程式碼\n4. 優化錯誤處理和日誌記錄，確保一致性和可讀性",
-            "status": "pending",
-            "testStrategy": "編寫整合測試，確保 PetUsecase 可以與模擬的 Repository 正確協作，並驗證乾淨架構原則的遵守"
+            "details": "1. 為每個 Command 和 Query Handler 建立對應的測試檔案\n2. 使用模擬 (mock) 來模擬 pet.Repository 的行為\n3. 測試正常路徑和各種錯誤情境\n4. 驗證業務邏輯的正確性\n5. 確保正確驗證輸入和權限\n6. 測試與共享驗證邏輯的整合",
+            "status": "done",
+            "testStrategy": "確保測試覆蓋率高，包括所有可能的分支和錯誤情境，使用模擬來隔離測試對象"
           }
         ]
       },
@@ -453,7 +487,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-20T01:00:05.535Z",
+      "updated": "2025-06-20T01:32:39.422Z",
       "description": "Tasks for master context"
     }
   }
