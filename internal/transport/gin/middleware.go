@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/blackhorseya/petlog/internal/config"
+	"github.com/blackhorseya/petlog/pkg/contextx"
 )
 
 // CustomClaims contains custom data we want to be available in the go context.
@@ -69,6 +70,18 @@ func EnsureValidToken(cfg config.AppConfig) gin.HandlerFunc {
 		var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			encounteredError = false
 			c.Request = r
+
+			claims, ok := r.Context().Value(jwtmiddleware.ContextKey{}).(*validator.ValidatedClaims)
+			if !ok {
+				// This should not happen if the middleware is correctly configured.
+				c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]string{"message": "Failed to get validated claims"})
+				return
+			}
+
+			// Set user ID in our custom context
+			ctxWithUser := contextx.WithUserID(r.Context(), claims.RegisteredClaims.Subject)
+			c.Request = r.WithContext(ctxWithUser)
+
 			c.Next()
 		})
 

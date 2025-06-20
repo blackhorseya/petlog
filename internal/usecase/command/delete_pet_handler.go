@@ -8,14 +8,9 @@ import (
 	"github.com/blackhorseya/petlog/pkg/contextx"
 )
 
-// DeletePetRequest represents the request for deleting a pet.
-type DeletePetRequest struct {
+// DeletePetCommand represents the request for deleting a pet.
+type DeletePetCommand struct {
 	ID string
-}
-
-// DeletePetResponse represents the response for deleting a pet.
-type DeletePetResponse struct {
-	Success bool
 }
 
 // DeletePetHandler handles the pet deletion command.
@@ -34,33 +29,33 @@ func NewDeletePetHandler(petRepo repository.PetRepository) *DeletePetHandler {
 }
 
 // Handle executes the delete pet command.
-func (h *DeletePetHandler) Handle(c context.Context, req DeletePetRequest) (*DeletePetResponse, error) {
+func (h *DeletePetHandler) Handle(c context.Context, cmd DeletePetCommand) error {
 	ctx := contextx.WithContext(c)
 
-	userID, err := contextx.GetUserID(c)
+	userID, err := contextx.GetUserID(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user ID: %w", err)
+		return fmt.Errorf("user ID not found in context: %w", err)
 	}
 
-	ctx.Info("handling delete pet request", "user_id", userID, "pet_id", req.ID)
+	ctx.Info("handling delete pet request", "user_id", userID, "pet_id", cmd.ID)
 
 	// Fetch existing pet to check for ownership
-	pet, err := h.petRepo.FindByID(c, req.ID)
+	pet, err := h.petRepo.FindByID(ctx, cmd.ID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find pet with id %s: %w", req.ID, err)
+		return fmt.Errorf("failed to find pet with id %s: %w", cmd.ID, err)
 	}
 
 	// Authorization check
 	if pet.OwnerID != userID {
-		return nil, fmt.Errorf("user %s is not authorized to delete pet %s", userID, req.ID)
+		return fmt.Errorf("user %s is not authorized to delete pet %s", userID, cmd.ID)
 	}
 
-	if err := h.petRepo.Delete(c, req.ID); err != nil {
+	if err := h.petRepo.Delete(ctx, cmd.ID); err != nil {
 		ctx.Error("failed to delete pet from repository", "error", err)
-		return nil, fmt.Errorf("failed to delete pet: %w", err)
+		return fmt.Errorf("failed to delete pet: %w", err)
 	}
 
-	ctx.Info("pet deleted successfully", "pet_id", req.ID, "user_id", userID)
+	ctx.Info("pet deleted successfully", "pet_id", cmd.ID, "user_id", userID)
 
-	return &DeletePetResponse{Success: true}, nil
+	return nil
 }

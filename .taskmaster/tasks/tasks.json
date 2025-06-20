@@ -483,11 +483,25 @@
         ],
         "status": "pending",
         "subtasks": []
+      },
+      {
+        "id": 21,
+        "title": "實作寵物管理的 API 端點 (Endpoint) 與傳輸層 (Transport)",
+        "description": "為任務 #4 中實作的寵物管理 usecase 建立 Go-kit endpoint 和 Gin HTTP transport 層。這將會把 Create, Update, Delete, GetByID, ListByOwner 等操作公開為 RESTful API。",
+        "details": "1. 在 `internal/endpoint` 目錄中實作 Go-kit endpoints：\n   - 為每個 usecase 建立對應的 endpoint 函數：\n     - `MakePetCreateEndpoint`\n     - `MakePetUpdateEndpoint`\n     - `MakePetDeleteEndpoint`\n     - `MakePetGetByIDEndpoint`\n     - `MakePetListByOwnerEndpoint`\n   - 每個 endpoint 應接收對應的 usecase handler 作為依賴\n   - 實作請求/回應 DTO 結構體，用於序列化和反序列化\n\n2. 在 `internal/transport/http` 目錄中實作 Gin HTTP handlers：\n   - 建立 RESTful API 路由：\n     - `POST /v1/pets` - 建立寵物\n     - `PUT /v1/pets/:id` - 更新寵物\n     - `DELETE /v1/pets/:id` - 刪除寵物\n     - `GET /v1/pets/:id` - 獲取寵物詳情\n     - `GET /v1/pets` - 列出使用者的寵物（需要認證）\n   - 實作 HTTP 請求驗證和錯誤處理\n   - 整合 Auth0 JWT 驗證中間件，確保適當的授權\n   - 實作適當的 HTTP 狀態碼和回應格式\n\n3. 實作請求和回應的驗證：\n   - 使用 go-playground/validator 進行請求驗證\n   - 建立自定義驗證函數（如需要）\n   - 實作統一的錯誤回應格式\n\n4. 實作跨域資源共享 (CORS) 支援：\n   - 設定允許的來源、方法和標頭\n   - 處理預檢請求 (preflight requests)\n\n5. 實作 API 版本控制策略：\n   - 在 URL 路徑中包含版本號（如 `/v1/`）\n   - 為未來版本升級做準備\n\n6. 實作請求日誌記錄：\n   - 使用 uber-go/zap 記錄 API 請求和回應\n   - 包含請求 ID、用戶 ID、請求時間等關鍵資訊\n\n7. 實作速率限制：\n   - 使用 golang.org/x/time/rate 實作基本速率限制\n   - 根據 IP 或用戶 ID 進行限制\n\n8. 實作健康檢查端點：\n   - 建立 `/health` 端點以供監控系統使用\n\n9. 整合 Swagger/OpenAPI 文檔：\n   - 使用 swaggo/gin-swagger 生成 API 文檔\n   - 為每個端點添加適當的註釋",
+        "testStrategy": "1. 為每個 endpoint 編寫單元測試：\n   - 測試正常路徑和錯誤情境\n   - 使用模擬 (mock) 替代 usecase 層\n   - 驗證請求處理和回應格式\n\n2. 為 HTTP transport handlers 編寫單元測試：\n   - 使用 `net/http/httptest` 和 Gin 的測試工具\n   - 測試路由註冊和請求處理\n   - 驗證 HTTP 狀態碼和回應內容\n   - 測試錯誤處理和邊界情況\n\n3. 編寫整合測試：\n   - 使用 HTTP 客戶端（如 Postman 或 curl）測試 API\n   - 建立測試腳本以自動化測試流程\n   - 測試完整的 CRUD 操作流程\n   - 驗證認證和授權機制\n\n4. 效能測試：\n   - 使用 Apache Bench 或 wrk 等工具進行負載測試\n   - 測試 API 在高負載下的表現\n   - 驗證速率限制功能\n\n5. 安全性測試：\n   - 測試未授權訪問的處理\n   - 驗證 CORS 設定\n   - 測試輸入驗證和防止注入攻擊\n\n6. 文檔驗證：\n   - 確保 Swagger 文檔準確反映 API 功能\n   - 驗證 API 文檔中的範例請求和回應",
+        "status": "pending",
+        "dependencies": [
+          2,
+          4
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-20T01:32:39.422Z",
+      "updated": "2025-06-20T01:46:26.424Z",
       "description": "Tasks for master context"
     }
   }
