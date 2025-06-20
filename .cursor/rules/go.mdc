@@ -423,6 +423,47 @@ graph TD
 - **模型檔案 (Model Files)**:
 
   - 資料庫或領域模型的檔案使用 `_model.go` 後綴 (e.g., `pet_model.go`)。
+  - **Repository 持久化模型分離**: 在 `internal/infra/mongodb` 等基礎設施層，將持久化專用的模型結構體和轉換函式分離到獨立的 `*_repository_model.go` 檔案中 (e.g., `pet_repository_model.go`)。這有助於保持程式碼組織性和可維護性。
+    - **持久化模型檔案應包含**：
+      - 持久化專用的 struct（如 `petMongo`），包含資料庫特定的標籤（如 `bson`、`gorm` 等）
+      - `toDomain()` 方法：將持久化模型轉換為領域模型
+      - `fromDomain()` 函式：將領域模型轉換為持久化模型
+    - **Repository 實作檔案**（如 `pet_repository_impl.go`）專注於實際的 CRUD 操作邏輯
+    - **✅ DO**:
+      ```go
+      // internal/infra/mongodb/pet_repository_model.go
+      package mongodb
+
+      import (
+          "time"
+          "github.com/blackhorseya/petlog/internal/domain/model"
+      )
+
+      // petMongo 是 Pet 的持久化模型，包含 DB 專用的標籤
+      type petMongo struct {
+          ID        string    `bson:"_id,omitempty"`
+          Name      string    `bson:"name"`
+          CreatedAt time.Time `bson:"created_at"`
+      }
+
+      // toDomain 將持久化模型轉換為領域模型
+      func (pm *petMongo) toDomain() *model.Pet {
+          return &model.Pet{
+              ID:        pm.ID,
+              Name:      pm.Name,
+              CreatedAt: pm.CreatedAt,
+          }
+      }
+
+      // fromDomain 將領域模型轉換為持久化模型
+      func fromDomain(p *model.Pet) *petMongo {
+          return &petMongo{
+              ID:        p.ID,
+              Name:      p.Name,
+              CreatedAt: p.CreatedAt,
+          }
+      }
+      ```
 
 - **Context 變數命名**:
 

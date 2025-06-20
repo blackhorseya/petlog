@@ -27,15 +27,12 @@ func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	petMongoRepo, err := mongodb.NewPetMongoRepo(database)
-	if err != nil {
-		return nil, err
-	}
-	createPetHandler := command.NewCreatePetHandler(petMongoRepo)
-	updatePetHandler := command.NewUpdatePetHandler(petMongoRepo)
-	deletePetHandler := command.NewDeletePetHandler(petMongoRepo)
-	getPetByIDHandler := query.NewGetPetByIDHandler(petMongoRepo)
-	listPetsByOwnerHandler := query.NewListPetsByOwnerHandler(petMongoRepo)
+	petRepository := mongodb.NewPetMongoRepo(database)
+	createPetHandler := command.NewCreatePetHandler(petRepository)
+	updatePetHandler := command.NewUpdatePetHandler(petRepository)
+	deletePetHandler := command.NewDeletePetHandler(petRepository)
+	getPetByIDHandler := query.NewGetPetByIDHandler(petRepository)
+	listPetsByOwnerHandler := query.NewListPetsByOwnerHandler(petRepository)
 	petEndpoints := endpoint.MakePetEndpoints(createPetHandler, updatePetHandler, deletePetHandler, getPetByIDHandler, listPetsByOwnerHandler)
 	v := _wireValue
 	handler := gin.NewPetHandler(cfg, petEndpoints, v...)
