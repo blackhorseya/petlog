@@ -8,7 +8,360 @@
     },
     "host": "localhost:8080",
     "basePath": "/",
-    "paths": {},
+    "paths": {
+        "/api/v1/pets": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "取得目前使用者擁有的所有寵物列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pets"
+                ],
+                "summary": "列出所有寵物",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ListPetsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "為使用者建立一筆新的寵物資料",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pets"
+                ],
+                "summary": "建立新寵物",
+                "parameters": [
+                    {
+                        "description": "寵物資訊",
+                        "name": "pet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreatePetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreatePetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pets/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根據寵物ID取得詳細資訊",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pets"
+                ],
+                "summary": "取得寵物資訊",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "寵物ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetPetResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根據寵物ID更新現有寵物資料",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pets"
+                ],
+                "summary": "更新寵物資訊",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "寵物ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "要更新的寵物資訊",
+                        "name": "pet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdatePetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdatePetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根據寵物ID刪除寵物資料",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pets"
+                ],
+                "summary": "刪除寵物",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "寵物ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.DeletePetResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "endpoint.CreatePetRequest": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "endpoint.CreatePetResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "pet": {
+                    "$ref": "#/definitions/model.Pet"
+                }
+            }
+        },
+        "endpoint.DeletePetResponse": {
+            "type": "object",
+            "properties": {
+                "error": {}
+            }
+        },
+        "endpoint.GetPetResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "pet": {
+                    "$ref": "#/definitions/model.Pet"
+                }
+            }
+        },
+        "endpoint.ListPetsResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "pets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Pet"
+                    }
+                }
+            }
+        },
+        "endpoint.UpdatePetRequest": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "endpoint.UpdatePetResponse": {
+            "type": "object",
+            "properties": {
+                "error": {}
+            }
+        },
+        "model.Pet": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "breed": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "dob": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "microchip_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        }
+    },
     "securityDefinitions": {
         "BearerAuth": {
             "description": "Type \"Bearer\" followed by a space and JWT token.",

@@ -1,11 +1,240 @@
 basePath: /
+definitions:
+  endpoint.CreatePetRequest:
+    properties:
+      avatar_url:
+        type: string
+      name:
+        type: string
+    type: object
+  endpoint.CreatePetResponse:
+    properties:
+      error: {}
+      pet:
+        $ref: '#/definitions/model.Pet'
+    type: object
+  endpoint.DeletePetResponse:
+    properties:
+      error: {}
+    type: object
+  endpoint.GetPetResponse:
+    properties:
+      error: {}
+      pet:
+        $ref: '#/definitions/model.Pet'
+    type: object
+  endpoint.ListPetsResponse:
+    properties:
+      error: {}
+      pets:
+        items:
+          $ref: '#/definitions/model.Pet'
+        type: array
+    type: object
+  endpoint.UpdatePetRequest:
+    properties:
+      avatar_url:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  endpoint.UpdatePetResponse:
+    properties:
+      error: {}
+    type: object
+  model.Pet:
+    properties:
+      avatar_url:
+        type: string
+      breed:
+        type: string
+      created_at:
+        type: string
+      dob:
+        type: string
+      id:
+        type: string
+      microchip_id:
+        type: string
+      name:
+        type: string
+      owner_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
   description: 寵物健康記錄管理系統 API
   title: PetLog API
   version: "0.1"
-paths: {}
+paths:
+  /api/v1/pets:
+    get:
+      consumes:
+      - application/json
+      description: 取得目前使用者擁有的所有寵物列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.ListPetsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 列出所有寵物
+      tags:
+      - pets
+    post:
+      consumes:
+      - application/json
+      description: 為使用者建立一筆新的寵物資料
+      parameters:
+      - description: 寵物資訊
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/endpoint.CreatePetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.CreatePetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 建立新寵物
+      tags:
+      - pets
+  /api/v1/pets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 根據寵物ID刪除寵物資料
+      parameters:
+      - description: 寵物ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.DeletePetResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 刪除寵物
+      tags:
+      - pets
+    get:
+      consumes:
+      - application/json
+      description: 根據寵物ID取得詳細資訊
+      parameters:
+      - description: 寵物ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.GetPetResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 取得寵物資訊
+      tags:
+      - pets
+    put:
+      consumes:
+      - application/json
+      description: 根據寵物ID更新現有寵物資料
+      parameters:
+      - description: 寵物ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 要更新的寵物資訊
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/endpoint.UpdatePetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.UpdatePetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 更新寵物資訊
+      tags:
+      - pets
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and JWT token.
