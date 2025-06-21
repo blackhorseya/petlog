@@ -26,6 +26,7 @@ import (
 
 // initPetAPI initializes the pet API.
 func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, func(), error) {
+	engine := gin.NewGinEngine()
 	database, cleanup, err := mongodb.NewDatabase(cfg)
 	if err != nil {
 		return nil, nil, err
@@ -38,7 +39,7 @@ func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, func(), 
 	listPetsByOwnerHandler := query.NewListPetsByOwnerHandler(petRepository)
 	petEndpoints := endpoint.MakePetEndpoints(createPetHandler, updatePetHandler, deletePetHandler, getPetByIDHandler, listPetsByOwnerHandler)
 	v := _wireValue
-	handler := gin.NewPetHandler(cfg, petEndpoints, v...)
+	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, v)
 	return handler, func() {
 		cleanup()
 	}, nil

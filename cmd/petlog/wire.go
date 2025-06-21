@@ -33,7 +33,8 @@ func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, func(), 
 
 		// Endpoint & Transport
 		endpoint.MakePetEndpoints,
-		gin.NewPetHandler,
+		gin.NewGinEngine,
+		gin.NewHTTPHandler,
 		wire.Value([]kithttp.ServerOption{}),
 	)
 	return nil, nil, nil

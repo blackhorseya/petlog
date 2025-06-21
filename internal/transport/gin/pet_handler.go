@@ -12,10 +12,8 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 )
 
-// NewPetHandler returns a new pet handler.
-func NewPetHandler(cfg config.AppConfig, e endpoint.PetEndpoints, options ...httptransport.ServerOption) http.Handler {
-	r := gin.New()
-
+// RegisterPetRoutes registers pet-related routes on the given Gin engine.
+func RegisterPetRoutes(r *gin.Engine, cfg config.AppConfig, e endpoint.PetEndpoints, options ...httptransport.ServerOption) {
 	// Error handler
 	opts := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(nil)), // replace nil with a logger
@@ -26,7 +24,8 @@ func NewPetHandler(cfg config.AppConfig, e endpoint.PetEndpoints, options ...htt
 	// Public endpoints
 
 	// Private endpoints
-	petRoutes := r.Group("/api/v1/pets")
+	v1 := r.Group("/api/v1")
+	petRoutes := v1.Group("/pets")
 	petRoutes.Use(EnsureValidToken(cfg))
 	{
 		petRoutes.POST("", CreatePet(e, opts...))
@@ -35,8 +34,6 @@ func NewPetHandler(cfg config.AppConfig, e endpoint.PetEndpoints, options ...htt
 		petRoutes.DELETE("/:id", DeletePet(e, opts...))
 		petRoutes.GET("", ListPets(e, opts...))
 	}
-
-	return r
 }
 
 // CreatePet godoc
