@@ -5,6 +5,8 @@ import { Auth0Provider } from "@auth0/nextjs-auth0";
 
 import { ThemeProvider } from "@/hooks/use-theme";
 import { AppLayout } from "@/components/layout/app-layout";
+import { QueryProvider } from "@/components/providers/query-provider";
+import { ToasterProvider } from "@/components/providers/toaster-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,9 +32,12 @@ export default function RootLayout({
     <html lang="zh-TW" suppressHydrationWarning>
       <body className={inter.className}>
         <Auth0Provider>
-          <ThemeProvider defaultTheme="system" storageKey="petlog-ui-theme">
-            <AppLayout>{children}</AppLayout>
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider defaultTheme="system" storageKey="petlog-ui-theme">
+              <AppLayout>{children}</AppLayout>
+              <ToasterProvider />
+            </ThemeProvider>
+          </QueryProvider>
         </Auth0Provider>
       </body>
     </html>

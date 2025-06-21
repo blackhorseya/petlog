@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-kit/kit/endpoint"
 
@@ -33,8 +34,11 @@ func MakePetEndpoints(ch *command.CreatePetHandler, uh *command.UpdatePetHandler
 
 // CreatePet
 type CreatePetRequest struct {
-	Name      string `json:"name"`
-	AvatarURL string `json:"avatar_url"`
+	Name        string    `json:"name"`
+	AvatarURL   string    `json:"avatar_url"`
+	DOB         time.Time `json:"dob"`
+	Breed       string    `json:"breed"`
+	MicrochipID string    `json:"microchip_id"`
 }
 type CreatePetResponse struct {
 	Pet *model.Pet `json:"pet"`
@@ -47,8 +51,11 @@ func MakeCreatePetEndpoint(h *command.CreatePetHandler) endpoint.Endpoint {
 	return func(c context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreatePetRequest)
 		cmd := command.CreatePetCommand{
-			Name:      req.Name,
-			AvatarURL: req.AvatarURL,
+			Name:        req.Name,
+			AvatarURL:   req.AvatarURL,
+			DOB:         req.DOB,
+			Breed:       req.Breed,
+			MicrochipID: req.MicrochipID,
 		}
 
 		p, err := h.Handle(c, cmd)
@@ -61,9 +68,12 @@ func MakeCreatePetEndpoint(h *command.CreatePetHandler) endpoint.Endpoint {
 
 // UpdatePet
 type UpdatePetRequest struct {
-	ID        string
-	Name      string `json:"name"`
-	AvatarURL string `json:"avatar_url"`
+	ID          string
+	Name        string    `json:"name"`
+	AvatarURL   string    `json:"avatar_url"`
+	DOB         time.Time `json:"dob"`
+	Breed       string    `json:"breed"`
+	MicrochipID string    `json:"microchip_id"`
 }
 type UpdatePetResponse struct {
 	Err error `json:"error,omitempty"`
@@ -75,9 +85,12 @@ func MakeUpdatePetEndpoint(h *command.UpdatePetHandler) endpoint.Endpoint {
 	return func(c context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdatePetRequest)
 		cmd := command.UpdatePetCommand{
-			ID:        req.ID,
-			Name:      req.Name,
-			AvatarURL: req.AvatarURL,
+			ID:          req.ID,
+			Name:        req.Name,
+			AvatarURL:   req.AvatarURL,
+			DOB:         req.DOB,
+			Breed:       req.Breed,
+			MicrochipID: req.MicrochipID,
 		}
 
 		err := h.Handle(c, cmd)

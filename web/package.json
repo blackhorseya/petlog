@@ -10,15 +10,23 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.6.1",
+    "@hookform/resolvers": "^5.1.1",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
+    "@tanstack/react-query": "^5.80.10",
+    "@tanstack/react-query-devtools": "^5.80.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.519.0",
     "next": "15.3.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "tailwind-merge": "^3.3.1"
+    "react-hook-form": "^7.58.1",
+    "sonner": "^2.0.5",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.10",
