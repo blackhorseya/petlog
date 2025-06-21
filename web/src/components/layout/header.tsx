@@ -105,15 +105,15 @@ export function Header({ onMenuToggle, isMenuOpen }: HeaderProps) {
                 asChild
                 className="hidden sm:inline-flex"
               >
-                <Link href="/api/auth/logout">
+                <a href="/auth/logout">
                   <LogOut className="mr-2 h-4 w-4" />
                   登出
-                </Link>
+                </a>
               </Button>
             </div>
           ) : (
             <Button asChild>
-              <Link href="/api/auth/login">登入</Link>
+              <a href="/auth/login">登入</a>
             </Button>
           )}
         </div>

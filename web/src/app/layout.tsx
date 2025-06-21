@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -12,7 +12,12 @@ export const metadata: Metadata = {
   description: "追蹤您的寵物健康與生活記錄，讓愛寵更健康快樂。",
   keywords: ["寵物", "健康管理", "醫療記錄", "寵物日記"],
   authors: [{ name: "PetLog Team" }],
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
