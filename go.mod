@@ -6,6 +6,7 @@ require (
 	github.com/air-verse/air v1.62.0
 	github.com/akrylysov/algnhsa v1.1.0
 	github.com/auth0/go-jwt-middleware/v2 v2.3.0
+	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-kit/kit v0.13.0
 	github.com/golangci/golangci-lint v1.64.8

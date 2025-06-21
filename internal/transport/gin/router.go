@@ -5,6 +5,7 @@ import (
 
 	"github.com/blackhorseya/petlog/internal/config"
 	"github.com/blackhorseya/petlog/internal/endpoint"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	httptransport "github.com/go-kit/kit/transport/http"
 	swaggerFiles "github.com/swaggo/files"
@@ -16,6 +17,12 @@ func NewGinEngine() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AddAllowHeaders("Authorization", "Accept", "Cache-Control")
+	corsConfig.AddExposeHeaders("X-Total-Count")
+	r.Use(cors.New(corsConfig))
 
 	// Swagger documentation endpoint
 	// URL: /api/docs/index.html
