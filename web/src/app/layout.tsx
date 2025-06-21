@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Auth0Provider } from "@auth0/nextjs-auth0";
 
 import { ThemeProvider } from "@/hooks/use-theme";
 import { AppLayout } from "@/components/layout/app-layout";
@@ -28,14 +29,11 @@ export default function RootLayout({
   return (
     <html lang="zh-TW" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          defaultTheme="system"
-          storageKey="petlog-ui-theme"
-        >
-          <AppLayout>
-            {children}
-          </AppLayout>
-        </ThemeProvider>
+        <Auth0Provider>
+          <ThemeProvider defaultTheme="system" storageKey="petlog-ui-theme">
+            <AppLayout>{children}</AppLayout>
+          </ThemeProvider>
+        </Auth0Provider>
       </body>
     </html>
   );
