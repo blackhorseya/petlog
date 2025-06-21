@@ -2,50 +2,70 @@ package config
 
 import (
 	"fmt"
-	"strings"
+	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
-// AppConfig is the application configuration.
-type AppConfig struct {
-	Auth0Domain   string `mapstructure:"auth0_domain"`
-	Auth0Audience string `mapstructure:"auth0_audience"`
-	MongoURI      string `mapstructure:"mongo_uri"`
-	MongoDatabase string `mapstructure:"mongo_database"`
-	ServerPort    string `mapstructure:"server_port"`
+// Config 應用程式配置結構
+type Config struct {
+	Auth0 Auth0Config `mapstructure:"auth0"`
+	Mongo MongoConfig `mapstructure:"mongo"`
+	HTTP  HTTPConfig  `mapstructure:"http"`
 }
 
-// LoadConfig loads configuration from environment variables,
-// falling back to a config file for local development.
-func LoadConfig() (AppConfig, error) {
-	// Set a replacer to map environment variables like AUTH0_DOMAIN to auth0_domain
-	replacer := strings.NewReplacer(".", "_")
-	viper.SetEnvKeyReplacer(replacer)
+// Auth0Config Auth0 認證配置
+type Auth0Config struct {
+	Domain   string `mapstructure:"domain"`
+	Audience string `mapstructure:"audience"`
+}
+
+// MongoConfig MongoDB 配置
+type MongoConfig struct {
+	URI      string `mapstructure:"uri"`
+	Database string `mapstructure:"database"`
+}
+
+// HTTPConfig HTTP 伺服器配置
+type HTTPConfig struct {
+	Port string `mapstructure:"port"`
+}
+
+// Load 載入配置
+func Load() (*Config, error) {
+	// 嘗試載入 .env 檔案（按照慣例順序）
+	// 如果檔案不存在，godotenv 會靜默忽略
+	_ = godotenv.Load(".env.dev.local")
+	_ = godotenv.Load(".env.local")
+	_ = godotenv.Load(".env")
+
+	// 設定 viper
+	viper.SetConfigType("env")
 	viper.AutomaticEnv()
 
-	// Explicitly bind environment variables to config fields
-	viper.MustBindEnv("auth0_domain", "AUTH0_DOMAIN")
-	viper.MustBindEnv("auth0_audience", "AUTH0_AUDIENCE")
-	viper.MustBindEnv("mongo_uri", "MONGO_URI")
-	viper.MustBindEnv("mongo_database", "MONGO_DATABASE")
-	viper.MustBindEnv("server_port", "SERVER_PORT")
+	// 設定環境變數對應
+	viper.BindEnv("auth0.domain", "AUTH0_DOMAIN")
+	viper.BindEnv("auth0.audience", "AUTH0_AUDIENCE")
+	viper.BindEnv("mongo.uri", "MONGO_URI")
+	viper.BindEnv("mongo.database", "MONGO_DATABASE")
+	viper.BindEnv("http.port", "SERVER_PORT")
 
-	// Try to read from config file for local dev, but env vars will always override.
-	viper.AddConfigPath(".")
-	viper.SetConfigName(".env")
-	viper.SetConfigType("env")
-	_ = viper.ReadInConfig() // Ignore error if file not found
+	// 設定預設值
+	viper.SetDefault("http.port", "8080")
 
-	var cfg AppConfig
-	if err := viper.Unmarshal(&cfg); err != nil {
-		return AppConfig{}, fmt.Errorf("failed to unmarshal config: %w", err)
+	var config Config
+	if err := viper.Unmarshal(&config); err != nil {
+		return nil, fmt.Errorf("無法解析配置: %w", err)
 	}
 
-	// Validate critical configuration
-	if cfg.MongoURI == "" {
-		return AppConfig{}, fmt.Errorf("MONGO_URI is not set")
+	// 驗證必要配置
+	if config.Mongo.URI == "" {
+		return nil, fmt.Errorf("MONGO_URI 環境變數為必填項")
 	}
 
-	return cfg, nil
+	log.Printf("配置載入成功 - HTTP Port: %s, MongoDB Database: %s",
+		config.HTTP.Port, config.Mongo.Database)
+
+	return &config, nil
 }

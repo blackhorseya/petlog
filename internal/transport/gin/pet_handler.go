@@ -13,7 +13,7 @@ import (
 )
 
 // RegisterPetRoutes registers pet-related routes on the given Gin engine.
-func RegisterPetRoutes(r *gin.Engine, cfg config.AppConfig, e endpoint.PetEndpoints, options ...httptransport.ServerOption) {
+func RegisterPetRoutes(r *gin.Engine, cfg config.Config, e endpoint.PetEndpoints, options ...httptransport.ServerOption) {
 	// Error handler
 	opts := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(nil)), // replace nil with a logger

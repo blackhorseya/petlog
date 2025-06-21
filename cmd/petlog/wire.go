@@ -18,7 +18,7 @@ import (
 )
 
 // initPetAPI initializes the pet API.
-func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, func(), error) {
+func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), error) {
 	wire.Build(
 		// Database
 		mongodb.ProviderSet,

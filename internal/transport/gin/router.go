@@ -28,7 +28,7 @@ func NewGinEngine() *gin.Engine {
 // It acts as an aggregator for all route registration functions.
 func NewHTTPHandler(
 	r *gin.Engine,
-	cfg config.AppConfig,
+	cfg config.Config,
 	petEndpoints endpoint.PetEndpoints,
 	options []httptransport.ServerOption,
 ) http.Handler {
