@@ -1,5 +1,7 @@
 {
 	"devDependencies": {
-		"autoprefixer": "^10.4.21"
+		"glob": "^11.0.3",
+		"serverless-go-plugin": "^2.4.1",
+		"serverless-dotenv-plugin": "^6.0.0"
 	}
 }

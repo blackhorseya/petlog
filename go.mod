@@ -4,11 +4,13 @@ go 1.24.3
 
 require (
 	github.com/air-verse/air v1.62.0
+	github.com/akrylysov/algnhsa v1.1.0
 	github.com/auth0/go-jwt-middleware/v2 v2.3.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-kit/kit v0.13.0
 	github.com/golangci/golangci-lint v1.64.8
 	github.com/google/wire v0.6.0
+	github.com/joho/godotenv v1.5.1
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/files v1.0.1
@@ -41,6 +43,7 @@ require (
 	github.com/alingse/nilnesserr v0.1.2 // indirect
 	github.com/ashanbrown/forbidigo v1.6.0 // indirect
 	github.com/ashanbrown/makezero v1.2.0 // indirect
+	github.com/aws/aws-lambda-go v1.43.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bep/godartsass/v2 v2.5.0 // indirect
 	github.com/bep/golibsass v1.2.0 // indirect

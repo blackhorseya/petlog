@@ -25,7 +25,7 @@ import (
 // Injectors from wire.go:
 
 // initPetAPI initializes the pet API.
-func initPetAPI(c context.Context, cfg config.AppConfig) (http.Handler, func(), error) {
+func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), error) {
 	engine := gin.NewGinEngine()
 	database, cleanup, err := mongodb.NewDatabase(cfg)
 	if err != nil {
