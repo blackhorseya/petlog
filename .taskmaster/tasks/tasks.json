@@ -677,9 +677,32 @@
               3,
               4
             ],
-            "details": "在 Makefile 中添加部署命令，在 serverless.yml 中定義環境變量，並使用 AWS Systems Manager Parameter Store 管理敏感數據\n<info added on 2025-06-21T06:04:10.497Z>\n已完成環境變數管理的設定：\n1. 修改 config.go 使用 viper.MustBindEnv() 明確綁定環境變數\n2. 設定 serverless.yml 從 .env 檔案讀取環境變數並注入到 Lambda\n3. 確保 MONGO_URI, MONGO_DATABASE, AUTH0_DOMAIN, AUTH0_AUDIENCE 等關鍵變數能正確傳遞\n</info added on 2025-06-21T06:04:10.497Z>",
-            "status": "pending",
+            "details": "在 Makefile 中添加部署命令，在 serverless.yml 中定義環境變量，並使用 AWS Systems Manager Parameter Store 管理敏感數據\n<info added on 2025-06-21T06:04:10.497Z>\n已完成環境變數管理的設定：\n1. 修改 config.go 使用 viper.MustBindEnv() 明確綁定環境變數\n2. 設定 serverless.yml 從 .env 檔案讀取環境變數並注入到 Lambda\n3. 確保 MONGO_URI, MONGO_DATABASE, AUTH0_DOMAIN, AUTH0_AUDIENCE 等關鍵變數能正確傳遞\n</info added on 2025-06-21T06:04:10.497Z>\n<info added on 2025-06-21T06:46:09.232Z>\n✅ **環境變數管理問題已解決**\n\n**解決方案：使用 godotenv 套件**\n- 安裝了 `github.com/joho/godotenv` 套件\n- 修改 `internal/config/config.go` 使用 godotenv 來載入 .env 檔案\n- 按照慣例順序載入環境檔案：`.env.dev.local` → `.env.local` → `.env`\n- 如果檔案不存在，godotenv 會靜默忽略，不會產生錯誤\n\n**配置結構重構**\n- 將 `AppConfig` 重構為更有組織的 `Config` 結構\n- 使用嵌套結構：`Auth0Config`、`MongoConfig`、`HTTPConfig`\n- 更新了所有相關檔案來使用新的配置結構\n\n**修正的檔案**\n1. `internal/config/config.go` - 使用 godotenv 和新的配置結構\n2. `cmd/petlog/main.go` - 更新使用新的 Config 和 Load() 函式\n3. `internal/infra/mongodb/client.go` - 更新使用新的配置結構\n4. `internal/transport/gin/middleware.go` - 更新配置使用，保留重要的用戶 ID 設定功能\n5. `internal/transport/gin/router.go` - 更新配置參數\n6. `internal/transport/gin/pet_handler.go` - 更新配置參數和路由註冊\n\n**關鍵改進**\n- 保留了重要的用戶認證功能：從 JWT token 提取用戶 ID 並設定到 contextx\n- 環境變數現在可以正確從 `.env.dev.local` 檔案中讀取\n- Lambda 環境中的環境變數仍然正常工作（優先級更高）\n\n**測試狀態**\n- 需要測試本地開發環境的環境變數載入\n- 需要測試 Lambda 部署中的環境變數讀取\n</info added on 2025-06-21T06:46:09.232Z>",
+            "status": "done",
             "testStrategy": "部署後檢查 Lambda 配置中的環境變量，並執行函數以驗證變量是否正確傳遞"
+          },
+          {
+            "id": 6,
+            "title": "Wire 依賴注入修復",
+            "description": "修復 Wire 依賴注入以支援新的配置結構",
+            "dependencies": [
+              5
+            ],
+            "details": "重新生成 wire_gen.go 檔案以支援從 AppConfig 升級為更有組織的 Config 結構，確保所有依賴注入正確運作",
+            "status": "done",
+            "testStrategy": "編譯測試整個應用程式，確保沒有依賴注入相關的錯誤"
+          },
+          {
+            "id": 7,
+            "title": "測試環境變數載入機制",
+            "description": "測試 godotenv 環境變數載入機制在本地和 Lambda 環境中的運作",
+            "dependencies": [
+              5,
+              6
+            ],
+            "details": "1. 測試本地開發環境中從 .env.dev.local、.env.local 和 .env 檔案載入環境變數的優先順序\n2. 測試 Lambda 環境中的環境變數讀取，確保 Lambda 環境變數優先級高於檔案載入",
+            "status": "pending",
+            "testStrategy": "在不同環境設定中測試應用程式，確認環境變數正確載入並應用"
           }
         ]
       },
@@ -700,7 +723,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-21T06:04:06.388Z",
+      "updated": "2025-06-21T06:47:51.565Z",
       "description": "Tasks for master context"
     }
   }

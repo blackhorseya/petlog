@@ -20,21 +20,23 @@ import (
 // initPetAPI initializes the pet API.
 func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), error) {
 	wire.Build(
-		// Database
+		// 資料庫層
 		mongodb.ProviderSet,
 		mongodb.NewPetMongoRepo,
 
-		// Usecase Handlers
+		// 用例處理器
 		command.NewCreatePetHandler,
 		command.NewUpdatePetHandler,
 		command.NewDeletePetHandler,
 		query.NewGetPetByIDHandler,
 		query.NewListPetsByOwnerHandler,
 
-		// Endpoint & Transport
+		// 端點和傳輸層
 		endpoint.MakePetEndpoints,
 		gin.NewGinEngine,
 		gin.NewHTTPHandler,
+
+		// 提供空的 HTTP 選項
 		wire.Value([]kithttp.ServerOption{}),
 	)
 	return nil, nil, nil
