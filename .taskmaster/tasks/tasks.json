@@ -624,7 +624,64 @@
         "priority": "medium",
         "details": "1. 在專案中安裝並設定 Serverless Framework v4。\n2. 建立 `serverless.yml` 設定檔，定義服務名稱、provider (aws)、runtime (go1.x) 和函式。\n3. 設定 API Gateway 事件來觸發 `main` 函式。\n4. 建立或修改 `Makefile`，新增一個 `build-lambda` 指令來編譯 Go 程式，產生適用於 Lambda 的 `bootstrap` 執行檔。\n5. 實作部署流程，並確保環境變數能正確傳遞。",
         "testStrategy": "測試 Serverless Framework 部署流程在開發環境中的運作。驗證 API Gateway 與 Lambda 函式的整合。測試環境變數的正確傳遞。確認 Go 應用程式在 Lambda 環境中的正常運作。",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "安裝和設定 Serverless Framework v4",
+            "description": "在專案中安裝 Serverless Framework v4 並進行初始設定",
+            "dependencies": [],
+            "details": "使用 npm 安裝 Serverless Framework v4，初始化專案，並設定 AWS 認證",
+            "status": "done",
+            "testStrategy": "驗證 serverless 命令可以正確執行，並能夠列出 AWS 服務"
+          },
+          {
+            "id": 2,
+            "title": "創建和配置 serverless.yml",
+            "description": "建立 serverless.yml 文件並定義服務配置",
+            "dependencies": [
+              1
+            ],
+            "details": "定義服務名稱、AWS 作為 provider、Go 1.x 作為 runtime，並配置主函數",
+            "status": "in-progress",
+            "testStrategy": "使用 serverless print 命令檢查配置是否正確"
+          },
+          {
+            "id": 3,
+            "title": "設定 API Gateway 觸發器",
+            "description": "在 serverless.yml 中配置 API Gateway 事件以觸發 Lambda 函數",
+            "dependencies": [
+              2
+            ],
+            "details": "為主函數添加 HTTP 事件配置，指定路徑和方法",
+            "status": "pending",
+            "testStrategy": "部署後使用 curl 或 Postman 測試 API 端點"
+          },
+          {
+            "id": 4,
+            "title": "實現 Lambda 函數構建流程",
+            "description": "創建或修改 Makefile 以編譯 Go 代碼為 Lambda 可執行文件",
+            "dependencies": [
+              2
+            ],
+            "details": "添加 build-lambda 命令，使用 GOOS=linux 和 GOARCH=amd64 編譯生成 bootstrap 文件",
+            "status": "pending",
+            "testStrategy": "執行 build-lambda 命令並驗證 bootstrap 文件的存在和大小"
+          },
+          {
+            "id": 5,
+            "title": "實現部署流程和環境變量管理",
+            "description": "配置部署命令並確保環境變量正確傳遞到 Lambda",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "在 Makefile 中添加部署命令，在 serverless.yml 中定義環境變量，並使用 AWS Systems Manager Parameter Store 管理敏感數據",
+            "status": "pending",
+            "testStrategy": "部署後檢查 Lambda 配置中的環境變量，並執行函數以驗證變量是否正確傳遞"
+          }
+        ]
       },
       {
         "id": 21,
@@ -643,7 +700,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-21T03:06:16.437Z",
+      "updated": "2025-06-21T03:40:04.246Z",
       "description": "Tasks for master context"
     }
   }

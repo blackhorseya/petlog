@@ -1,0 +1,6 @@
+{
+	"devDependencies": {
+		"glob": "^11.0.3",
+		"serverless-go-plugin": "^2.4.1"
+	}
+}
