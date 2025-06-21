@@ -1,28 +1,37 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Auth0Provider } from "@auth0/nextjs-auth0";
-import { auth0 } from "@/lib/auth0";
+
+import { ThemeProvider } from "@/hooks/use-theme";
+import { AppLayout } from "@/components/layout/app-layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PetLog",
-  description: "Track your pet's health and wellness.",
+  title: "PetLog - 寵物健康管理系統",
+  description: "追蹤您的寵物健康與生活記錄，讓愛寵更健康快樂。",
+  keywords: ["寵物", "健康管理", "醫療記錄", "寵物日記"],
+  authors: [{ name: "PetLog Team" }],
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth0.getSession();
-
   return (
-    <html lang="en">
-      <Auth0Provider user={session?.user}>
-        <body className={inter.className}>{children}</body>
-      </Auth0Provider>
+    <html lang="zh-TW" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider
+          defaultTheme="system"
+          storageKey="petlog-ui-theme"
+        >
+          <AppLayout>
+            {children}
+          </AppLayout>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
