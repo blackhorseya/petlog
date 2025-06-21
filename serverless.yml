@@ -30,7 +30,7 @@ custom:
 provider:
   name: aws
   # 建議使用 provided，這是目前 Go 在 Lambda 上的標準執行環境
-  runtime: provided
+  runtime: provided.al2
   region: ap-northeast-1 # 請根據您的需求修改區域
   stage: ${opt:stage, 'dev'}
   # httpApi:
@@ -44,7 +44,7 @@ package:
 functions:
   api:
     # 指向包含 main.go 的套件目錄
-    handler: cmd/petlog
+    handler: ./cmd/petlog
     events:
       - httpApi:
           method: "*"
