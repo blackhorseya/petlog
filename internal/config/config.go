@@ -24,6 +24,13 @@ func LoadConfig() (AppConfig, error) {
 	viper.SetEnvKeyReplacer(replacer)
 	viper.AutomaticEnv()
 
+	// Explicitly bind environment variables to config fields
+	viper.MustBindEnv("auth0_domain", "AUTH0_DOMAIN")
+	viper.MustBindEnv("auth0_audience", "AUTH0_AUDIENCE")
+	viper.MustBindEnv("mongo_uri", "MONGO_URI")
+	viper.MustBindEnv("mongo_database", "MONGO_DATABASE")
+	viper.MustBindEnv("server_port", "SERVER_PORT")
+
 	// Try to read from config file for local dev, but env vars will always override.
 	viper.AddConfigPath(".")
 	viper.SetConfigName(".env")

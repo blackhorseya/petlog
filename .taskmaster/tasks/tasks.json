@@ -641,8 +641,8 @@
             "dependencies": [
               1
             ],
-            "details": "定義服務名稱、AWS 作為 provider、Go 1.x 作為 runtime，並配置主函數",
-            "status": "in-progress",
+            "details": "定義服務名稱、AWS 作為 provider、Go 1.x 作為 runtime，並配置主函數\n<info added on 2025-06-21T06:04:06.154Z>\n已完成 serverless.yml 的建立和設定，包括：\n1. 使用 serverless-go-plugin 進行 Go 程式編譯\n2. 設定 provided.al2 runtime\n3. 配置環境變數從 .env 檔案讀取並注入到 Lambda\n4. 設定 HTTP API Gateway 觸發器\n</info added on 2025-06-21T06:04:06.154Z>",
+            "status": "done",
             "testStrategy": "使用 serverless print 命令檢查配置是否正確"
           },
           {
@@ -677,7 +677,7 @@
               3,
               4
             ],
-            "details": "在 Makefile 中添加部署命令，在 serverless.yml 中定義環境變量，並使用 AWS Systems Manager Parameter Store 管理敏感數據",
+            "details": "在 Makefile 中添加部署命令，在 serverless.yml 中定義環境變量，並使用 AWS Systems Manager Parameter Store 管理敏感數據\n<info added on 2025-06-21T06:04:10.497Z>\n已完成環境變數管理的設定：\n1. 修改 config.go 使用 viper.MustBindEnv() 明確綁定環境變數\n2. 設定 serverless.yml 從 .env 檔案讀取環境變數並注入到 Lambda\n3. 確保 MONGO_URI, MONGO_DATABASE, AUTH0_DOMAIN, AUTH0_AUDIENCE 等關鍵變數能正確傳遞\n</info added on 2025-06-21T06:04:10.497Z>",
             "status": "pending",
             "testStrategy": "部署後檢查 Lambda 配置中的環境變量，並執行函數以驗證變量是否正確傳遞"
           }
@@ -700,7 +700,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-21T03:40:04.246Z",
+      "updated": "2025-06-21T06:04:06.388Z",
       "description": "Tasks for master context"
     }
   }
