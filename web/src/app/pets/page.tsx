@@ -1,12 +1,16 @@
 "use client";
 
 import { useUser } from "@auth0/nextjs-auth0";
-import { PawPrint, Plus } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { PetList } from "@/components/pets/pet-list";
+import { PetProfile } from "@/components/pets/pet-profile";
+import { PetForm } from "@/components/pets/pet-form";
+import { Pet } from "@/lib/types/pet";
+import { useState } from "react";
 
 export default function PetsPage() {
   const { user, isLoading } = useUser();
+  const [selectedPet, setSelectedPet] = useState<Pet | undefined>();
+  const [isEditingPet, setIsEditingPet] = useState(false);
 
   if (isLoading) {
     return (
@@ -25,35 +29,42 @@ export default function PetsPage() {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">我的寵物</h1>
-          <p className="text-muted-foreground">
-            管理您的寵物檔案和基本資訊
-          </p>
-        </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          新增寵物
-        </Button>
-      </div>
+  const handlePetSelect = (pet: Pet) => {
+    setSelectedPet(pet);
+  };
 
-      {/* Empty state */}
-      <div className="text-center py-12">
-        <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
-          <PawPrint className="h-12 w-12 text-muted-foreground" />
-        </div>
-        <h3 className="text-lg font-semibold mb-2">還沒有寵物</h3>
-        <p className="text-muted-foreground mb-4">
-          開始新增您的第一隻寵物，建立專屬的健康檔案
-        </p>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          新增寵物
-        </Button>
-      </div>
-    </div>
-  );
+  const handleBackToList = () => {
+    setSelectedPet(undefined);
+  };
+
+  const handleEditPet = (pet: Pet) => {
+    setSelectedPet(pet);
+    setIsEditingPet(true);
+  };
+
+  const handleCloseEdit = () => {
+    setIsEditingPet(false);
+  };
+
+  // 如果選擇了寵物，顯示寵物詳細檔案
+  if (selectedPet) {
+    return (
+      <>
+        <PetProfile
+          pet={selectedPet}
+          onBack={handleBackToList}
+          onEdit={handleEditPet}
+        />
+        <PetForm
+          open={isEditingPet}
+          onOpenChange={(open) => !open && handleCloseEdit()}
+          pet={selectedPet}
+          onSuccess={handleCloseEdit}
+        />
+      </>
+    );
+  }
+
+  // 顯示寵物列表
+  return <PetList onPetSelect={handlePetSelect} />;
 }
