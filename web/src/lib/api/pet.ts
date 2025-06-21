@@ -8,6 +8,7 @@ import {
   UpdatePetResponse,
   DeletePetResponse,
 } from '../types/pet';
+import { getAccessToken } from '@auth0/nextjs-auth0';
 
 // API 基礎 URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -20,26 +21,11 @@ async function apiRequest<T>(
   const url = `${API_BASE_URL}${endpoint}`;
   
   try {
-    // 獲取 Auth0 存取令牌
-    // 注意：在開發階段，如果沒有設置 Auth0，將會優雅地失敗並繼續請求
-    let token: string | null = null;
-    
-    if (typeof window !== 'undefined') {
-      // 客戶端：通過 Auth0 標準路由獲取令牌
-      try {
-        const tokenResponse = await fetch('/auth/access-token');
-        if (tokenResponse.ok) {
-          const tokenData = await tokenResponse.json();
-          token = tokenData.access_token; // Auth0 標準回應格式
-        }
-      } catch (tokenError) {
-        console.warn('無法獲取 Auth0 存取令牌 (開發階段可忽略):', tokenError);
-      }
-    }
+    const accessToken = await getAccessToken();
 
     const headers = {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
+      Authorization: `Bearer ${accessToken}`,
       ...options.headers,
     };
 
@@ -50,7 +36,21 @@ async function apiRequest<T>(
 
     if (!response.ok) {
       const errorData = await response.text();
-      throw new Error(`API 請求失敗: ${response.status} ${response.statusText} - ${errorData}`);
+      let errorMessage = `API 請求失敗: ${response.status} ${response.statusText}`;
+      try {
+        // 嘗試解析 JSON 格式的錯誤
+        const parsedError = JSON.parse(errorData);
+        if (parsedError.error) {
+          errorMessage += ` - ${parsedError.error}`;
+        }
+        if (parsedError.message) {
+          errorMessage += `: ${parsedError.message}`;
+        }
+      } catch (e) {
+        // 如果不是 JSON，則直接使用純文字
+        errorMessage += ` - ${errorData}`;
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
