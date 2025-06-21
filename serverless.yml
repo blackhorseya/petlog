@@ -7,8 +7,11 @@ service: petlog
 
 frameworkVersion: "4"
 
+useDotenv: true
+
 plugins:
   - serverless-go-plugin
+  - serverless-dotenv-plugin
 
 custom:
   go:
@@ -26,13 +29,20 @@ custom:
     supportedRuntimes: ["provided.al2"]
     # 如果為 true，則將提供的 runtime 函式建立為單一的 "bootstrap" 二進位檔
     buildProvidedRuntimeAsBootstrap: true
+  dotenv:
+    logging: true
 
 provider:
   name: aws
   # 建議使用 provided，這是目前 Go 在 Lambda 上的標準執行環境
   runtime: provided.al2
   region: ap-northeast-1 # 請根據您的需求修改區域
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'int'}
+  environment:
+    MONGO_URI: ${env:MONGO_URI}
+    MONGO_DATABASE: ${env:MONGO_DATABASE}
+    AUTH0_DOMAIN: ${env:AUTH0_DOMAIN}
+    AUTH0_AUDIENCE: ${env:AUTH0_AUDIENCE}
   # httpApi:
   #   cors: true
 

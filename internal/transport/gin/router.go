@@ -7,11 +7,21 @@ import (
 	"github.com/blackhorseya/petlog/internal/endpoint"
 	"github.com/gin-gonic/gin"
 	httptransport "github.com/go-kit/kit/transport/http"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // NewGinEngine creates a new Gin engine with default middleware.
 func NewGinEngine() *gin.Engine {
-	return gin.Default()
+	r := gin.New()
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
+
+	// Swagger documentation endpoint
+	// URL: /api/docs/index.html
+	r.GET("/api/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	return r
 }
 
 // NewHTTPHandler sets up the routing and returns the main HTTP handler.
