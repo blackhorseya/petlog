@@ -21,18 +21,19 @@ async function apiRequest<T>(
   
   try {
     // 獲取 Auth0 存取令牌
+    // 注意：在開發階段，如果沒有設置 Auth0，將會優雅地失敗並繼續請求
     let token: string | null = null;
     
     if (typeof window !== 'undefined') {
-      // 客戶端：通過 Auth0 API 路由獲取令牌
+      // 客戶端：通過 Auth0 標準路由獲取令牌
       try {
-        const tokenResponse = await fetch('/api/auth/token');
+        const tokenResponse = await fetch('/auth/access-token');
         if (tokenResponse.ok) {
           const tokenData = await tokenResponse.json();
-          token = tokenData.accessToken;
+          token = tokenData.access_token; // Auth0 標準回應格式
         }
       } catch (tokenError) {
-        console.warn('無法獲取存取令牌:', tokenError);
+        console.warn('無法獲取 Auth0 存取令牌 (開發階段可忽略):', tokenError);
       }
     }
 
