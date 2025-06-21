@@ -1,591 +1,599 @@
 {
-  "master": {
-    "tasks": [
-      {
-        "id": 1,
-        "title": "Setup Project Repository and Development Environment",
-        "description": "Initialize the project repository with Next.js 14, TypeScript, and TailwindCSS. Set up a local Docker development environment.",
-        "details": "1. Create a new GitHub repository named 'petlog'\n2. Initialize Next.js 14 project with TypeScript:\n   npx create-next-app@latest petlog --typescript\n3. Install TailwindCSS:\n   npm install -D tailwindcss postcss autoprefixer\n   npx tailwindcss init -p\n4. Set up Docker for local development:\n   - Create Dockerfile and docker-compose.yml\n   - Include services for Next.js, Go API, and MongoDB\n5. Set up VSCode with recommended extensions (ESLint, Prettier, Docker)\n6. Initialize Go modules and create basic project structure following Clean Architecture",
-        "testStrategy": "Verify that the development environment can be started with Docker Compose and that Next.js, Go API, and MongoDB services are running correctly.",
-        "priority": "high",
-        "dependencies": [],
-        "status": "done",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Initialize GitHub Repository and Next.js Project",
-            "description": "Create a new GitHub repository and set up a Next.js 14 project with TypeScript",
-            "dependencies": [],
-            "details": "1. Create a new GitHub repository named 'petlog'\n2. Clone the repository locally\n3. Run 'npx create-next-app@latest petlog --typescript'\n4. Push the initial commit to GitHub",
-            "status": "done",
-            "testStrategy": "Verify the repository is created on GitHub and the Next.js project structure is present locally"
-          },
-          {
-            "id": 2,
-            "title": "Install and Configure TailwindCSS",
-            "description": "Add TailwindCSS to the Next.js project and set up the necessary configuration",
-            "dependencies": [
-              1
-            ],
-            "details": "1. Run 'npm install -D tailwindcss postcss autoprefixer'\n2. Execute 'npx tailwindcss init -p'\n3. Configure Tailwind by updating tailwind.config.js and globals.css",
-            "status": "done",
-            "testStrategy": "Create a sample component using Tailwind classes and verify styling is applied correctly"
-          },
-          {
-            "id": 3,
-            "title": "Set Up Docker Development Environment",
-            "description": "Create Docker configuration for local development including Next.js, Go API, and MongoDB services",
-            "dependencies": [
-              1
-            ],
-            "details": "1. Create a Dockerfile for the Next.js application\n2. Create a docker-compose.yml file with services for Next.js, Go API, and MongoDB\n3. Configure environment variables and network settings",
-            "status": "deferred",
-            "testStrategy": "Run 'docker-compose up' and verify all services start without errors"
-          },
-          {
-            "id": 4,
-            "title": "Configure VSCode with Recommended Extensions",
-            "description": "Set up Visual Studio Code with ESLint, Prettier, and Docker extensions",
-            "dependencies": [],
-            "details": "1. Install ESLint, Prettier, and Docker extensions in VSCode\n2. Create .vscode/extensions.json with recommended extensions\n3. Set up ESLint and Prettier configuration files",
-            "status": "done",
-            "testStrategy": "Open the project in VSCode and verify all recommended extensions are installed and functioning"
-          },
-          {
-            "id": 5,
-            "title": "Initialize Go API Project Structure",
-            "description": "Set up the Go API project following Clean Architecture principles",
-            "dependencies": [
-              1
-            ],
-            "details": "1. Initialize Go modules with 'go mod init github.com/yourusername/petlog-api'\n2. Create directory structure: cmd, internal, pkg\n3. Set up basic main.go file in cmd/api\n4. Implement initial Clean Architecture layers: domain, usecase, repository, delivery",
-            "status": "done",
-            "testStrategy": "Run 'go build ./...' and ensure the project compiles without errors"
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "title": "Implement User Authentication",
-        "description": "Implement user authentication using Auth0 for both backend and frontend integration.",
-        "status": "done",
-        "dependencies": [
-          1
-        ],
-        "priority": "high",
-        "details": "1. Set up Auth0 account and configure application settings\n2. Integrate Auth0 SDK with Go backend:\n   - Configure Auth0 application settings for API\n   - Implement JWT verification middleware using Auth0 libraries\n   - Set up necessary environment variables and configuration\n3. Integrate Auth0 SDK with Next.js frontend:\n   - Install and configure Auth0 React SDK\n   - Implement login, logout, and user profile functionality\n   - Handle authentication state and protected routes\n4. Implement proper error handling for authentication failures\n5. Set up proper CORS and security configurations\n6. Configure Auth0 Rules or Actions for custom claims if needed",
-        "testStrategy": "Write unit tests for Auth0 integration. Implement integration tests for authentication flows. Test token verification middleware. Create end-to-end tests for login, logout, and protected routes.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Set Up Auth0 Account and Application",
-            "description": "Create and configure Auth0 account with appropriate application settings for our project.",
-            "dependencies": [],
-            "details": "Create Auth0 account. Set up a new application in Auth0 dashboard. Configure callback URLs, logout URLs, and allowed web origins. Set up API settings and permissions. Document all credentials and configuration details securely.",
-            "status": "done",
-            "testStrategy": "Verify that the Auth0 application is properly configured by testing login flow manually before implementation."
-          },
-          {
-            "id": 2,
-            "title": "Integrate Auth0 with Go Backend",
-            "description": "Implement Auth0 integration with the Go backend for JWT verification and protected routes.",
-            "dependencies": [
-              1
-            ],
-            "details": "Install Auth0 Go SDK or appropriate JWT libraries. Configure middleware to validate Auth0-issued JWTs. Set up environment variables for Auth0 domain, audience, and other required settings. Implement error handling for authentication failures.",
-            "status": "done",
-            "testStrategy": "Write unit tests for JWT verification middleware. Create integration tests to ensure protected routes properly validate Auth0 tokens."
-          },
-          {
-            "id": 3,
-            "title": "Implement JWT Verification Middleware",
-            "description": "Create middleware to verify Auth0-issued JWT tokens for protected routes.",
-            "dependencies": [
-              2
-            ],
-            "details": "Develop middleware that extracts JWT from the Authorization header. Verify token signature and expiration using Auth0 public keys. Attach user information to the request context. Handle various authentication error scenarios gracefully.",
-            "status": "done",
-            "testStrategy": "Write unit tests for token extraction and verification. Create integration tests with protected routes to ensure proper middleware functionality."
-          },
-          {
-            "id": 4,
-            "title": "Integrate Auth0 with Next.js Frontend",
-            "description": "Implement Auth0 authentication in the Next.js frontend application.",
-            "dependencies": [
-              1
-            ],
-            "details": "Install Auth0 React SDK (@auth0/auth0-react). Configure Auth0Provider with appropriate settings. Create login and logout buttons. Implement protected routes using authentication state. Handle authentication callbacks and redirects.",
-            "status": "done",
-            "testStrategy": "Write unit tests for authentication components. Create integration tests to verify login, logout, and protected route functionality."
-          },
-          {
-            "id": 5,
-            "title": "Implement User Profile and Token Management",
-            "description": "Handle user profile information and token management in the frontend application.",
-            "dependencies": [
-              4
-            ],
-            "details": "Retrieve and display user profile information from Auth0. Implement proper token storage and renewal. Handle session expiration gracefully. Create user profile components to display user information.",
-            "status": "done",
-            "testStrategy": "Test user profile retrieval and display. Verify token renewal functionality. Test session expiration handling."
-          },
-          {
-            "id": 6,
-            "title": "Configure Auth0 Rules or Actions",
-            "description": "Set up custom Auth0 Rules or Actions for additional authentication logic if needed.",
-            "dependencies": [
-              1
-            ],
-            "details": "Evaluate requirements for custom authentication logic. Implement Auth0 Rules or Actions for custom claims or additional validation. Test and verify custom logic works as expected.",
-            "status": "done",
-            "testStrategy": "Test custom Rules or Actions to ensure they properly modify tokens or authentication behavior as expected."
-          }
-        ]
-      },
-      {
-        "id": 3,
-        "title": "定義領域模型 (Domain Models) 與倉儲介面 (Repository Interfaces)",
-        "description": "在 `internal/domain` 套件中，為 `Pet`、`HealthLog` 和 `MedicalRecord` 建立 Go 的 struct。為每個模型定義一個 `Repository` 介面，並明確指定所需的 CRUD 方法簽名 (例如：Create, FindByID, Update, Delete)。此層級必須保持純淨，不依賴任何特定的資料庫驅動程式或其他基礎設施。",
-        "status": "done",
-        "dependencies": [
-          1
-        ],
-        "priority": "high",
-        "details": "1. 在 `internal/domain` 套件中建立領域模型：\n   - Pet: {ID, OwnerID, Name, AvatarURL, DOB, Breed, MicrochipID}\n   - HealthLog: {ID, PetID, Date, WeightKg, FoodGram, LitterNotes, BehaviourNotes}\n   - MedicalRecord: {ID, PetID, Type, Description, Date, NextDueDate, Dosage}\n\n2. 為每個模型定義倉儲介面：\n   ```go\n   type PetRepository interface {\n     Create(ctx context.Context, pet *Pet) error\n     FindByID(ctx context.Context, id string) (*Pet, error)\n     FindByOwnerID(ctx context.Context, ownerID string) ([]*Pet, error)\n     Update(ctx context.Context, pet *Pet) error\n     Delete(ctx context.Context, id string) error\n   }\n   ```\n   (為 HealthLogRepository 和 MedicalRecordRepository 建立類似的介面)\n\n3. 確保領域模型和倉儲介面不依賴 MongoDB 或其他基礎設施\n\n4. 記錄每個倉儲方法的預期行為\n\n5. 為後續任務準備 MongoDB 的實作 (將在基礎設施層實作)",
-        "testStrategy": "為領域模型編寫單元測試，以驗證它們包含所有必要的欄位。建立倉儲介面的模擬實作以進行測試。在測試中使用依賴注入，以確保領域層保持純淨。",
-        "subtasks": []
-      },
-      {
-        "id": 4,
-        "title": "實作寵物管理的 Usecase/Service",
-        "description": "在 `internal/usecase` 套件中，採用 CQRS (Command Query Responsibility Segregation) 架構實作寵物管理服務。將分離讀取操作 (Query) 和寫入操作 (Command)，並將共享的驗證邏輯放在 behavior 中。所有處理器將透過其建構函式，接收 `pet.Repository` 介面 (在任務 #3 中定義) 作為依賴。它們應實作寵物資料的 CRUD 核心業務邏輯，並由 `Endpoint` 層呼叫。此任務不應包含任何傳輸層或特定資料庫的程式碼。",
-        "status": "done",
-        "dependencies": [
-          2,
-          3
-        ],
-        "priority": "high",
-        "details": "1. 在 internal/usecase 中建立以下目錄結構：\n   - command/ - 處理寫入操作\n   - query/ - 處理讀取操作\n   - behavior/ - 共享的驗證邏輯\n\n2. 實作 Command Handlers：\n   - CreatePetHandler - 建立新寵物\n   - UpdatePetHandler - 更新寵物詳細資訊\n   - DeletePetHandler - 刪除寵物\n\n3. 實作 Query Handlers：\n   - GetPetByIDHandler - 獲取寵物詳細資訊\n   - ListPetsByOwnerHandler - 列出已認證使用者的所有寵物\n\n4. 在 behavior/ 中實作共享的驗證邏輯\n\n5. 每個 Handler 應：\n   - 接收 pet.Repository 作為依賴\n   - 實作適當的錯誤處理\n   - 使用 uber-go/zap 實作適當的日誌記錄\n\n6. 遵循乾淨架構原則：\n   - 無傳輸層依賴 (HTTP、gRPC 等)\n   - 無特定資料庫程式碼\n   - 專注於業務規則和使用案例\n\n7. 使用 internal/domain 中定義的領域模型",
-        "testStrategy": "1. 為每個 Command 和 Query Handler 編寫全面的單元測試\n2. 為儲存庫介面使用模擬 (mock)\n3. 測試正常路徑和錯誤情境\n4. 驗證業務邏輯正確性\n5. 確保正確驗證輸入\n6. 測試 behavior 中的共享驗證邏輯",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "擴展 contextx 以支援 User ID",
-            "description": "擴展 contextx 套件，使其能夠在上下文中攜帶和提取使用者 ID，以便在 CQRS 處理器中識別當前使用者。",
-            "dependencies": [],
-            "details": "1. 在 internal/contextx 套件中新增支援使用者 ID 的功能\n2. 實作 WithUserID 函數，將使用者 ID 添加到上下文中\n3. 實作 GetUserID 函數，從上下文中提取使用者 ID\n4. 確保這些函數具有適當的錯誤處理，例如當上下文中沒有使用者 ID 時",
-            "status": "done",
-            "testStrategy": "編寫單元測試，確保 WithUserID 和 GetUserID 函數在各種情況下都能正確工作，包括正常情況和錯誤情況"
-          },
-          {
-            "id": 2,
-            "title": "實作 CreatePet Command Handler",
-            "description": "在 command 目錄中實作 CreatePet 命令處理器，負責建立新寵物的業務邏輯。",
-            "dependencies": [
-              1
-            ],
-            "details": "1. 在 internal/usecase/command 目錄中建立 create_pet.go 檔案\n2. 定義 CreatePetCommand 結構體，包含建立寵物所需的所有資料\n3. 實作 CreatePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物建立邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 驗證輸入資料\n   - 建立新的寵物實體\n   - 調用儲存庫保存寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
-            "status": "done",
-            "testStrategy": "編寫單元測試，覆蓋成功建立寵物和各種失敗情境，如無效輸入、儲存庫錯誤等"
-          },
-          {
-            "id": 3,
-            "title": "實作 UpdatePet Command Handler",
-            "description": "在 command 目錄中實作 UpdatePet 命令處理器，負責更新現有寵物資訊的業務邏輯。",
-            "dependencies": [
-              1
-            ],
-            "details": "1. 在 internal/usecase/command 目錄中建立 update_pet.go 檔案\n2. 定義 UpdatePetCommand 結構體，包含更新寵物所需的所有資料\n3. 實作 UpdatePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物更新邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 驗證輸入資料\n   - 檢查寵物是否存在\n   - 驗證使用者是否有權限更新該寵物\n   - 更新寵物資訊\n   - 調用儲存庫保存更新後的寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
-            "status": "done",
-            "testStrategy": "編寫單元測試，覆蓋成功更新寵物和各種失敗情境，如無效輸入、寵物不存在、權限不足等"
-          },
-          {
-            "id": 4,
-            "title": "實作 DeletePet Command Handler",
-            "description": "在 command 目錄中實作 DeletePet 命令處理器，負責刪除寵物的業務邏輯。",
-            "dependencies": [
-              1
-            ],
-            "details": "1. 在 internal/usecase/command 目錄中建立 delete_pet.go 檔案\n2. 定義 DeletePetCommand 結構體，包含刪除寵物所需的資料（主要是寵物 ID）\n3. 實作 DeletePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物刪除邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 檢查寵物是否存在\n   - 驗證使用者是否有權限刪除該寵物\n   - 調用儲存庫刪除寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
-            "status": "done",
-            "testStrategy": "編寫單元測試，覆蓋成功刪除寵物和各種失敗情境，如寵物不存在、權限不足等"
-          },
-          {
-            "id": 5,
-            "title": "實作 GetPetByID Query Handler",
-            "description": "在 query 目錄中實作 GetPetByID 查詢處理器，負責獲取特定寵物詳細資訊的業務邏輯。",
-            "dependencies": [
-              1
-            ],
-            "details": "1. 在 internal/usecase/query 目錄中建立 get_pet_by_id.go 檔案\n2. 定義 GetPetByIDQuery 結構體，包含獲取寵物所需的資料（主要是寵物 ID）\n3. 實作 GetPetByIDHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理獲取寵物詳細資訊的邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 調用儲存庫獲取寵物\n   - 驗證使用者是否有權限查看該寵物\n   - 處理可能的錯誤，如寵物不存在\n   - 實作適當的日誌記錄",
-            "status": "done",
-            "testStrategy": "編寫單元測試，覆蓋成功獲取寵物和各種失敗情境，如寵物不存在、權限不足等"
-          },
-          {
-            "id": 6,
-            "title": "實作 ListPetsByOwner Query Handler",
-            "description": "在 query 目錄中實作 ListPetsByOwner 查詢處理器，負責列出使用者所有寵物的業務邏輯。",
-            "dependencies": [
-              1
-            ],
-            "details": "1. 在 internal/usecase/query 目錄中建立 list_pets_by_owner.go 檔案\n2. 定義 ListPetsByOwnerQuery 結構體，可能包含分頁或過濾選項\n3. 實作 ListPetsByOwnerHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理列出使用者寵物的邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 調用儲存庫獲取該使用者的所有寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄\n   - 支援可能的分頁或過濾功能",
-            "status": "done",
-            "testStrategy": "編寫單元測試，覆蓋成功列出寵物和各種情境，如使用者沒有寵物、分頁功能等"
-          },
-          {
-            "id": 7,
-            "title": "實作共享的驗證邏輯",
-            "description": "在 behavior 目錄中實作可被 Command 和 Query Handlers 共用的驗證邏輯。",
-            "dependencies": [],
-            "details": "1. 在 internal/usecase/behavior 目錄中建立適當的檔案結構\n2. 實作寵物資料驗證函數，如檢查名稱、類型、年齡等\n3. 實作權限檢查邏輯，確保使用者只能操作自己的寵物\n4. 實作其他可能的共享邏輯，如格式化或轉換函數\n5. 設計易於重用的介面，讓 Command 和 Query Handlers 可以方便地使用這些驗證邏輯",
-            "status": "done",
-            "testStrategy": "為共享的驗證邏輯編寫單元測試，確保在各種情況下都能正確驗證輸入和權限"
-          },
-          {
-            "id": 8,
-            "title": "為所有新的 Handlers 撰寫單元測試",
-            "description": "為所有實作的 Command 和 Query Handlers 撰寫全面的單元測試，確保它們在各種情況下都能正確工作。",
-            "dependencies": [
-              2,
-              3,
-              4,
-              5,
-              6,
-              7
-            ],
-            "details": "1. 為每個 Command 和 Query Handler 建立對應的測試檔案\n2. 使用模擬 (mock) 來模擬 pet.Repository 的行為\n3. 測試正常路徑和各種錯誤情境\n4. 驗證業務邏輯的正確性\n5. 確保正確驗證輸入和權限\n6. 測試與共享驗證邏輯的整合",
-            "status": "done",
-            "testStrategy": "確保測試覆蓋率高，包括所有可能的分支和錯誤情境，使用模擬來隔離測試對象"
-          }
-        ]
-      },
-      {
-        "id": 5,
-        "title": "實作 MongoDB 倉儲 (Repositories)",
-        "description": "在 `internal/infra/mongodb` 目錄下，為 Pet, HealthLog, 和 MedicalRecord 這三個領域模型實作完整的 Repository 介面。這將取代所有臨時的存根 (stub) 實作，並包含所有必要的 CRUD (Create, Read, Update, Delete) 操作。",
-        "status": "in-progress",
-        "dependencies": [
-          3
-        ],
-        "priority": "high",
-        "details": "1. 在 `internal/infra/mongodb` 中建立 MongoDB 連線邏輯\n   - 實作連線池管理\n   - 設定連線參數（URI、認證、超時等）\n   - 實作健康檢查功能\n\n2. 為每個領域模型建立對應的 Repository 實作：\n   - `pet_repository_impl.go` 和 `pet_repository_model.go`\n   - `health_log_repository_impl.go` 和 `health_log_repository_model.go`\n   - `medical_record_repository_impl.go` 和 `medical_record_repository_model.go`\n\n3. 為每個模型實作完整的 CRUD 操作：\n   - 建立 (Create)：將領域模型轉換為 MongoDB 文件並儲存，使用 `bson.NewObjectID()` 生成 ID\n   - 讀取 (Read)：支援單一項目查詢和列表查詢\n   - 更新 (Update)：支援完整更新和部分更新\n   - 刪除 (Delete)：支援軟刪除和硬刪除\n\n4. 實作資料轉換層：\n   - 在各自的 `*_repository_model.go` 檔案中建立領域模型與 MongoDB 文件之間的轉換函數\n   - 處理 MongoDB 特有的 ID 類型 (ObjectID) 轉換\n   - 確保日期時間格式正確處理\n\n5. 實作進階查詢功能：\n   - 基於游標的分頁功能\n   - 多條件過濾（日期範圍、類型、狀態等）\n   - 排序功能\n\n6. 實作索引管理：\n   - 為常用查詢建立適當的索引\n   - 實作索引初始化和更新機制\n\n7. 錯誤處理與日誌：\n   - 使用 `internal/domain/errors.go` 中定義的標準化領域錯誤（如 `ErrNotFound`、`ErrInvalidID`）\n   - 將 MongoDB 錯誤轉換為應用程式定義的錯誤類型\n   - 實作詳細的操作日誌\n   - 處理連線失敗、超時等異常情況\n\n8. 效能最佳化：\n   - 實作批次操作支援\n   - 最佳化查詢（投影、限制返回欄位）\n   - 實作適當的快取策略",
-        "testStrategy": "1. 單元測試：\n   - 為每個 Repository 實作撰寫完整的單元測試\n   - 使用模擬 (mock) MongoDB 驅動進行測試\n   - 測試所有 CRUD 操作的正常和異常路徑\n   - 測試標準化錯誤處理（如 `ErrNotFound`、`ErrInvalidID`）\n\n2. 整合測試：\n   - 使用 Docker 容器啟動測試用 MongoDB 實例\n   - 測試實際資料庫連線和操作\n   - 驗證資料持久化和查詢結果\n\n3. 功能測試：\n   - 測試分頁功能（驗證結果集大小、游標行為）\n   - 測試過濾功能（多條件組合、邊界條件）\n   - 測試排序功能\n\n4. 錯誤處理測試：\n   - 模擬連線失敗情境\n   - 測試無效輸入處理\n   - 測試並發操作下的行為\n\n5. 效能測試：\n   - 對批次操作進行基準測試\n   - 測試大數據集下的查詢效能\n   - 驗證索引效果\n\n6. 測試資料管理：\n   - 建立測試資料生成器\n   - 確保測試前後資料庫狀態一致性\n   - 實作測試資料清理機制",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "實作 Pet Repository",
-            "description": "在 `internal/infra/mongodb` 目錄下實作 Pet 模型的 Repository 介面",
-            "dependencies": [],
-            "details": "建立 `pet_repository_impl.go` 文件，實作 CRUD 操作，包括建立、讀取（單一和列表）、更新和刪除功能。實作資料轉換層，處理領域模型與 MongoDB 文件之間的轉換。\n<info added on 2025-06-20T03:20:28.550Z>\n已完成 Pet Repository 的基礎結構和 Create 方法實作：\n\n## 完成的工作\n1. **更新到 MongoDB Go Driver v2**: 修正了 import 路徑使用 `go.mongodb.org/mongo-driver/v2/mongo`\n2. **完成 petMongo struct**: 定義了包含所有必要欄位的持久化模型，使用正確的 `bson` 標籤\n3. **實作模型轉換函式**: \n   - `toDomain()`: 將 petMongo 轉換為 model.Pet\n   - `fromDomain()`: 將 model.Pet 轉換為 petMongo\n4. **實作 Create 方法**: \n   - 使用 contextx 進行日誌記錄（正體中文）\n   - 正確設定 CreatedAt 和 UpdatedAt 時間戳記\n   - 使用 MongoDB v2 API 進行 InsertOne 操作\n   - 完整的錯誤處理和日誌記錄\n   - 將插入後的 ID 回填到領域模型\n\n## 技術細節\n- 遵循 Clean Architecture 原則，將持久化邏輯與領域邏輯分離\n- 使用正體中文撰寫所有註解、日誌訊息和錯誤訊息\n- 採用 contextx 套件進行結構化日誌記錄\n- 正確處理 MongoDB v2 的 API 變化\n\n## 下一步\n需要繼續實作其他 CRUD 方法：FindByID, FindByOwnerID, Update, Delete\n</info added on 2025-06-20T03:20:28.550Z>\n<info added on 2025-06-20T03:23:13.510Z>\n## 程式碼重構與規範更新\n\n### 程式碼重構\n1. **分離持久化模型**: 將 `petMongo` struct 和轉換函式從 `pet_repository_impl.go` 移動到新的 `pet_repository_model.go` 檔案中\n2. **改善程式碼組織**: \n   - `pet_repository_model.go`: 專門存放持久化模型和轉換邏輯\n   - `pet_repository_impl.go`: 專注於實際的 Repository CRUD 操作\n3. **遵循單一職責原則**: 每個檔案都有明確的職責分工\n\n### 規範更新\n更新了 `.cursor/rules/clean_architecture.mdc` 規則，新增了「Repository 持久化模型分離」的最佳實踐：\n- 持久化模型應使用 `*_repository_model.go` 命名\n- 模型檔案包含持久化 struct、`toDomain()` 方法和 `fromDomain()` 函式\n- Repository 實作檔案專注於 CRUD 操作邏輯\n\n### 技術效益\n- **更好的可維護性**: 模型邏輯和業務邏輯分離\n- **更清晰的職責**: 每個檔案職責單一且明確\n- **更易於測試**: 可以獨立測試模型轉換和 Repository 操作\n- **符合團隊規範**: 建立了可重複使用的檔案組織模式\n\n### 下一步\n繼續實作其他 CRUD 方法：FindByID, FindByOwnerID, Update, Delete\n</info added on 2025-06-20T03:23:13.510Z>\n<info added on 2025-06-20T03:30:21.263Z>\n## Pet Repository 完全實作完成！\n\n### 完成的所有 CRUD 方法\n\n1. **Create 方法**\n   - 使用 `InsertOne` 進行文件插入\n   - 自動設定 `CreatedAt` 和 `UpdatedAt` 時間戳記\n   - 將插入後的 ID 回填到領域模型\n   - 完整的錯誤處理和日誌記錄\n\n2. **FindByID 方法**\n   - 使用 `FindOne` 進行單一文件查詢\n   - 正確處理 `mongo.ErrNoDocuments` 錯誤\n   - 自動轉換持久化模型為領域模型\n   - 包含詳細的日誌記錄\n\n3. **FindByOwnerID 方法**\n   - 使用 `Find` 進行多文件查詢\n   - 正確使用 cursor 迭代查詢結果\n   - 適當的 cursor 資源管理（defer close）\n   - 完整的錯誤處理和結果計數日誌\n\n4. **Update 方法**\n   - 使用 `ReplaceOne` 進行文件替換\n   - 智慧處理時間戳記（保留 CreatedAt，更新 UpdatedAt）\n   - 檢查 MatchedCount 確認文件存在\n   - 記錄 ModifiedCount 用於追蹤\n\n5. **Delete 方法**\n   - 使用 `DeleteOne` 進行文件刪除\n   - 檢查 DeletedCount 確認刪除成功\n   - 完整的錯誤處理和確認機制\n\n### 技術亮點\n\n- **MongoDB v2 API 使用**\n  - 正確使用 `go.mongodb.org/mongo-driver/v2` 套件\n  - 使用最新的 `bson.D` 語法進行查詢過濾器\n  - 遵循 v2 版本的最佳實踐\n\n- **Clean Architecture 遵循**\n  - 完全分離持久化邏輯和領域邏輯\n  - 模型轉換函式確保資料流正確\n  - 依賴注入設計模式\n\n- **正體中文本地化**\n  - 所有註解、日誌訊息、錯誤訊息都使用正體中文\n  - 提供清晰的中文技術文件\n\n- **錯誤處理最佳實踐**\n  - 使用 `fmt.Errorf` 和 `%w` 進行錯誤包裝\n  - 適當的日誌等級（Info, Warn, Error）\n  - 具體的錯誤訊息提供除錯資訊\n\n- **效能考量**\n  - 適當的 cursor 資源管理\n  - 時間戳記處理最佳化\n  - 結構化日誌記錄\n\n### 檔案組織\n- `pet_repository_model.go`: 持久化模型和轉換邏輯\n- `pet_repository_impl.go`: Repository 介面實作\n\nPet Repository 已經完全準備好用於生產環境！\n</info added on 2025-06-20T03:30:21.263Z>",
-            "status": "done",
-            "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。"
-          },
-          {
-            "id": 2,
-            "title": "實作 HealthLog Repository",
-            "description": "在 `internal/infra/mongodb` 目錄下實作 HealthLog 模型的 Repository 介面",
-            "dependencies": [],
-            "details": "建立 `health_log_repository_impl.go` 和 `health_log_repository_model.go` 檔案，遵循已建立的設計模式：\n\n1. 在 `health_log_repository_model.go` 中：\n   - 定義 `healthLogMongo` 持久化模型，包含適當的 `bson` 標籤\n   - 實作 `toDomain()` 和 `fromDomain()` 轉換函式\n   - 確保正確處理 `string` ID 和 `bson.ObjectID` 之間的轉換\n\n2. 在 `health_log_repository_impl.go` 中實作完整的 CRUD 操作：\n   - Create：使用 `bson.NewObjectID()` 生成 ID，設定時間戳記\n   - FindByID：根據 ID 查詢單一健康記錄\n   - FindByPetID：查詢特定寵物的所有健康記錄\n   - Update：更新健康記錄，保留 CreatedAt，更新 UpdatedAt\n   - Delete：刪除健康記錄\n\n3. 錯誤處理：\n   - 使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 適當地轉換 MongoDB 錯誤為領域錯誤\n   - 提供詳細的錯誤訊息和日誌記錄",
-            "status": "pending",
-            "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。測試應包括：\n1. 正常操作路徑\n2. 錯誤處理路徑（如 ID 無效、記錄不存在等）\n3. 驗證標準化錯誤的正確使用（如 ErrNotFound、ErrInvalidID）"
-          },
-          {
-            "id": 3,
-            "title": "實作 MedicalRecord Repository",
-            "description": "在 `internal/infra/mongodb` 目錄下實作 MedicalRecord 模型的 Repository 介面",
-            "dependencies": [],
-            "details": "建立 `medical_record_repository_impl.go` 和 `medical_record_repository_model.go` 檔案，遵循已建立的設計模式：\n\n1. 在 `medical_record_repository_model.go` 中：\n   - 定義 `medicalRecordMongo` 持久化模型，包含適當的 `bson` 標籤\n   - 實作 `toDomain()` 和 `fromDomain()` 轉換函式\n   - 確保正確處理 `string` ID 和 `bson.ObjectID` 之間的轉換\n\n2. 在 `medical_record_repository_impl.go` 中實作完整的 CRUD 操作：\n   - Create：使用 `bson.NewObjectID()` 生成 ID，設定時間戳記\n   - FindByID：根據 ID 查詢單一醫療記錄\n   - FindByPetID：查詢特定寵物的所有醫療記錄\n   - Update：更新醫療記錄，保留 CreatedAt，更新 UpdatedAt\n   - Delete：刪除醫療記錄\n\n3. 錯誤處理：\n   - 使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 適當地轉換 MongoDB 錯誤為領域錯誤\n   - 提供詳細的錯誤訊息和日誌記錄",
-            "status": "pending",
-            "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。測試應包括：\n1. 正常操作路徑\n2. 錯誤處理路徑（如 ID 無效、記錄不存在等）\n3. 驗證標準化錯誤的正確使用（如 ErrNotFound、ErrInvalidID）"
-          },
-          {
-            "id": 4,
-            "title": "實作進階查詢功能",
-            "description": "為所有 Repository 實作進階查詢功能，包括分頁、過濾和排序",
-            "dependencies": [
-              1,
-              2,
-              3
-            ],
-            "details": "在每個 Repository 實作中添加基於游標的分頁功能、多條件過濾（如日期範圍、類型、狀態等）和排序功能。確保這些功能適用於所有三個模型（Pet、HealthLog 和 MedicalRecord）。\n\n1. 分頁功能：\n   - 實作 `FindWithPagination` 方法，支援基於游標的分頁\n   - 支援設定每頁記錄數量\n   - 提供獲取下一頁的游標機制\n\n2. 過濾功能：\n   - 實作 `FindWithFilters` 方法，支援多條件組合查詢\n   - 支援日期範圍過濾（如建立時間、更新時間）\n   - 支援狀態、類型等欄位的精確匹配和模糊查詢\n\n3. 排序功能：\n   - 支援單欄位和多欄位排序\n   - 支援升序和降序排序\n   - 與分頁和過濾功能整合",
-            "status": "pending",
-            "testStrategy": "編寫整合測試，驗證進階查詢功能在實際 MongoDB 環境中的正確性。測試應包括：\n1. 分頁功能測試：驗證結果集大小、游標行為、邊界條件\n2. 過濾功能測試：測試單一條件和多條件組合、日期範圍、模糊查詢\n3. 排序功能測試：驗證單欄位和多欄位排序、升序和降序排序\n4. 組合功能測試：同時使用分頁、過濾和排序"
-          },
-          {
-            "id": 5,
-            "title": "實作錯誤處理和效能最佳化",
-            "description": "為所有 Repository 實作添加錯誤處理、日誌記錄和效能最佳化",
-            "dependencies": [
-              1,
-              2,
-              3,
-              4
-            ],
-            "details": "1. 錯誤處理：\n   - 確保所有 Repository 一致地使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 實作錯誤轉換層，將 MongoDB 特定錯誤轉換為領域錯誤\n   - 提供詳細的錯誤訊息，便於除錯\n\n2. 日誌記錄：\n   - 在所有 Repository 方法中添加結構化日誌\n   - 記錄操作類型、參數、結果和執行時間\n   - 使用適當的日誌等級（Info, Warn, Error）\n\n3. 效能最佳化：\n   - 實作批次操作支援（批次插入、更新、刪除）\n   - 最佳化查詢（使用投影、限制返回欄位）\n   - 建立適當的索引以提高查詢效能\n   - 實作連線池管理和重用\n\n4. 索引管理：\n   - 為每個集合定義必要的索引\n   - 實作索引初始化和更新機制\n   - 記錄索引創建和使用情況",
-            "status": "pending",
-            "testStrategy": "1. 效能測試：\n   - 對批次操作進行基準測試\n   - 測試大數據集下的查詢效能\n   - 比較有索引和無索引的查詢效能差異\n\n2. 錯誤處理測試：\n   - 模擬各種錯誤情境（連線失敗、超時、無效輸入等）\n   - 驗證錯誤轉換的正確性\n   - 測試錯誤恢復機制\n\n3. 負載測試：\n   - 測試高並發下的 Repository 行為\n   - 驗證連線池管理的效能\n   - 測試長時間運行下的穩定性"
-          },
-          {
-            "id": 6,
-            "title": "實作標準化錯誤處理機制",
-            "description": "建立和實作 Repository 層的標準化錯誤處理機制",
-            "dependencies": [],
-            "details": "1. 維護和擴展 `internal/domain/errors.go` 中的標準化錯誤類型：\n   - 確保包含 `ErrNotFound`、`ErrInvalidID` 等常見錯誤\n   - 添加 Repository 層特定的錯誤類型（如連線錯誤、衝突錯誤等）\n   - 實作錯誤檢查函式（如 `IsNotFound(err error) bool`）\n\n2. 在所有 Repository 實作中統一使用這些標準化錯誤：\n   - 建立 MongoDB 錯誤到領域錯誤的轉換函式\n   - 確保錯誤訊息清晰且包含足夠的上下文\n   - 保持錯誤處理的一致性\n\n3. 文件化錯誤處理最佳實踐：\n   - 更新開發指南，說明如何正確使用和處理這些錯誤\n   - 提供錯誤處理的程式碼範例",
-            "status": "pending",
-            "testStrategy": "1. 單元測試：\n   - 測試錯誤轉換函式\n   - 測試錯誤檢查函式\n   - 驗證錯誤訊息的格式和內容\n\n2. 整合測試：\n   - 模擬各種錯誤情境\n   - 驗證 Repository 層正確轉換和回傳錯誤\n   - 測試上層服務如何正確處理這些錯誤"
-          }
-        ]
-      },
-      {
-        "id": 6,
-        "title": "Implement Medical Record CRUD API",
-        "description": "Create REST API endpoints for managing pet medical records.",
-        "details": "1. Implement endpoints:\n   - GET /v1/pets/{id}/medical-records\n   - POST /v1/pets/{id}/medical-records\n   - PUT /v1/pets/{id}/medical-records/{recordId}\n   - DELETE /v1/pets/{id}/medical-records/{recordId}\n2. Implement sorting and filtering options\n3. Add support for file attachments (store in S3-compatible storage)\n4. Implement reminder system for upcoming medical events\n5. Use go-kit for service layer implementation\n6. Implement rate limiting using golang.org/x/time/rate",
-        "testStrategy": "Write unit tests for medical record use cases. Test file upload and download. Verify reminder system functionality.",
-        "priority": "high",
-        "dependencies": [
-          4
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 7,
-        "title": "Setup S3-compatible Storage",
-        "description": "Integrate S3-compatible storage (Wasabi/MinIO) for storing pet avatars and medical record attachments.",
-        "details": "1. Set up Wasabi or MinIO account\n2. Create necessary buckets for avatars and attachments\n3. Implement Go client for S3 using AWS SDK (github.com/aws/aws-sdk-go-v2)\n4. Create service for file upload and download\n5. Implement file type and size validation\n6. Generate signed URLs for secure file access\n7. Implement file deletion when associated records are deleted",
-        "testStrategy": "Test file upload, download, and deletion. Verify signed URL functionality. Test with various file types and sizes.",
-        "priority": "medium",
-        "dependencies": [
-          1
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 8,
-        "title": "Implement Frontend Authentication",
-        "description": "Create frontend components and logic for user registration, login, and authentication state management.",
-        "details": "1. Create React components for registration and login forms\n2. Implement form validation using react-hook-form\n3. Create authentication context using React Context API\n4. Implement API calls using axios or fetch API\n5. Store JWT token in HttpOnly cookie\n6. Create protected routes using Next.js middleware\n7. Implement logout functionality\n8. Add remember me functionality\n9. Implement password reset flow",
-        "testStrategy": "Write unit tests for authentication components. Implement integration tests for the entire authentication flow. Test token refresh mechanism.",
-        "priority": "high",
-        "dependencies": [
-          2
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 9,
-        "title": "Design and Implement Responsive UI Layout",
-        "description": "Create a responsive layout for the application with a focus on mobile-first design.",
-        "details": "1. Design mobile-first layouts using Figma or similar tool\n2. Implement responsive layout using TailwindCSS\n3. Create reusable components (Header, Footer, Navigation)\n4. Implement a side menu for desktop and bottom navigation for mobile\n5. Use Next.js App Router for efficient routing\n6. Implement lazy loading for components and images\n7. Ensure accessibility (WCAG 2.1 AA compliance)\n8. Implement dark mode using TailwindCSS",
-        "testStrategy": "Test responsiveness across various devices and screen sizes. Conduct accessibility audit. Perform usability testing with potential users.",
-        "priority": "high",
-        "dependencies": [
-          8
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 10,
-        "title": "Implement Pet Profile Management UI",
-        "description": "Create frontend components for adding, editing, and viewing pet profiles.",
-        "details": "1. Create components:\n   - PetList: Display all pets\n   - PetForm: Add/Edit pet details\n   - PetProfile: View pet details\n2. Implement image upload for pet avatars\n3. Use react-query for efficient data fetching and caching\n4. Implement optimistic updates for better UX\n5. Add form validation using react-hook-form\n6. Implement error handling and display error messages\n7. Add confirmation dialogs for delete actions\n8. Implement skeleton loading states",
-        "testStrategy": "Write unit tests for components. Implement integration tests for the pet management flow. Test error scenarios and edge cases.",
-        "priority": "high",
-        "dependencies": [
-          4,
-          9
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 11,
-        "title": "Implement Health Log Calendar View",
-        "description": "Create a calendar view to display and manage pet health logs.",
-        "details": "1. Use react-big-calendar for the calendar component\n2. Implement day, week, and month views\n3. Create custom event rendering for different log types\n4. Implement log entry creation and editing through calendar interface\n5. Add color coding for different log types\n6. Implement filters for log types and date ranges\n7. Create a heatmap view for quick overview (use d3.js)\n8. Implement infinite scrolling for performance\n9. Add drag-and-drop functionality for log entries",
-        "testStrategy": "Write unit tests for calendar components. Test different view modes and interactions. Perform performance testing with large datasets.",
-        "priority": "high",
-        "dependencies": [
-          5,
-          9
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 12,
-        "title": "Implement Medical Record Management UI",
-        "description": "Create frontend components for adding, editing, and viewing medical records.",
-        "details": "1. Create components:\n   - MedicalRecordList: Display all records\n   - MedicalRecordForm: Add/Edit record\n   - MedicalRecordDetail: View record details\n2. Implement file attachment upload and preview\n3. Create a timeline view for medical history\n4. Implement sorting and filtering options\n5. Add form validation using react-hook-form\n6. Implement reminder settings for upcoming events\n7. Create a print view for medical records\n8. Implement search functionality",
-        "testStrategy": "Write unit tests for medical record components. Test file upload and preview functionality. Verify reminder creation and notification.",
-        "priority": "high",
-        "dependencies": [
-          6,
-          9
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 13,
-        "title": "Implement Data Visualization for Health Trends",
-        "description": "Create charts and graphs to visualize pet health trends over time.",
-        "details": "1. Use recharts or Chart.js for creating visualizations\n2. Implement weight trend chart\n3. Create food intake visualization\n4. Implement behavior trend analysis\n5. Add customizable date range for all charts\n6. Create exportable reports of health trends\n7. Implement comparative analysis between multiple pets\n8. Add annotations for significant events (e.g., medication changes)",
-        "testStrategy": "Test chart rendering with various datasets. Verify export functionality. Test performance with large datasets.",
-        "priority": "medium",
-        "dependencies": [
-          11,
-          12
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 14,
-        "title": "Implement CSV/PDF Export Functionality",
-        "description": "Add the ability to export pet data, health logs, and medical records in CSV and PDF formats.",
-        "details": "1. Implement CSV export using encoding/csv package in Go\n2. Use gopdf or gofpdf for PDF generation\n3. Create API endpoints for initiating exports\n4. Implement background job processing for large exports\n5. Add progress tracking for export jobs\n6. Implement file download mechanism\n7. Create frontend UI for initiating and downloading exports\n8. Add customization options for export content",
-        "testStrategy": "Test export functionality with various data sizes. Verify CSV and PDF format correctness. Test concurrent export requests.",
-        "priority": "medium",
-        "dependencies": [
-          5,
-          6
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 15,
-        "title": "Implement Read-only Sharing Feature",
-        "description": "Create functionality to generate read-only sharing links for pet profiles and records.",
-        "details": "1. Implement token-based sharing mechanism\n2. Create API endpoint for generating share tokens\n3. Implement middleware for validating share tokens\n4. Create read-only views for shared data\n5. Add ability to revoke share tokens\n6. Implement expiration for share tokens\n7. Create UI for managing shared links\n8. Add email sharing option",
-        "testStrategy": "Test share link generation and access. Verify token expiration and revocation. Test concurrent access to shared resources.",
-        "priority": "low",
-        "dependencies": [
-          4,
-          5,
-          6
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 16,
-        "title": "Implement PWA Functionality",
-        "description": "Convert the web application into a Progressive Web App for offline capabilities and improved mobile experience.",
-        "details": "1. Add Web App Manifest\n2. Implement Service Worker using Workbox\n3. Set up offline caching strategies\n4. Implement background sync for offline data submission\n5. Add 'Add to Home Screen' prompt\n6. Implement push notifications (prepare for future LINE Notify integration)\n7. Optimize assets for faster loading\n8. Implement app shell architecture",
-        "testStrategy": "Test offline functionality. Verify PWA installation process. Test sync behavior when coming back online.",
-        "priority": "medium",
-        "dependencies": [
-          9,
-          10,
-          11,
-          12
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 17,
-        "title": "Implement Error Handling and Logging",
-        "description": "Set up comprehensive error handling and logging across the application.",
-        "details": "1. Implement structured logging using uber-go/zap\n2. Set up error tracking service (e.g., Sentry)\n3. Create custom error types and error wrapping\n4. Implement global error handler for API\n5. Create error boundary components in React\n6. Implement user-friendly error messages\n7. Set up log rotation and archiving\n8. Implement audit logging for sensitive operations",
-        "testStrategy": "Simulate various error scenarios. Verify log output and error reporting. Test error recovery mechanisms.",
-        "priority": "high",
-        "dependencies": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 18,
-        "title": "Implement API Documentation",
-        "description": "Create comprehensive API documentation using OpenAPI/Swagger.",
-        "status": "in-progress",
-        "dependencies": [
-          4,
-          5,
-          6
-        ],
-        "priority": "medium",
-        "details": "1. Use swaggo/swag to generate OpenAPI specification (completed for pet management APIs)\n2. Implement API annotations in Go code (completed for pet management endpoints)\n3. Set up Swagger UI for interactive documentation\n4. Validate and fine-tune the generated documentation\n5. Document authentication and error responses\n6. Implement API versioning\n7. Generate client SDKs using OpenAPI Generator\n8. Create Postman collection for API testing\n9. Extend Swagger annotations to remaining API endpoints",
-        "testStrategy": "Verify OpenAPI spec correctness and completeness. Test Swagger UI functionality. Validate that all pet management endpoints are properly documented. Ensure documentation reflects the refactored Gin Transport layer. Validate generated client SDKs.",
-        "subtasks": [
-          {
-            "id": "18.1",
-            "title": "Verify pet management API documentation",
-            "description": "Review the Swagger documentation generated for pet management endpoints to ensure accuracy and completeness.",
-            "status": "pending"
-          },
-          {
-            "id": "18.2",
-            "title": "Configure and deploy Swagger UI",
-            "description": "Set up Swagger UI to provide interactive documentation for the API endpoints.",
-            "status": "pending"
-          },
-          {
-            "id": "18.3",
-            "title": "Add Swagger annotations to remaining endpoints",
-            "description": "Extend the Swagger documentation to cover all API endpoints beyond pet management.",
-            "status": "pending"
-          }
-        ]
-      },
-      {
-        "id": 19,
-        "title": "Setup CI/CD Pipeline",
-        "description": "Implement Continuous Integration and Continuous Deployment using GitHub Actions.",
-        "details": "1. Create GitHub Actions workflow for CI:\n   - Run tests for both frontend and backend\n   - Perform linting and code style checks\n   - Build Docker images\n2. Implement CD pipeline:\n   - Deploy to staging environment on PR merge\n   - Deploy to production on release tag\n3. Set up k3s cluster for deployment\n4. Implement blue-green deployment strategy\n5. Set up automated database migrations\n6. Implement secret management using GitHub Secrets\n7. Set up monitoring and alerting",
-        "testStrategy": "Test CI pipeline with various scenarios (PR, merge, release). Verify staging and production deployments. Test rollback procedures.",
-        "priority": "high",
-        "dependencies": [
-          1
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 20,
-        "title": "Implement Infrastructure as Code",
-        "description": "Set up infrastructure using Terraform for reproducible deployments.",
-        "details": "1. Create Terraform configurations for:\n   - k3s cluster setup\n   - MongoDB Atlas cluster\n   - S3-compatible storage\n   - Networking and security groups\n2. Implement modular Terraform structure\n3. Set up remote state storage\n4. Implement Terraform workspaces for different environments\n5. Create Terraform output for sensitive information\n6. Implement Terraform validation in CI pipeline\n7. Document Terraform usage and variables",
-        "testStrategy": "Test Terraform configurations in a sandbox environment. Verify idempotency of Terraform apply. Test disaster recovery scenarios.",
-        "priority": "medium",
-        "dependencies": [
-          19
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 21,
-        "title": "實作寵物管理的 API 端點 (Endpoint) 與傳輸層 (Transport)",
-        "description": "為任務 #4 中實作的寵物管理 usecase 建立 Go-kit endpoint 和 Gin HTTP transport 層。這將會把 Create, Update, Delete, GetByID, ListByOwner 等操作公開為 RESTful API。目前進度：Go-kit Endpoint 層的結構和 DTO (Data Transfer Objects) 皆已定義完成。下一步是實作 Gin HTTP Transport 層，將這些 Endpoints 透過具體的 HTTP Handlers 公開為 API。",
-        "status": "done",
-        "dependencies": [
-          2,
-          4
-        ],
-        "priority": "high",
-        "details": "1. [已完成] 在 `internal/endpoint` 目錄中實作 Go-kit endpoints：\n   - 為每個 usecase 建立對應的 endpoint 函數：\n     - `MakePetCreateEndpoint`\n     - `MakePetUpdateEndpoint`\n     - `MakePetDeleteEndpoint`\n     - `MakePetGetByIDEndpoint`\n     - `MakePetListByOwnerEndpoint`\n   - 每個 endpoint 應接收對應的 usecase handler 作為依賴\n   - 實作請求/回應 DTO 結構體，用於序列化和反序列化\n\n2. [待辦] 在 `internal/transport/http` 目錄中實作 Gin HTTP handlers：\n   - 建立 RESTful API 路由：\n     - `POST /v1/pets` - 建立寵物\n     - `PUT /v1/pets/:id` - 更新寵物\n     - `DELETE /v1/pets/:id` - 刪除寵物\n     - `GET /v1/pets/:id` - 獲取寵物詳情\n     - `GET /v1/pets` - 列出使用者的寵物（需要認證）\n   - 實作 HTTP 請求驗證和錯誤處理\n   - 整合 Auth0 JWT 驗證中間件，確保適當的授權\n   - 實作適當的 HTTP 狀態碼和回應格式\n\n3. [待辦] 實作請求和回應的驗證：\n   - 使用 go-playground/validator 進行請求驗證\n   - 建立自定義驗證函數（如需要）\n   - 實作統一的錯誤回應格式\n\n4. [待辦] 實作跨域資源共享 (CORS) 支援：\n   - 設定允許的來源、方法和標頭\n   - 處理預檢請求 (preflight requests)\n\n5. [待辦] 實作 API 版本控制策略：\n   - 在 URL 路徑中包含版本號（如 `/v1/`）\n   - 為未來版本升級做準備\n\n6. [待辦] 實作請求日誌記錄：\n   - 使用 uber-go/zap 記錄 API 請求和回應\n   - 包含請求 ID、用戶 ID、請求時間等關鍵資訊\n\n7. [待辦] 實作速率限制：\n   - 使用 golang.org/x/time/rate 實作基本速率限制\n   - 根據 IP 或用戶 ID 進行限制\n\n8. [待辦] 實作健康檢查端點：\n   - 建立 `/health` 端點以供監控系統使用\n\n9. [待辦] 整合 Swagger/OpenAPI 文檔：\n   - 使用 swaggo/gin-swagger 生成 API 文檔\n   - 為每個端點添加適當的註釋",
-        "testStrategy": "1. 為每個 endpoint 編寫單元測試：\n   - 測試正常路徑和錯誤情境\n   - 使用模擬 (mock) 替代 usecase 層\n   - 驗證請求處理和回應格式\n\n2. 為 HTTP transport handlers 編寫單元測試：\n   - 使用 `net/http/httptest` 和 Gin 的測試工具\n   - 測試路由註冊和請求處理\n   - 驗證 HTTP 狀態碼和回應內容\n   - 測試錯誤處理和邊界情況\n\n3. 編寫整合測試：\n   - 使用 HTTP 客戶端（如 Postman 或 curl）測試 API\n   - 建立測試腳本以自動化測試流程\n   - 測試完整的 CRUD 操作流程\n   - 驗證認證和授權機制\n\n4. 效能測試：\n   - 使用 Apache Bench 或 wrk 等工具進行負載測試\n   - 測試 API 在高負載下的表現\n   - 驗證速率限制功能\n\n5. 安全性測試：\n   - 測試未授權訪問的處理\n   - 驗證 CORS 設定\n   - 測試輸入驗證和防止注入攻擊\n\n6. 文檔驗證：\n   - 確保 Swagger 文檔準確反映 API 功能\n   - 驗證 API 文檔中的範例請求和回應",
-        "subtasks": []
-      }
-    ],
-    "metadata": {
-      "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-20T04:53:55.528Z",
-      "description": "Tasks for master context"
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Project Repository and Development Environment",
+      "description": "Initialize the project repository with Next.js 14, TypeScript, and TailwindCSS. Set up a local Docker development environment.",
+      "details": "1. Create a new GitHub repository named 'petlog'\n2. Initialize Next.js 14 project with TypeScript:\n   npx create-next-app@latest petlog --typescript\n3. Install TailwindCSS:\n   npm install -D tailwindcss postcss autoprefixer\n   npx tailwindcss init -p\n4. Set up Docker for local development:\n   - Create Dockerfile and docker-compose.yml\n   - Include services for Next.js, Go API, and MongoDB\n5. Set up VSCode with recommended extensions (ESLint, Prettier, Docker)\n6. Initialize Go modules and create basic project structure following Clean Architecture",
+      "testStrategy": "Verify that the development environment can be started with Docker Compose and that Next.js, Go API, and MongoDB services are running correctly.",
+      "priority": "high",
+      "dependencies": [],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Initialize GitHub Repository and Next.js Project",
+          "description": "Create a new GitHub repository and set up a Next.js 14 project with TypeScript",
+          "dependencies": [],
+          "details": "1. Create a new GitHub repository named 'petlog'\n2. Clone the repository locally\n3. Run 'npx create-next-app@latest petlog --typescript'\n4. Push the initial commit to GitHub",
+          "status": "done",
+          "testStrategy": "Verify the repository is created on GitHub and the Next.js project structure is present locally"
+        },
+        {
+          "id": 2,
+          "title": "Install and Configure TailwindCSS",
+          "description": "Add TailwindCSS to the Next.js project and set up the necessary configuration",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Run 'npm install -D tailwindcss postcss autoprefixer'\n2. Execute 'npx tailwindcss init -p'\n3. Configure Tailwind by updating tailwind.config.js and globals.css",
+          "status": "done",
+          "testStrategy": "Create a sample component using Tailwind classes and verify styling is applied correctly"
+        },
+        {
+          "id": 3,
+          "title": "Set Up Docker Development Environment",
+          "description": "Create Docker configuration for local development including Next.js, Go API, and MongoDB services",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create a Dockerfile for the Next.js application\n2. Create a docker-compose.yml file with services for Next.js, Go API, and MongoDB\n3. Configure environment variables and network settings",
+          "status": "deferred",
+          "testStrategy": "Run 'docker-compose up' and verify all services start without errors"
+        },
+        {
+          "id": 4,
+          "title": "Configure VSCode with Recommended Extensions",
+          "description": "Set up Visual Studio Code with ESLint, Prettier, and Docker extensions",
+          "dependencies": [],
+          "details": "1. Install ESLint, Prettier, and Docker extensions in VSCode\n2. Create .vscode/extensions.json with recommended extensions\n3. Set up ESLint and Prettier configuration files",
+          "status": "done",
+          "testStrategy": "Open the project in VSCode and verify all recommended extensions are installed and functioning"
+        },
+        {
+          "id": 5,
+          "title": "Initialize Go API Project Structure",
+          "description": "Set up the Go API project following Clean Architecture principles",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Initialize Go modules with 'go mod init github.com/yourusername/petlog-api'\n2. Create directory structure: cmd, internal, pkg\n3. Set up basic main.go file in cmd/api\n4. Implement initial Clean Architecture layers: domain, usecase, repository, delivery",
+          "status": "done",
+          "testStrategy": "Run 'go build ./...' and ensure the project compiles without errors"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Implement User Authentication",
+      "description": "Implement user authentication using Auth0 for both backend and frontend integration.",
+      "status": "done",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "1. Set up Auth0 account and configure application settings\n2. Integrate Auth0 SDK with Go backend:\n   - Configure Auth0 application settings for API\n   - Implement JWT verification middleware using Auth0 libraries\n   - Set up necessary environment variables and configuration\n3. Integrate Auth0 SDK with Next.js frontend:\n   - Install and configure Auth0 React SDK\n   - Implement login, logout, and user profile functionality\n   - Handle authentication state and protected routes\n4. Implement proper error handling for authentication failures\n5. Set up proper CORS and security configurations\n6. Configure Auth0 Rules or Actions for custom claims if needed",
+      "testStrategy": "Write unit tests for Auth0 integration. Implement integration tests for authentication flows. Test token verification middleware. Create end-to-end tests for login, logout, and protected routes.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Set Up Auth0 Account and Application",
+          "description": "Create and configure Auth0 account with appropriate application settings for our project.",
+          "dependencies": [],
+          "details": "Create Auth0 account. Set up a new application in Auth0 dashboard. Configure callback URLs, logout URLs, and allowed web origins. Set up API settings and permissions. Document all credentials and configuration details securely.",
+          "status": "done",
+          "testStrategy": "Verify that the Auth0 application is properly configured by testing login flow manually before implementation."
+        },
+        {
+          "id": 2,
+          "title": "Integrate Auth0 with Go Backend",
+          "description": "Implement Auth0 integration with the Go backend for JWT verification and protected routes.",
+          "dependencies": [
+            1
+          ],
+          "details": "Install Auth0 Go SDK or appropriate JWT libraries. Configure middleware to validate Auth0-issued JWTs. Set up environment variables for Auth0 domain, audience, and other required settings. Implement error handling for authentication failures.",
+          "status": "done",
+          "testStrategy": "Write unit tests for JWT verification middleware. Create integration tests to ensure protected routes properly validate Auth0 tokens."
+        },
+        {
+          "id": 3,
+          "title": "Implement JWT Verification Middleware",
+          "description": "Create middleware to verify Auth0-issued JWT tokens for protected routes.",
+          "dependencies": [
+            2
+          ],
+          "details": "Develop middleware that extracts JWT from the Authorization header. Verify token signature and expiration using Auth0 public keys. Attach user information to the request context. Handle various authentication error scenarios gracefully.",
+          "status": "done",
+          "testStrategy": "Write unit tests for token extraction and verification. Create integration tests with protected routes to ensure proper middleware functionality."
+        },
+        {
+          "id": 4,
+          "title": "Integrate Auth0 with Next.js Frontend",
+          "description": "Implement Auth0 authentication in the Next.js frontend application.",
+          "dependencies": [
+            1
+          ],
+          "details": "Install Auth0 React SDK (@auth0/auth0-react). Configure Auth0Provider with appropriate settings. Create login and logout buttons. Implement protected routes using authentication state. Handle authentication callbacks and redirects.",
+          "status": "done",
+          "testStrategy": "Write unit tests for authentication components. Create integration tests to verify login, logout, and protected route functionality."
+        },
+        {
+          "id": 5,
+          "title": "Implement User Profile and Token Management",
+          "description": "Handle user profile information and token management in the frontend application.",
+          "dependencies": [
+            4
+          ],
+          "details": "Retrieve and display user profile information from Auth0. Implement proper token storage and renewal. Handle session expiration gracefully. Create user profile components to display user information.",
+          "status": "done",
+          "testStrategy": "Test user profile retrieval and display. Verify token renewal functionality. Test session expiration handling."
+        },
+        {
+          "id": 6,
+          "title": "Configure Auth0 Rules or Actions",
+          "description": "Set up custom Auth0 Rules or Actions for additional authentication logic if needed.",
+          "dependencies": [
+            1
+          ],
+          "details": "Evaluate requirements for custom authentication logic. Implement Auth0 Rules or Actions for custom claims or additional validation. Test and verify custom logic works as expected.",
+          "status": "done",
+          "testStrategy": "Test custom Rules or Actions to ensure they properly modify tokens or authentication behavior as expected."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "定義領域模型 (Domain Models) 與倉儲介面 (Repository Interfaces)",
+      "description": "在 `internal/domain` 套件中，為 `Pet`、`HealthLog` 和 `MedicalRecord` 建立 Go 的 struct。為每個模型定義一個 `Repository` 介面，並明確指定所需的 CRUD 方法簽名 (例如：Create, FindByID, Update, Delete)。此層級必須保持純淨，不依賴任何特定的資料庫驅動程式或其他基礎設施。",
+      "status": "done",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "1. 在 `internal/domain` 套件中建立領域模型：\n   - Pet: {ID, OwnerID, Name, AvatarURL, DOB, Breed, MicrochipID}\n   - HealthLog: {ID, PetID, Date, WeightKg, FoodGram, LitterNotes, BehaviourNotes}\n   - MedicalRecord: {ID, PetID, Type, Description, Date, NextDueDate, Dosage}\n\n2. 為每個模型定義倉儲介面：\n   ```go\n   type PetRepository interface {\n     Create(ctx context.Context, pet *Pet) error\n     FindByID(ctx context.Context, id string) (*Pet, error)\n     FindByOwnerID(ctx context.Context, ownerID string) ([]*Pet, error)\n     Update(ctx context.Context, pet *Pet) error\n     Delete(ctx context.Context, id string) error\n   }\n   ```\n   (為 HealthLogRepository 和 MedicalRecordRepository 建立類似的介面)\n\n3. 確保領域模型和倉儲介面不依賴 MongoDB 或其他基礎設施\n\n4. 記錄每個倉儲方法的預期行為\n\n5. 為後續任務準備 MongoDB 的實作 (將在基礎設施層實作)",
+      "testStrategy": "為領域模型編寫單元測試，以驗證它們包含所有必要的欄位。建立倉儲介面的模擬實作以進行測試。在測試中使用依賴注入，以確保領域層保持純淨。",
+      "subtasks": []
+    },
+    {
+      "id": 4,
+      "title": "實作寵物管理的 Usecase/Service",
+      "description": "在 `internal/usecase` 套件中，採用 CQRS (Command Query Responsibility Segregation) 架構實作寵物管理服務。將分離讀取操作 (Query) 和寫入操作 (Command)，並將共享的驗證邏輯放在 behavior 中。所有處理器將透過其建構函式，接收 `pet.Repository` 介面 (在任務 #3 中定義) 作為依賴。它們應實作寵物資料的 CRUD 核心業務邏輯，並由 `Endpoint` 層呼叫。此任務不應包含任何傳輸層或特定資料庫的程式碼。",
+      "status": "done",
+      "dependencies": [
+        2,
+        3
+      ],
+      "priority": "high",
+      "details": "1. 在 internal/usecase 中建立以下目錄結構：\n   - command/ - 處理寫入操作\n   - query/ - 處理讀取操作\n   - behavior/ - 共享的驗證邏輯\n\n2. 實作 Command Handlers：\n   - CreatePetHandler - 建立新寵物\n   - UpdatePetHandler - 更新寵物詳細資訊\n   - DeletePetHandler - 刪除寵物\n\n3. 實作 Query Handlers：\n   - GetPetByIDHandler - 獲取寵物詳細資訊\n   - ListPetsByOwnerHandler - 列出已認證使用者的所有寵物\n\n4. 在 behavior/ 中實作共享的驗證邏輯\n\n5. 每個 Handler 應：\n   - 接收 pet.Repository 作為依賴\n   - 實作適當的錯誤處理\n   - 使用 uber-go/zap 實作適當的日誌記錄\n\n6. 遵循乾淨架構原則：\n   - 無傳輸層依賴 (HTTP、gRPC 等)\n   - 無特定資料庫程式碼\n   - 專注於業務規則和使用案例\n\n7. 使用 internal/domain 中定義的領域模型",
+      "testStrategy": "1. 為每個 Command 和 Query Handler 編寫全面的單元測試\n2. 為儲存庫介面使用模擬 (mock)\n3. 測試正常路徑和錯誤情境\n4. 驗證業務邏輯正確性\n5. 確保正確驗證輸入\n6. 測試 behavior 中的共享驗證邏輯",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "擴展 contextx 以支援 User ID",
+          "description": "擴展 contextx 套件，使其能夠在上下文中攜帶和提取使用者 ID，以便在 CQRS 處理器中識別當前使用者。",
+          "dependencies": [],
+          "details": "1. 在 internal/contextx 套件中新增支援使用者 ID 的功能\n2. 實作 WithUserID 函數，將使用者 ID 添加到上下文中\n3. 實作 GetUserID 函數，從上下文中提取使用者 ID\n4. 確保這些函數具有適當的錯誤處理，例如當上下文中沒有使用者 ID 時",
+          "status": "done",
+          "testStrategy": "編寫單元測試，確保 WithUserID 和 GetUserID 函數在各種情況下都能正確工作，包括正常情況和錯誤情況"
+        },
+        {
+          "id": 2,
+          "title": "實作 CreatePet Command Handler",
+          "description": "在 command 目錄中實作 CreatePet 命令處理器，負責建立新寵物的業務邏輯。",
+          "dependencies": [
+            1
+          ],
+          "details": "1. 在 internal/usecase/command 目錄中建立 create_pet.go 檔案\n2. 定義 CreatePetCommand 結構體，包含建立寵物所需的所有資料\n3. 實作 CreatePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物建立邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 驗證輸入資料\n   - 建立新的寵物實體\n   - 調用儲存庫保存寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
+          "status": "done",
+          "testStrategy": "編寫單元測試，覆蓋成功建立寵物和各種失敗情境，如無效輸入、儲存庫錯誤等"
+        },
+        {
+          "id": 3,
+          "title": "實作 UpdatePet Command Handler",
+          "description": "在 command 目錄中實作 UpdatePet 命令處理器，負責更新現有寵物資訊的業務邏輯。",
+          "dependencies": [
+            1
+          ],
+          "details": "1. 在 internal/usecase/command 目錄中建立 update_pet.go 檔案\n2. 定義 UpdatePetCommand 結構體，包含更新寵物所需的所有資料\n3. 實作 UpdatePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物更新邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 驗證輸入資料\n   - 檢查寵物是否存在\n   - 驗證使用者是否有權限更新該寵物\n   - 更新寵物資訊\n   - 調用儲存庫保存更新後的寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
+          "status": "done",
+          "testStrategy": "編寫單元測試，覆蓋成功更新寵物和各種失敗情境，如無效輸入、寵物不存在、權限不足等"
+        },
+        {
+          "id": 4,
+          "title": "實作 DeletePet Command Handler",
+          "description": "在 command 目錄中實作 DeletePet 命令處理器，負責刪除寵物的業務邏輯。",
+          "dependencies": [
+            1
+          ],
+          "details": "1. 在 internal/usecase/command 目錄中建立 delete_pet.go 檔案\n2. 定義 DeletePetCommand 結構體，包含刪除寵物所需的資料（主要是寵物 ID）\n3. 實作 DeletePetHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理寵物刪除邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 檢查寵物是否存在\n   - 驗證使用者是否有權限刪除該寵物\n   - 調用儲存庫刪除寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄",
+          "status": "done",
+          "testStrategy": "編寫單元測試，覆蓋成功刪除寵物和各種失敗情境，如寵物不存在、權限不足等"
+        },
+        {
+          "id": 5,
+          "title": "實作 GetPetByID Query Handler",
+          "description": "在 query 目錄中實作 GetPetByID 查詢處理器，負責獲取特定寵物詳細資訊的業務邏輯。",
+          "dependencies": [
+            1
+          ],
+          "details": "1. 在 internal/usecase/query 目錄中建立 get_pet_by_id.go 檔案\n2. 定義 GetPetByIDQuery 結構體，包含獲取寵物所需的資料（主要是寵物 ID）\n3. 實作 GetPetByIDHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理獲取寵物詳細資訊的邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 調用儲存庫獲取寵物\n   - 驗證使用者是否有權限查看該寵物\n   - 處理可能的錯誤，如寵物不存在\n   - 實作適當的日誌記錄",
+          "status": "done",
+          "testStrategy": "編寫單元測試，覆蓋成功獲取寵物和各種失敗情境，如寵物不存在、權限不足等"
+        },
+        {
+          "id": 6,
+          "title": "實作 ListPetsByOwner Query Handler",
+          "description": "在 query 目錄中實作 ListPetsByOwner 查詢處理器，負責列出使用者所有寵物的業務邏輯。",
+          "dependencies": [
+            1
+          ],
+          "details": "1. 在 internal/usecase/query 目錄中建立 list_pets_by_owner.go 檔案\n2. 定義 ListPetsByOwnerQuery 結構體，可能包含分頁或過濾選項\n3. 實作 ListPetsByOwnerHandler 結構體，接收 pet.Repository 作為依賴\n4. 實作 Handle 方法，處理列出使用者寵物的邏輯，包括：\n   - 從上下文中提取使用者 ID\n   - 調用儲存庫獲取該使用者的所有寵物\n   - 處理可能的錯誤\n   - 實作適當的日誌記錄\n   - 支援可能的分頁或過濾功能",
+          "status": "done",
+          "testStrategy": "編寫單元測試，覆蓋成功列出寵物和各種情境，如使用者沒有寵物、分頁功能等"
+        },
+        {
+          "id": 7,
+          "title": "實作共享的驗證邏輯",
+          "description": "在 behavior 目錄中實作可被 Command 和 Query Handlers 共用的驗證邏輯。",
+          "dependencies": [],
+          "details": "1. 在 internal/usecase/behavior 目錄中建立適當的檔案結構\n2. 實作寵物資料驗證函數，如檢查名稱、類型、年齡等\n3. 實作權限檢查邏輯，確保使用者只能操作自己的寵物\n4. 實作其他可能的共享邏輯，如格式化或轉換函數\n5. 設計易於重用的介面，讓 Command 和 Query Handlers 可以方便地使用這些驗證邏輯",
+          "status": "done",
+          "testStrategy": "為共享的驗證邏輯編寫單元測試，確保在各種情況下都能正確驗證輸入和權限"
+        },
+        {
+          "id": 8,
+          "title": "為所有新的 Handlers 撰寫單元測試",
+          "description": "為所有實作的 Command 和 Query Handlers 撰寫全面的單元測試，確保它們在各種情況下都能正確工作。",
+          "dependencies": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "details": "1. 為每個 Command 和 Query Handler 建立對應的測試檔案\n2. 使用模擬 (mock) 來模擬 pet.Repository 的行為\n3. 測試正常路徑和各種錯誤情境\n4. 驗證業務邏輯的正確性\n5. 確保正確驗證輸入和權限\n6. 測試與共享驗證邏輯的整合",
+          "status": "done",
+          "testStrategy": "確保測試覆蓋率高，包括所有可能的分支和錯誤情境，使用模擬來隔離測試對象"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "實作 MongoDB 倉儲 (Repositories)",
+      "description": "在 `internal/infra/mongodb` 目錄下，為 Pet, HealthLog, 和 MedicalRecord 這三個領域模型實作完整的 Repository 介面。這將取代所有臨時的存根 (stub) 實作，並包含所有必要的 CRUD (Create, Read, Update, Delete) 操作。",
+      "status": "in-progress",
+      "dependencies": [
+        3
+      ],
+      "priority": "high",
+      "details": "1. 在 `internal/infra/mongodb` 中建立 MongoDB 連線邏輯\n   - 實作連線池管理\n   - 設定連線參數（URI、認證、超時等）\n   - 實作健康檢查功能\n\n2. 為每個領域模型建立對應的 Repository 實作：\n   - `pet_repository_impl.go` 和 `pet_repository_model.go`\n   - `health_log_repository_impl.go` 和 `health_log_repository_model.go`\n   - `medical_record_repository_impl.go` 和 `medical_record_repository_model.go`\n\n3. 為每個模型實作完整的 CRUD 操作：\n   - 建立 (Create)：將領域模型轉換為 MongoDB 文件並儲存，使用 `bson.NewObjectID()` 生成 ID\n   - 讀取 (Read)：支援單一項目查詢和列表查詢\n   - 更新 (Update)：支援完整更新和部分更新\n   - 刪除 (Delete)：支援軟刪除和硬刪除\n\n4. 實作資料轉換層：\n   - 在各自的 `*_repository_model.go` 檔案中建立領域模型與 MongoDB 文件之間的轉換函數\n   - 處理 MongoDB 特有的 ID 類型 (ObjectID) 轉換\n   - 確保日期時間格式正確處理\n\n5. 實作進階查詢功能：\n   - 基於游標的分頁功能\n   - 多條件過濾（日期範圍、類型、狀態等）\n   - 排序功能\n\n6. 實作索引管理：\n   - 為常用查詢建立適當的索引\n   - 實作索引初始化和更新機制\n\n7. 錯誤處理與日誌：\n   - 使用 `internal/domain/errors.go` 中定義的標準化領域錯誤（如 `ErrNotFound`、`ErrInvalidID`）\n   - 將 MongoDB 錯誤轉換為應用程式定義的錯誤類型\n   - 實作詳細的操作日誌\n   - 處理連線失敗、超時等異常情況\n\n8. 效能最佳化：\n   - 實作批次操作支援\n   - 最佳化查詢（投影、限制返回欄位）\n   - 實作適當的快取策略",
+      "testStrategy": "1. 單元測試：\n   - 為每個 Repository 實作撰寫完整的單元測試\n   - 使用模擬 (mock) MongoDB 驅動進行測試\n   - 測試所有 CRUD 操作的正常和異常路徑\n   - 測試標準化錯誤處理（如 `ErrNotFound`、`ErrInvalidID`）\n\n2. 整合測試：\n   - 使用 Docker 容器啟動測試用 MongoDB 實例\n   - 測試實際資料庫連線和操作\n   - 驗證資料持久化和查詢結果\n\n3. 功能測試：\n   - 測試分頁功能（驗證結果集大小、游標行為）\n   - 測試過濾功能（多條件組合、邊界條件）\n   - 測試排序功能\n\n4. 錯誤處理測試：\n   - 模擬連線失敗情境\n   - 測試無效輸入處理\n   - 測試並發操作下的行為\n\n5. 效能測試：\n   - 對批次操作進行基準測試\n   - 測試大數據集下的查詢效能\n   - 驗證索引效果\n\n6. 測試資料管理：\n   - 建立測試資料生成器\n   - 確保測試前後資料庫狀態一致性\n   - 實作測試資料清理機制",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "實作 Pet Repository",
+          "description": "在 `internal/infra/mongodb` 目錄下實作 Pet 模型的 Repository 介面",
+          "dependencies": [],
+          "details": "建立 `pet_repository_impl.go` 文件，實作 CRUD 操作，包括建立、讀取（單一和列表）、更新和刪除功能。實作資料轉換層，處理領域模型與 MongoDB 文件之間的轉換。\n<info added on 2025-06-20T03:20:28.550Z>\n已完成 Pet Repository 的基礎結構和 Create 方法實作：\n\n## 完成的工作\n1. **更新到 MongoDB Go Driver v2**: 修正了 import 路徑使用 `go.mongodb.org/mongo-driver/v2/mongo`\n2. **完成 petMongo struct**: 定義了包含所有必要欄位的持久化模型，使用正確的 `bson` 標籤\n3. **實作模型轉換函式**: \n   - `toDomain()`: 將 petMongo 轉換為 model.Pet\n   - `fromDomain()`: 將 model.Pet 轉換為 petMongo\n4. **實作 Create 方法**: \n   - 使用 contextx 進行日誌記錄（正體中文）\n   - 正確設定 CreatedAt 和 UpdatedAt 時間戳記\n   - 使用 MongoDB v2 API 進行 InsertOne 操作\n   - 完整的錯誤處理和日誌記錄\n   - 將插入後的 ID 回填到領域模型\n\n## 技術細節\n- 遵循 Clean Architecture 原則，將持久化邏輯與領域邏輯分離\n- 使用正體中文撰寫所有註解、日誌訊息和錯誤訊息\n- 採用 contextx 套件進行結構化日誌記錄\n- 正確處理 MongoDB v2 的 API 變化\n\n## 下一步\n需要繼續實作其他 CRUD 方法：FindByID, FindByOwnerID, Update, Delete\n</info added on 2025-06-20T03:20:28.550Z>\n<info added on 2025-06-20T03:23:13.510Z>\n## 程式碼重構與規範更新\n\n### 程式碼重構\n1. **分離持久化模型**: 將 `petMongo` struct 和轉換函式從 `pet_repository_impl.go` 移動到新的 `pet_repository_model.go` 檔案中\n2. **改善程式碼組織**: \n   - `pet_repository_model.go`: 專門存放持久化模型和轉換邏輯\n   - `pet_repository_impl.go`: 專注於實際的 Repository CRUD 操作\n3. **遵循單一職責原則**: 每個檔案都有明確的職責分工\n\n### 規範更新\n更新了 `.cursor/rules/clean_architecture.mdc` 規則，新增了「Repository 持久化模型分離」的最佳實踐：\n- 持久化模型應使用 `*_repository_model.go` 命名\n- 模型檔案包含持久化 struct、`toDomain()` 方法和 `fromDomain()` 函式\n- Repository 實作檔案專注於 CRUD 操作邏輯\n\n### 技術效益\n- **更好的可維護性**: 模型邏輯和業務邏輯分離\n- **更清晰的職責**: 每個檔案職責單一且明確\n- **更易於測試**: 可以獨立測試模型轉換和 Repository 操作\n- **符合團隊規範**: 建立了可重複使用的檔案組織模式\n\n### 下一步\n繼續實作其他 CRUD 方法：FindByID, FindByOwnerID, Update, Delete\n</info added on 2025-06-20T03:23:13.510Z>\n<info added on 2025-06-20T03:30:21.263Z>\n## Pet Repository 完全實作完成！\n\n### 完成的所有 CRUD 方法\n\n1. **Create 方法**\n   - 使用 `InsertOne` 進行文件插入\n   - 自動設定 `CreatedAt` 和 `UpdatedAt` 時間戳記\n   - 將插入後的 ID 回填到領域模型\n   - 完整的錯誤處理和日誌記錄\n\n2. **FindByID 方法**\n   - 使用 `FindOne` 進行單一文件查詢\n   - 正確處理 `mongo.ErrNoDocuments` 錯誤\n   - 自動轉換持久化模型為領域模型\n   - 包含詳細的日誌記錄\n\n3. **FindByOwnerID 方法**\n   - 使用 `Find` 進行多文件查詢\n   - 正確使用 cursor 迭代查詢結果\n   - 適當的 cursor 資源管理（defer close）\n   - 完整的錯誤處理和結果計數日誌\n\n4. **Update 方法**\n   - 使用 `ReplaceOne` 進行文件替換\n   - 智慧處理時間戳記（保留 CreatedAt，更新 UpdatedAt）\n   - 檢查 MatchedCount 確認文件存在\n   - 記錄 ModifiedCount 用於追蹤\n\n5. **Delete 方法**\n   - 使用 `DeleteOne` 進行文件刪除\n   - 檢查 DeletedCount 確認刪除成功\n   - 完整的錯誤處理和確認機制\n\n### 技術亮點\n\n- **MongoDB v2 API 使用**\n  - 正確使用 `go.mongodb.org/mongo-driver/v2` 套件\n  - 使用最新的 `bson.D` 語法進行查詢過濾器\n  - 遵循 v2 版本的最佳實踐\n\n- **Clean Architecture 遵循**\n  - 完全分離持久化邏輯和領域邏輯\n  - 模型轉換函式確保資料流正確\n  - 依賴注入設計模式\n\n- **正體中文本地化**\n  - 所有註解、日誌訊息、錯誤訊息都使用正體中文\n  - 提供清晰的中文技術文件\n\n- **錯誤處理最佳實踐**\n  - 使用 `fmt.Errorf` 和 `%w` 進行錯誤包裝\n  - 適當的日誌等級（Info, Warn, Error）\n  - 具體的錯誤訊息提供除錯資訊\n\n- **效能考量**\n  - 適當的 cursor 資源管理\n  - 時間戳記處理最佳化\n  - 結構化日誌記錄\n\n### 檔案組織\n- `pet_repository_model.go`: 持久化模型和轉換邏輯\n- `pet_repository_impl.go`: Repository 介面實作\n\nPet Repository 已經完全準備好用於生產環境！\n</info added on 2025-06-20T03:30:21.263Z>",
+          "status": "done",
+          "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。"
+        },
+        {
+          "id": 2,
+          "title": "實作 HealthLog Repository",
+          "description": "在 `internal/infra/mongodb` 目錄下實作 HealthLog 模型的 Repository 介面",
+          "dependencies": [],
+          "details": "建立 `health_log_repository_impl.go` 和 `health_log_repository_model.go` 檔案，遵循已建立的設計模式：\n\n1. 在 `health_log_repository_model.go` 中：\n   - 定義 `healthLogMongo` 持久化模型，包含適當的 `bson` 標籤\n   - 實作 `toDomain()` 和 `fromDomain()` 轉換函式\n   - 確保正確處理 `string` ID 和 `bson.ObjectID` 之間的轉換\n\n2. 在 `health_log_repository_impl.go` 中實作完整的 CRUD 操作：\n   - Create：使用 `bson.NewObjectID()` 生成 ID，設定時間戳記\n   - FindByID：根據 ID 查詢單一健康記錄\n   - FindByPetID：查詢特定寵物的所有健康記錄\n   - Update：更新健康記錄，保留 CreatedAt，更新 UpdatedAt\n   - Delete：刪除健康記錄\n\n3. 錯誤處理：\n   - 使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 適當地轉換 MongoDB 錯誤為領域錯誤\n   - 提供詳細的錯誤訊息和日誌記錄",
+          "status": "pending",
+          "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。測試應包括：\n1. 正常操作路徑\n2. 錯誤處理路徑（如 ID 無效、記錄不存在等）\n3. 驗證標準化錯誤的正確使用（如 ErrNotFound、ErrInvalidID）"
+        },
+        {
+          "id": 3,
+          "title": "實作 MedicalRecord Repository",
+          "description": "在 `internal/infra/mongodb` 目錄下實作 MedicalRecord 模型的 Repository 介面",
+          "dependencies": [],
+          "details": "建立 `medical_record_repository_impl.go` 和 `medical_record_repository_model.go` 檔案，遵循已建立的設計模式：\n\n1. 在 `medical_record_repository_model.go` 中：\n   - 定義 `medicalRecordMongo` 持久化模型，包含適當的 `bson` 標籤\n   - 實作 `toDomain()` 和 `fromDomain()` 轉換函式\n   - 確保正確處理 `string` ID 和 `bson.ObjectID` 之間的轉換\n\n2. 在 `medical_record_repository_impl.go` 中實作完整的 CRUD 操作：\n   - Create：使用 `bson.NewObjectID()` 生成 ID，設定時間戳記\n   - FindByID：根據 ID 查詢單一醫療記錄\n   - FindByPetID：查詢特定寵物的所有醫療記錄\n   - Update：更新醫療記錄，保留 CreatedAt，更新 UpdatedAt\n   - Delete：刪除醫療記錄\n\n3. 錯誤處理：\n   - 使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 適當地轉換 MongoDB 錯誤為領域錯誤\n   - 提供詳細的錯誤訊息和日誌記錄",
+          "status": "pending",
+          "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。測試應包括：\n1. 正常操作路徑\n2. 錯誤處理路徑（如 ID 無效、記錄不存在等）\n3. 驗證標準化錯誤的正確使用（如 ErrNotFound、ErrInvalidID）"
+        },
+        {
+          "id": 4,
+          "title": "實作進階查詢功能",
+          "description": "為所有 Repository 實作進階查詢功能，包括分頁、過濾和排序",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "在每個 Repository 實作中添加基於游標的分頁功能、多條件過濾（如日期範圍、類型、狀態等）和排序功能。確保這些功能適用於所有三個模型（Pet、HealthLog 和 MedicalRecord）。\n\n1. 分頁功能：\n   - 實作 `FindWithPagination` 方法，支援基於游標的分頁\n   - 支援設定每頁記錄數量\n   - 提供獲取下一頁的游標機制\n\n2. 過濾功能：\n   - 實作 `FindWithFilters` 方法，支援多條件組合查詢\n   - 支援日期範圍過濾（如建立時間、更新時間）\n   - 支援狀態、類型等欄位的精確匹配和模糊查詢\n\n3. 排序功能：\n   - 支援單欄位和多欄位排序\n   - 支援升序和降序排序\n   - 與分頁和過濾功能整合",
+          "status": "pending",
+          "testStrategy": "編寫整合測試，驗證進階查詢功能在實際 MongoDB 環境中的正確性。測試應包括：\n1. 分頁功能測試：驗證結果集大小、游標行為、邊界條件\n2. 過濾功能測試：測試單一條件和多條件組合、日期範圍、模糊查詢\n3. 排序功能測試：驗證單欄位和多欄位排序、升序和降序排序\n4. 組合功能測試：同時使用分頁、過濾和排序"
+        },
+        {
+          "id": 5,
+          "title": "實作錯誤處理和效能最佳化",
+          "description": "為所有 Repository 實作添加錯誤處理、日誌記錄和效能最佳化",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "1. 錯誤處理：\n   - 確保所有 Repository 一致地使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 實作錯誤轉換層，將 MongoDB 特定錯誤轉換為領域錯誤\n   - 提供詳細的錯誤訊息，便於除錯\n\n2. 日誌記錄：\n   - 在所有 Repository 方法中添加結構化日誌\n   - 記錄操作類型、參數、結果和執行時間\n   - 使用適當的日誌等級（Info, Warn, Error）\n\n3. 效能最佳化：\n   - 實作批次操作支援（批次插入、更新、刪除）\n   - 最佳化查詢（使用投影、限制返回欄位）\n   - 建立適當的索引以提高查詢效能\n   - 實作連線池管理和重用\n\n4. 索引管理：\n   - 為每個集合定義必要的索引\n   - 實作索引初始化和更新機制\n   - 記錄索引創建和使用情況",
+          "status": "pending",
+          "testStrategy": "1. 效能測試：\n   - 對批次操作進行基準測試\n   - 測試大數據集下的查詢效能\n   - 比較有索引和無索引的查詢效能差異\n\n2. 錯誤處理測試：\n   - 模擬各種錯誤情境（連線失敗、超時、無效輸入等）\n   - 驗證錯誤轉換的正確性\n   - 測試錯誤恢復機制\n\n3. 負載測試：\n   - 測試高並發下的 Repository 行為\n   - 驗證連線池管理的效能\n   - 測試長時間運行下的穩定性"
+        },
+        {
+          "id": 6,
+          "title": "實作標準化錯誤處理機制",
+          "description": "建立和實作 Repository 層的標準化錯誤處理機制",
+          "dependencies": [],
+          "details": "1. 維護和擴展 `internal/domain/errors.go` 中的標準化錯誤類型：\n   - 確保包含 `ErrNotFound`、`ErrInvalidID` 等常見錯誤\n   - 添加 Repository 層特定的錯誤類型（如連線錯誤、衝突錯誤等）\n   - 實作錯誤檢查函式（如 `IsNotFound(err error) bool`）\n\n2. 在所有 Repository 實作中統一使用這些標準化錯誤：\n   - 建立 MongoDB 錯誤到領域錯誤的轉換函式\n   - 確保錯誤訊息清晰且包含足夠的上下文\n   - 保持錯誤處理的一致性\n\n3. 文件化錯誤處理最佳實踐：\n   - 更新開發指南，說明如何正確使用和處理這些錯誤\n   - 提供錯誤處理的程式碼範例",
+          "status": "pending",
+          "testStrategy": "1. 單元測試：\n   - 測試錯誤轉換函式\n   - 測試錯誤檢查函式\n   - 驗證錯誤訊息的格式和內容\n\n2. 整合測試：\n   - 模擬各種錯誤情境\n   - 驗證 Repository 層正確轉換和回傳錯誤\n   - 測試上層服務如何正確處理這些錯誤"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Implement Medical Record CRUD API",
+      "description": "Create REST API endpoints for managing pet medical records.",
+      "details": "1. Implement endpoints:\n   - GET /v1/pets/{id}/medical-records\n   - POST /v1/pets/{id}/medical-records\n   - PUT /v1/pets/{id}/medical-records/{recordId}\n   - DELETE /v1/pets/{id}/medical-records/{recordId}\n2. Implement sorting and filtering options\n3. Add support for file attachments (store in S3-compatible storage)\n4. Implement reminder system for upcoming medical events\n5. Use go-kit for service layer implementation\n6. Implement rate limiting using golang.org/x/time/rate",
+      "testStrategy": "Write unit tests for medical record use cases. Test file upload and download. Verify reminder system functionality.",
+      "priority": "high",
+      "dependencies": [
+        4
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 7,
+      "title": "Setup S3-compatible Storage",
+      "description": "Integrate S3-compatible storage (Wasabi/MinIO) for storing pet avatars and medical record attachments.",
+      "details": "1. Set up Wasabi or MinIO account\n2. Create necessary buckets for avatars and attachments\n3. Implement Go client for S3 using AWS SDK (github.com/aws/aws-sdk-go-v2)\n4. Create service for file upload and download\n5. Implement file type and size validation\n6. Generate signed URLs for secure file access\n7. Implement file deletion when associated records are deleted",
+      "testStrategy": "Test file upload, download, and deletion. Verify signed URL functionality. Test with various file types and sizes.",
+      "priority": "medium",
+      "dependencies": [
+        1
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 8,
+      "title": "Implement Frontend Authentication",
+      "description": "Create frontend components and logic for user registration, login, and authentication state management.",
+      "details": "1. Create React components for registration and login forms\n2. Implement form validation using react-hook-form\n3. Create authentication context using React Context API\n4. Implement API calls using axios or fetch API\n5. Store JWT token in HttpOnly cookie\n6. Create protected routes using Next.js middleware\n7. Implement logout functionality\n8. Add remember me functionality\n9. Implement password reset flow",
+      "testStrategy": "Write unit tests for authentication components. Implement integration tests for the entire authentication flow. Test token refresh mechanism.",
+      "priority": "high",
+      "dependencies": [
+        2
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "在 layout.tsx 中設定 UserProvider",
+          "description": "使用 Auth0 的 UserProvider 來包裹整個應用程式，以便在所有組件中共享使用者狀態。",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 8
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Design and Implement Responsive UI Layout",
+      "description": "Create a responsive layout for the application with a focus on mobile-first design.",
+      "details": "1. Design mobile-first layouts using Figma or similar tool\n2. Implement responsive layout using TailwindCSS\n3. Create reusable components (Header, Footer, Navigation)\n4. Implement a side menu for desktop and bottom navigation for mobile\n5. Use Next.js App Router for efficient routing\n6. Implement lazy loading for components and images\n7. Ensure accessibility (WCAG 2.1 AA compliance)\n8. Implement dark mode using TailwindCSS",
+      "testStrategy": "Test responsiveness across various devices and screen sizes. Conduct accessibility audit. Perform usability testing with potential users.",
+      "priority": "high",
+      "dependencies": [
+        8
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 10,
+      "title": "Implement Pet Profile Management UI",
+      "description": "Create frontend components for adding, editing, and viewing pet profiles.",
+      "details": "1. Create components:\n   - PetList: Display all pets\n   - PetForm: Add/Edit pet details\n   - PetProfile: View pet details\n2. Implement image upload for pet avatars\n3. Use react-query for efficient data fetching and caching\n4. Implement optimistic updates for better UX\n5. Add form validation using react-hook-form\n6. Implement error handling and display error messages\n7. Add confirmation dialogs for delete actions\n8. Implement skeleton loading states",
+      "testStrategy": "Write unit tests for components. Implement integration tests for the pet management flow. Test error scenarios and edge cases.",
+      "priority": "high",
+      "dependencies": [
+        4,
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 11,
+      "title": "Implement Health Log Calendar View",
+      "description": "Create a calendar view to display and manage pet health logs.",
+      "details": "1. Use react-big-calendar for the calendar component\n2. Implement day, week, and month views\n3. Create custom event rendering for different log types\n4. Implement log entry creation and editing through calendar interface\n5. Add color coding for different log types\n6. Implement filters for log types and date ranges\n7. Create a heatmap view for quick overview (use d3.js)\n8. Implement infinite scrolling for performance\n9. Add drag-and-drop functionality for log entries",
+      "testStrategy": "Write unit tests for calendar components. Test different view modes and interactions. Perform performance testing with large datasets.",
+      "priority": "high",
+      "dependencies": [
+        5,
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 12,
+      "title": "Implement Medical Record Management UI",
+      "description": "Create frontend components for adding, editing, and viewing medical records.",
+      "details": "1. Create components:\n   - MedicalRecordList: Display all records\n   - MedicalRecordForm: Add/Edit record\n   - MedicalRecordDetail: View record details\n2. Implement file attachment upload and preview\n3. Create a timeline view for medical history\n4. Implement sorting and filtering options\n5. Add form validation using react-hook-form\n6. Implement reminder settings for upcoming events\n7. Create a print view for medical records\n8. Implement search functionality",
+      "testStrategy": "Write unit tests for medical record components. Test file upload and preview functionality. Verify reminder creation and notification.",
+      "priority": "high",
+      "dependencies": [
+        6,
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 13,
+      "title": "Implement Data Visualization for Health Trends",
+      "description": "Create charts and graphs to visualize pet health trends over time.",
+      "details": "1. Use recharts or Chart.js for creating visualizations\n2. Implement weight trend chart\n3. Create food intake visualization\n4. Implement behavior trend analysis\n5. Add customizable date range for all charts\n6. Create exportable reports of health trends\n7. Implement comparative analysis between multiple pets\n8. Add annotations for significant events (e.g., medication changes)",
+      "testStrategy": "Test chart rendering with various datasets. Verify export functionality. Test performance with large datasets.",
+      "priority": "medium",
+      "dependencies": [
+        11,
+        12
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 14,
+      "title": "Implement CSV/PDF Export Functionality",
+      "description": "Add the ability to export pet data, health logs, and medical records in CSV and PDF formats.",
+      "details": "1. Implement CSV export using encoding/csv package in Go\n2. Use gopdf or gofpdf for PDF generation\n3. Create API endpoints for initiating exports\n4. Implement background job processing for large exports\n5. Add progress tracking for export jobs\n6. Implement file download mechanism\n7. Create frontend UI for initiating and downloading exports\n8. Add customization options for export content",
+      "testStrategy": "Test export functionality with various data sizes. Verify CSV and PDF format correctness. Test concurrent export requests.",
+      "priority": "medium",
+      "dependencies": [
+        5,
+        6
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 15,
+      "title": "Implement Read-only Sharing Feature",
+      "description": "Create functionality to generate read-only sharing links for pet profiles and records.",
+      "details": "1. Implement token-based sharing mechanism\n2. Create API endpoint for generating share tokens\n3. Implement middleware for validating share tokens\n4. Create read-only views for shared data\n5. Add ability to revoke share tokens\n6. Implement expiration for share tokens\n7. Create UI for managing shared links\n8. Add email sharing option",
+      "testStrategy": "Test share link generation and access. Verify token expiration and revocation. Test concurrent access to shared resources.",
+      "priority": "low",
+      "dependencies": [
+        4,
+        5,
+        6
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 16,
+      "title": "Implement PWA Functionality",
+      "description": "Convert the web application into a Progressive Web App for offline capabilities and improved mobile experience.",
+      "details": "1. Add Web App Manifest\n2. Implement Service Worker using Workbox\n3. Set up offline caching strategies\n4. Implement background sync for offline data submission\n5. Add 'Add to Home Screen' prompt\n6. Implement push notifications (prepare for future LINE Notify integration)\n7. Optimize assets for faster loading\n8. Implement app shell architecture",
+      "testStrategy": "Test offline functionality. Verify PWA installation process. Test sync behavior when coming back online.",
+      "priority": "medium",
+      "dependencies": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 17,
+      "title": "Implement Error Handling and Logging",
+      "description": "Set up comprehensive error handling and logging across the application.",
+      "details": "1. Implement structured logging using uber-go/zap\n2. Set up error tracking service (e.g., Sentry)\n3. Create custom error types and error wrapping\n4. Implement global error handler for API\n5. Create error boundary components in React\n6. Implement user-friendly error messages\n7. Set up log rotation and archiving\n8. Implement audit logging for sensitive operations",
+      "testStrategy": "Simulate various error scenarios. Verify log output and error reporting. Test error recovery mechanisms.",
+      "priority": "high",
+      "dependencies": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 18,
+      "title": "Implement API Documentation",
+      "description": "Create comprehensive API documentation using OpenAPI/Swagger.",
+      "status": "in-progress",
+      "dependencies": [
+        4,
+        5,
+        6
+      ],
+      "priority": "medium",
+      "details": "1. Use swaggo/swag to generate OpenAPI specification (completed for pet management APIs)\n2. Implement API annotations in Go code (completed for pet management endpoints)\n3. Set up Swagger UI for interactive documentation\n4. Validate and fine-tune the generated documentation\n5. Document authentication and error responses\n6. Implement API versioning\n7. Generate client SDKs using OpenAPI Generator\n8. Create Postman collection for API testing\n9. Extend Swagger annotations to remaining API endpoints",
+      "testStrategy": "Verify OpenAPI spec correctness and completeness. Test Swagger UI functionality. Validate that all pet management endpoints are properly documented. Ensure documentation reflects the refactored Gin Transport layer. Validate generated client SDKs.",
+      "subtasks": [
+        {
+          "id": "18.1",
+          "title": "Verify pet management API documentation",
+          "description": "Review the Swagger documentation generated for pet management endpoints to ensure accuracy and completeness.",
+          "status": "pending"
+        },
+        {
+          "id": "18.2",
+          "title": "Configure and deploy Swagger UI",
+          "description": "Set up Swagger UI to provide interactive documentation for the API endpoints.",
+          "status": "pending"
+        },
+        {
+          "id": "18.3",
+          "title": "Add Swagger annotations to remaining endpoints",
+          "description": "Extend the Swagger documentation to cover all API endpoints beyond pet management.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "title": "Setup CI/CD Pipeline",
+      "description": "Implement Continuous Integration and Continuous Deployment using GitHub Actions.",
+      "details": "1. Create GitHub Actions workflow for CI:\n   - Run tests for both frontend and backend\n   - Perform linting and code style checks\n   - Build Docker images\n2. Implement CD pipeline:\n   - Deploy to staging environment on PR merge\n   - Deploy to production on release tag\n3. Set up k3s cluster for deployment\n4. Implement blue-green deployment strategy\n5. Set up automated database migrations\n6. Implement secret management using GitHub Secrets\n7. Set up monitoring and alerting",
+      "testStrategy": "Test CI pipeline with various scenarios (PR, merge, release). Verify staging and production deployments. Test rollback procedures.",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 20,
+      "title": "Implement Infrastructure as Code",
+      "description": "Set up infrastructure using Terraform for reproducible deployments.",
+      "details": "1. Create Terraform configurations for:\n   - k3s cluster setup\n   - MongoDB Atlas cluster\n   - S3-compatible storage\n   - Networking and security groups\n2. Implement modular Terraform structure\n3. Set up remote state storage\n4. Implement Terraform workspaces for different environments\n5. Create Terraform output for sensitive information\n6. Implement Terraform validation in CI pipeline\n7. Document Terraform usage and variables",
+      "testStrategy": "Test Terraform configurations in a sandbox environment. Verify idempotency of Terraform apply. Test disaster recovery scenarios.",
+      "priority": "medium",
+      "dependencies": [
+        19
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 21,
+      "title": "實作寵物管理的 API 端點 (Endpoint) 與傳輸層 (Transport)",
+      "description": "為任務 #4 中實作的寵物管理 usecase 建立 Go-kit endpoint 和 Gin HTTP transport 層。這將會把 Create, Update, Delete, GetByID, ListByOwner 等操作公開為 RESTful API。目前進度：Go-kit Endpoint 層的結構和 DTO (Data Transfer Objects) 皆已定義完成。下一步是實作 Gin HTTP Transport 層，將這些 Endpoints 透過具體的 HTTP Handlers 公開為 API。",
+      "status": "done",
+      "dependencies": [
+        2,
+        4
+      ],
+      "priority": "high",
+      "details": "1. [已完成] 在 `internal/endpoint` 目錄中實作 Go-kit endpoints：\n   - 為每個 usecase 建立對應的 endpoint 函數：\n     - `MakePetCreateEndpoint`\n     - `MakePetUpdateEndpoint`\n     - `MakePetDeleteEndpoint`\n     - `MakePetGetByIDEndpoint`\n     - `MakePetListByOwnerEndpoint`\n   - 每個 endpoint 應接收對應的 usecase handler 作為依賴\n   - 實作請求/回應 DTO 結構體，用於序列化和反序列化\n\n2. [待辦] 在 `internal/transport/http` 目錄中實作 Gin HTTP handlers：\n   - 建立 RESTful API 路由：\n     - `POST /v1/pets` - 建立寵物\n     - `PUT /v1/pets/:id` - 更新寵物\n     - `DELETE /v1/pets/:id` - 刪除寵物\n     - `GET /v1/pets/:id` - 獲取寵物詳情\n     - `GET /v1/pets` - 列出使用者的寵物（需要認證）\n   - 實作 HTTP 請求驗證和錯誤處理\n   - 整合 Auth0 JWT 驗證中間件，確保適當的授權\n   - 實作適當的 HTTP 狀態碼和回應格式\n\n3. [待辦] 實作請求和回應的驗證：\n   - 使用 go-playground/validator 進行請求驗證\n   - 建立自定義驗證函數（如需要）\n   - 實作統一的錯誤回應格式\n\n4. [待辦] 實作跨域資源共享 (CORS) 支援：\n   - 設定允許的來源、方法和標頭\n   - 處理預檢請求 (preflight requests)\n\n5. [待辦] 實作 API 版本控制策略：\n   - 在 URL 路徑中包含版本號（如 `/v1/`）\n   - 為未來版本升級做準備\n\n6. [待辦] 實作請求日誌記錄：\n   - 使用 uber-go/zap 記錄 API 請求和回應\n   - 包含請求 ID、用戶 ID、請求時間等關鍵資訊\n\n7. [待辦] 實作速率限制：\n   - 使用 golang.org/x/time/rate 實作基本速率限制\n   - 根據 IP 或用戶 ID 進行限制\n\n8. [待辦] 實作健康檢查端點：\n   - 建立 `/health` 端點以供監控系統使用\n\n9. [待辦] 整合 Swagger/OpenAPI 文檔：\n   - 使用 swaggo/gin-swagger 生成 API 文檔\n   - 為每個端點添加適當的註釋",
+      "testStrategy": "1. 為每個 endpoint 編寫單元測試：\n   - 測試正常路徑和錯誤情境\n   - 使用模擬 (mock) 替代 usecase 層\n   - 驗證請求處理和回應格式\n\n2. 為 HTTP transport handlers 編寫單元測試：\n   - 使用 `net/http/httptest` 和 Gin 的測試工具\n   - 測試路由註冊和請求處理\n   - 驗證 HTTP 狀態碼和回應內容\n   - 測試錯誤處理和邊界情況\n\n3. 編寫整合測試：\n   - 使用 HTTP 客戶端（如 Postman 或 curl）測試 API\n   - 建立測試腳本以自動化測試流程\n   - 測試完整的 CRUD 操作流程\n   - 驗證認證和授權機制\n\n4. 效能測試：\n   - 使用 Apache Bench 或 wrk 等工具進行負載測試\n   - 測試 API 在高負載下的表現\n   - 驗證速率限制功能\n\n5. 安全性測試：\n   - 測試未授權訪問的處理\n   - 驗證 CORS 設定\n   - 測試輸入驗證和防止注入攻擊\n\n6. 文檔驗證：\n   - 確保 Swagger 文檔準確反映 API 功能\n   - 驗證 API 文檔中的範例請求和回應",
+      "subtasks": []
     }
+  ],
+  "metadata": {
+    "created": "2025-06-19T23:35:36.274Z",
+    "updated": "2025-06-20T04:53:55.528Z",
+    "description": "Tasks for master context"
   }
 }

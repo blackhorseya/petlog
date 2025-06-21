@@ -1,0 +1,174 @@
+---
+description: F2E React/Next.js + TypeScript 最佳實踐（web/src）
+globs: 
+alwaysApply: true
+---
+
+## 1. 核心理念：功能垂直切分 (Vertical Slicing)
+
+- **原則**: 程式碼應圍繞「功能」或「路由」來組織，而非「檔案類型」。
+- **目標**: 提高內聚性，降低耦合度。所有與特定功能相關的檔案（元件、Hooks、API 呼叫、類型定義）都應放在同一個地方。
+- **範例**:
+  - ❌ **舊式 (按類型分層)**:
+    ```
+    /components/UserAvatar.tsx
+    /hooks/useUser.ts
+    /lib/api/users.ts
+    /app/users/[id]/page.tsx
+    ```
+  - ✅ **新式 (按功能切分與共置)**:
+    ```
+    /app/settings/
+    ├── _components/         # _components 資料夾不會被視為路由
+    │   ├── ProfileForm.tsx
+    │   └── UpdatePassword.tsx
+    ├── _lib/
+    │   └── actions.ts       # 此頁面專用的 Server Actions
+    ├── page.tsx             # /settings 的頁面元件
+    └── layout.tsx           # /settings 的佈局
+    ```
+
+---
+
+## 2. 專案目錄結構
+
+```
+petlog/
+└── web/
+    ├── public/                 # 靜態資源 (fonts, images)
+    ├── src/
+    │   ├── app/                # App Router 核心，所有路由與功能都在此
+    │   ├── components/         # **全域**、純 UI、可共用的原子元件 (e.g., Button, Input, Card)
+    │   ├── lib/                # **全域**共用工具函式 (e.g., date-fns, clsx, utils)
+    │   ├── hooks/              # **全域**共用 Hooks
+    │   ├── services/           # **全域** API 客戶端或服務層 (e.g., a configured fetch instance)
+    │   ├── styles/             # 全域樣式 (globals.css)
+    │   └── constants/          # 全域常數 (e.g., site config, nav links)
+    ├── next.config.mjs
+    └── tsconfig.json
+```
+
+- **區分全域與區域**:
+  - `src/components`, `src/lib` 等頂層資料夾**只存放**真正全域、跨多個功能共用的程式碼。
+  - **優先原則**: 優先將程式碼放在功能資料夾內的私有資料夾 (`_components`, `_lib`) 中。當一個元件或函式需要被第二個功能使用時，再考慮將其提升為全域。
+
+---
+
+## 3. App Router 檔案與資料夾慣例
+
+### 3.1 特殊檔案 (Special Files)
+
+- `layout.tsx`: 區段共享的 UI。必須接受 `children` prop。
+- `page.tsx`: 頁面 UI，是路由可公開訪問的部份。
+- `loading.tsx`: 載入狀態 UI (自動被 `<Suspense>` 包裹)。
+- `error.tsx`: 錯誤 UI (自動被 Error Boundary 包裹，捕捉區段內的錯誤)。
+- `not-found.tsx`: 404 頁面 UI。
+- `template.tsx`: 類似 `layout`，但在每次導航時都會建立新的實例。
+- `route.ts`: API 端點 (e.g., `app/api/users/route.ts`)。
+
+### 3.2 資料夾慣例 (Folder Conventions)
+
+- **`[folder]`**: 動態路由區段 (e.g., `[id]`)。
+- **`[...folder]`**: Catch-all 路由區段。
+- **`[[...folder]]`**: Optional catch-all 路由區段。
+- **`(group)`**: **路由群組**。用於組織路由、共享 Layout，但**不影響 URL 路徑**。
+  - 範例: `(marketing)/layout.tsx` 可以同時套用到 `(marketing)/about/page.tsx` 和 `(marketing)/blog/page.tsx`。
+- **`_folder`**: **私有資料夾**。用於**共置 (colocation)**，資料夾及其所有子資料夾都**不會**被視為路由的一部分。這是實現功能垂直切分的核心。
+  - 範例: `app/settings/_components/Form.tsx`。
+- **`@slot`**: 平行路由 (Parallel Routes) 的具名插槽，用於在同一個 Layout 中渲染多個頁面。
+
+---
+
+## 4. 元件與邏輯
+
+- **Server Components 優先**: 預設所有元件都是 Server Component，以利於靜態渲染和減少客戶端 JS。
+- **`'use client'` 最小化**: 僅在需要互動性 (Hooks, Event Listeners) 的**最末端葉子元件**上標記。
+- **在 Client 元件中傳遞 Server Component**: 將互動元件從父層 Server Component 中分離出來，並將靜態部分作為 `children` 傳入。
+  ```tsx
+  // app/page.tsx (Server Component)
+  import { Counter } from './_components/Counter'; // Client Component
+  import { ServerInfo } from './_components/ServerInfo'; // Server Component
+
+  export default function Page() {
+    return (
+      <Counter>
+        <ServerInfo />
+      </Counter>
+    );
+  }
+  ```
+- **資料獲取**:
+  - Server Components 中直接使用 `async/await`。
+  - Client Components 建議使用 SWR 或 React Query。
+- **Server Actions**: 用於表單提交和資料變更。將其定義在 Server Component 中或共置於 `_lib/actions.ts` 檔案中。
+
+---
+
+## 5. 命名規範
+
+- **資料夾**: 一律使用 `kebab-case` (e.g., `user-profile`)。
+- **檔案**:
+  - **元件 & 頁面**: `PascalCase` (e.g., `UserCard.tsx`, `page.tsx`)。
+  - **其他檔案 (lib, hooks, etc.)**: `kebab-case` (e.g., `use-query-state.ts`, `date-utils.ts`)。
+- **API Routes**: 必須是 `route.ts`。
+- **事件處理函式**: `handle` 前綴 (e.g., `handleSubmit`, `handleInputChange`)。
+- **布林狀態**: `isXxx`, `hasXxx`, `canXxx` (e.g., `isOpen`, `hasPermission`)。
+
+---
+
+## 6. 樣式
+
+- **統一使用 Tailwind CSS**: 搭配 `clsx` 或 `tailwind-merge` 處理條件式樣式。
+- **UI 元件庫**: 推薦使用 **Shadcn UI / Radix UI**，它們是無樣式 (un-styled)、可組合的，能最大化客製彈性。
+
+---
+
+## 7. Metadata 與 SEO
+
+- **靜態 Metadata**: 在 `layout.tsx` 或 `page.tsx` 中匯出 `metadata` 物件。
+  ```ts
+  import type { Metadata } from 'next';
+
+  export const metadata: Metadata = {
+    title: 'PetLog',
+    description: '記錄您寵物的點點滴滴',
+  };
+  ```
+- **動態 Metadata**: 使用 `generateMetadata` 函式，通常用於動態路由頁面。
+- **檔案慣例**:
+  - `opengraph-image.tsx` (或 `.jpg`): 產生 Open Graph 圖片。
+  - `twitter-image.tsx` (或 `.jpg`): 產生 Twitter Card 圖片。
+  - `favicon.ico`, `icon.png`, `apple-icon.png`: 應用程式圖示。
+
+---
+
+## 8. 安全性
+
+- **Server Actions 安全**:
+  - 在 Action 內部務必重新驗證使用者身份與權限。
+  - 使用 Zod 等函式庫對傳入的表單資料進行嚴格的驗證。
+- **隔離資料存取層**: 建立一個獨立的資料存取層 (Data Access Layer)，並確保資料庫相關的套件和金鑰不會洩漏到客戶端。
+- **環境變數**:
+  - 只有以 `NEXT_PUBLIC_` 為前綴的變數會暴露給瀏覽器。
+  - Server-side 的機密金鑰**絕不**加此前綴。
+
+---
+
+## 9. 測試與品質
+
+- **測試策略**:
+  - **Unit**: Vitest + React Testing Library，測試獨立元件或工具函式。
+  - **E2E**: Playwright，模擬真實使用者操作流程。
+- **測試檔案位置**: 測試檔案應與被測試的原始碼共置。
+  - 範例: `src/components/Button.tsx` 的測試檔為 `src/components/Button.test.tsx`。
+- **Linting & Formatting**:
+  - Git 提交前由 `lint-staged` 強制執行 `eslint --fix` 和 `prettier --write`。
+  - 遵循 `.eslintrc` 和 `.prettierrc` 的設定。
+
+---
+## 10. 其他
+
+- **絕對路徑導入**: 使用 `tsconfig.json` 中設定的 `paths` (`@/*`) 來進行導入，避免相對路徑地獄 (`../../..`)。
+- **禁止 Default Export**: 一律採用 `named export`，以保持導入的一致性。
+- **日誌**: 禁止在正式程式碼中提交 `console.log`。應使用統一的 Logger 服務。
+
