@@ -8,7 +8,6 @@ import (
 	"github.com/blackhorseya/petlog/internal/config"
 	"github.com/blackhorseya/petlog/internal/endpoint"
 	"github.com/gin-gonic/gin"
-	"github.com/go-kit/kit/transport"
 	httptransport "github.com/go-kit/kit/transport/http"
 )
 
@@ -16,7 +15,7 @@ import (
 func RegisterPetRoutes(r *gin.Engine, cfg config.Config, e endpoint.PetEndpoints, options ...httptransport.ServerOption) {
 	// Error handler
 	opts := []httptransport.ServerOption{
-		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(nil)), // replace nil with a logger
+		httptransport.ServerErrorHandler(NewContextualLogErrorHandler()),
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 	opts = append(opts, options...)

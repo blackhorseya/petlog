@@ -31,6 +31,9 @@ export function useCreatePet() {
       const createRequest: CreatePetRequest = {
         name: data.name,
         avatar_url: data.avatar_url,
+        dob: data.dob,
+        breed: data.breed,
+        microchip_id: data.microchip_id,
       };
       return petApi.createPet(createRequest);
     },
@@ -59,6 +62,9 @@ export function useUpdatePet() {
       petApi.updatePet(id, {
         name: data.name,
         avatar_url: data.avatar_url,
+        dob: data.dob,
+        breed: data.breed,
+        microchip_id: data.microchip_id,
       }),
     onSuccess: (_, { id, data }) => {
       // 無效化相關查詢
@@ -70,8 +76,7 @@ export function useUpdatePet() {
         if (!old) return old;
         return {
           ...old,
-          name: data.name,
-          avatar_url: data.avatar_url,
+          ...data,
           updated_at: new Date().toISOString(),
         };
       });

@@ -26,11 +26,14 @@ const petFormSchema = z.object({
     .string()
     .min(1, "寵物名稱是必填的")
     .max(50, "寵物名稱不能超過 50 個字元"),
+  dob: z.string().min(1, '出生日期為必填'),
   avatar_url: z
     .string()
     .url("請輸入有效的 URL")
     .optional()
     .or(z.literal("")),
+  breed: z.string().optional(),
+  microchip_id: z.string().optional(),
 });
 
 interface PetFormProps {
@@ -50,6 +53,9 @@ export function PetForm({ open, onOpenChange, pet, onSuccess }: PetFormProps) {
     defaultValues: {
       name: pet?.name || "",
       avatar_url: pet?.avatar_url || "",
+      dob: pet?.dob ? new Date(pet.dob).toISOString().split('T')[0] : "",
+      breed: pet?.breed || "",
+      microchip_id: pet?.microchip_id || "",
     },
   });
 
@@ -59,24 +65,35 @@ export function PetForm({ open, onOpenChange, pet, onSuccess }: PetFormProps) {
       form.reset({
         name: pet.name,
         avatar_url: pet.avatar_url || "",
+        dob: pet.dob ? new Date(pet.dob).toISOString().split('T')[0] : "",
+        breed: pet.breed || "",
+        microchip_id: pet.microchip_id || "",
       });
     } else {
       form.reset({
         name: "",
         avatar_url: "",
+        dob: "",
+        breed: "",
+        microchip_id: "",
       });
     }
   }, [pet, form]);
 
   const onSubmit = async (data: PetFormData) => {
     try {
+      const submissionData = {
+        ...data,
+        dob: new Date(data.dob).toISOString(),
+      };
+
       if (isEditing) {
         await updatePetMutation.mutateAsync({
           id: pet.id,
-          data,
+          data: submissionData,
         });
       } else {
-        await createPetMutation.mutateAsync(data);
+        await createPetMutation.mutateAsync(submissionData);
       }
       
       // 成功後關閉對話框並重置表單
@@ -118,6 +135,28 @@ export function PetForm({ open, onOpenChange, pet, onSuccess }: PetFormProps) {
             error={form.formState.errors.name?.message}
             required
             {...form.register("name")}
+          />
+
+          <Input
+            label="出生日期"
+            type="date"
+            error={form.formState.errors.dob?.message}
+            required
+            {...form.register("dob")}
+          />
+
+          <Input
+            label="品種"
+            placeholder="例如：米克斯"
+            error={form.formState.errors.breed?.message}
+            {...form.register("breed")}
+          />
+
+          <Input
+            label="晶片號碼"
+            placeholder="請輸入晶片號碼"
+            error={form.formState.errors.microchip_id?.message}
+            {...form.register("microchip_id")}
           />
 
           <Input

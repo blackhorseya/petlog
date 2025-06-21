@@ -56,6 +56,7 @@ func (h *CreatePetHandler) Handle(c context.Context, cmd CreatePetCommand) (*mod
 	}
 
 	if err := behavior.ValidatePet(pet); err != nil {
+		ctx.Warn("pet validation failed", "error", err, "pet_name", pet.Name)
 		return nil, fmt.Errorf("pet validation failed: %w", err)
 	}
 

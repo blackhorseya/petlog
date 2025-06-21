@@ -15,6 +15,9 @@ export interface Pet {
 export interface CreatePetRequest {
   name: string;
   avatar_url?: string;
+  dob: string;
+  breed?: string;
+  microchip_id?: string;
 }
 
 // 更新寵物請求類型，對應 endpoint.UpdatePetRequest
@@ -22,6 +25,9 @@ export interface UpdatePetRequest {
   id: string;
   name: string;
   avatar_url?: string;
+  dob: string;
+  breed?: string;
+  microchip_id?: string;
 }
 
 // API 回應類型
@@ -52,4 +58,7 @@ export interface DeletePetResponse {
 export interface PetFormData {
   name: string;
   avatar_url?: string;
+  dob: string;
+  breed?: string;
+  microchip_id?: string;
 }

@@ -274,6 +274,15 @@ const docTemplate = `{
                 "avatar_url": {
                     "type": "string"
                 },
+                "breed": {
+                    "type": "string"
+                },
+                "dob": {
+                    "type": "string"
+                },
+                "microchip_id": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -321,7 +330,16 @@ const docTemplate = `{
                 "avatar_url": {
                     "type": "string"
                 },
+                "breed": {
+                    "type": "string"
+                },
+                "dob": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "string"
+                },
+                "microchip_id": {
                     "type": "string"
                 },
                 "name": {
