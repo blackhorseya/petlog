@@ -616,14 +616,14 @@
       {
         "id": 20,
         "title": "Implement Infrastructure as Code",
-        "description": "Set up infrastructure using Terraform for reproducible deployments.",
-        "details": "1. Create Terraform configurations for:\n   - k3s cluster setup\n   - MongoDB Atlas cluster\n   - S3-compatible storage\n   - Networking and security groups\n2. Implement modular Terraform structure\n3. Set up remote state storage\n4. Implement Terraform workspaces for different environments\n5. Create Terraform output for sensitive information\n6. Implement Terraform validation in CI pipeline\n7. Document Terraform usage and variables",
-        "testStrategy": "Test Terraform configurations in a sandbox environment. Verify idempotency of Terraform apply. Test disaster recovery scenarios.",
-        "priority": "medium",
+        "description": "使用 Serverless Framework v4 將 Go 後端應用程式打包並部署到 AWS Lambda。設定 API Gateway 以觸發 Lambda 函式。",
+        "status": "in-progress",
         "dependencies": [
           19
         ],
-        "status": "pending",
+        "priority": "medium",
+        "details": "1. 在專案中安裝並設定 Serverless Framework v4。\n2. 建立 `serverless.yml` 設定檔，定義服務名稱、provider (aws)、runtime (go1.x) 和函式。\n3. 設定 API Gateway 事件來觸發 `main` 函式。\n4. 建立或修改 `Makefile`，新增一個 `build-lambda` 指令來編譯 Go 程式，產生適用於 Lambda 的 `bootstrap` 執行檔。\n5. 實作部署流程，並確保環境變數能正確傳遞。",
+        "testStrategy": "測試 Serverless Framework 部署流程在開發環境中的運作。驗證 API Gateway 與 Lambda 函式的整合。測試環境變數的正確傳遞。確認 Go 應用程式在 Lambda 環境中的正常運作。",
         "subtasks": []
       },
       {
@@ -643,7 +643,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-21T02:39:38.911Z",
+      "updated": "2025-06-21T03:06:16.437Z",
       "description": "Tasks for master context"
     }
   }
