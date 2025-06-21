@@ -21,11 +21,17 @@ async function apiRequest<T>(
   const url = `${API_BASE_URL}${endpoint}`;
   
   try {
-    const accessToken = await getAccessToken();
+    // 獲取 Auth0 存取令牌 (使用官方 SDK 方法)
+    let accessToken: string | undefined;
+    try {
+      accessToken = await getAccessToken();
+    } catch (tokenError) {
+      console.warn('無法獲取 Auth0 存取令牌 (開發階段可忽略):', tokenError);
+    }
 
     const headers = {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
+      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
       ...options.headers,
     };
 
