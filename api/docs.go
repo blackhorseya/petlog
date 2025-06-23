@@ -16,6 +16,74 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/v1/health-logs": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根據寵物 ID 和可選的日期範圍列出健康日誌",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health-logs"
+                ],
+                "summary": "列出寵物的健康日誌",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "寵物 ID",
+                        "name": "pet_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "開始日期 (RFC3339 格式)",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "結束日期 (RFC3339 格式)",
+                        "name": "end_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ListHealthLogsByPetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -60,6 +128,206 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/health-logs/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "取得指定 ID 的健康日誌詳細資訊",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health-logs"
+                ],
+                "summary": "根據 ID 取得健康日誌",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "健康日誌 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetHealthLogByIDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "更新指定 ID 的健康日誌資訊",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health-logs"
+                ],
+                "summary": "更新健康日誌",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "健康日誌 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新的健康日誌資訊",
+                        "name": "healthLog",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateHealthLogRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateHealthLogResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "刪除指定 ID 的健康日誌",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health-logs"
+                ],
+                "summary": "刪除健康日誌",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "健康日誌 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.DeleteHealthLogResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -389,10 +657,28 @@ const docTemplate = `{
                 }
             }
         },
+        "endpoint.DeleteHealthLogResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "endpoint.DeletePetResponse": {
             "type": "object",
             "properties": {
                 "error": {}
+            }
+        },
+        "endpoint.GetHealthLogByIDResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "health_log": {
+                    "$ref": "#/definitions/model.HealthLog"
+                }
             }
         },
         "endpoint.GetPetResponse": {
@@ -401,6 +687,18 @@ const docTemplate = `{
                 "error": {},
                 "pet": {
                     "$ref": "#/definitions/model.Pet"
+                }
+            }
+        },
+        "endpoint.ListHealthLogsByPetResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "health_logs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.HealthLog"
+                    }
                 }
             }
         },
@@ -413,6 +711,41 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/model.Pet"
                     }
+                }
+            }
+        },
+        "endpoint.UpdateHealthLogRequest": {
+            "type": "object",
+            "properties": {
+                "behaviour_notes": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "food_gram": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "litter_notes": {
+                    "type": "string"
+                },
+                "pet_id": {
+                    "type": "string"
+                },
+                "weight_kg": {
+                    "type": "number"
+                }
+            }
+        },
+        "endpoint.UpdateHealthLogResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "health_log": {
+                    "$ref": "#/definitions/model.HealthLog"
                 }
             }
         },
