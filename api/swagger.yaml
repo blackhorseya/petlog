@@ -1,5 +1,26 @@
 basePath: /
 definitions:
+  endpoint.CreateHealthLogRequest:
+    properties:
+      behaviour_notes:
+        type: string
+      date:
+        type: string
+      food_gram:
+        type: integer
+      litter_notes:
+        type: string
+      pet_id:
+        type: string
+      weight_kg:
+        type: number
+    type: object
+  endpoint.CreateHealthLogResponse:
+    properties:
+      error: {}
+      health_log:
+        $ref: '#/definitions/model.HealthLog'
+    type: object
   endpoint.CreatePetRequest:
     properties:
       avatar_url:
@@ -56,6 +77,23 @@ definitions:
     properties:
       error: {}
     type: object
+  model.HealthLog:
+    properties:
+      behaviour_notes:
+        type: string
+      date:
+        type: string
+      food_gram:
+        type: integer
+      id:
+        type: string
+      litter_notes:
+        type: string
+      pet_id:
+        type: string
+      weight_kg:
+        type: number
+    type: object
   model.Pet:
     properties:
       avatar_url:
@@ -84,6 +122,45 @@ info:
   title: PetLog API
   version: "0.1"
 paths:
+  /api/v1/health-logs:
+    post:
+      consumes:
+      - application/json
+      description: 為指定的寵物建立一筆新的健康日誌紀錄
+      parameters:
+      - description: 健康日誌資訊
+        in: body
+        name: healthLog
+        required: true
+        schema:
+          $ref: '#/definitions/endpoint.CreateHealthLogRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.CreateHealthLogResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 建立健康日誌
+      tags:
+      - health-logs
   /api/v1/pets:
     get:
       consumes:

@@ -37,13 +37,14 @@ func NewHTTPHandler(
 	r *gin.Engine,
 	cfg config.Config,
 	petEndpoints endpoint.PetEndpoints,
+	healthLogEndpoints endpoint.HealthLogEndpoints,
 	options []httptransport.ServerOption,
 ) http.Handler {
 	// Register routes for the "pet" module.
 	RegisterPetRoutes(r, cfg, petEndpoints, options...)
 
-	// In the future, other modules can be registered here:
-	// RegisterHealthLogRoutes(r, cfg, healthLogEndpoints, options...)
+	// Register routes for the "health-log" module.
+	RegisterHealthLogRoutes(r, cfg, healthLogEndpoints, options...)
 
 	return r
 }

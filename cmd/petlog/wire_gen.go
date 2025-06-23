@@ -38,8 +38,16 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 	getPetByIDHandler := query.NewGetPetByIDHandler(petRepository)
 	listPetsByOwnerHandler := query.NewListPetsByOwnerHandler(petRepository)
 	petEndpoints := endpoint.MakePetEndpoints(createPetHandler, updatePetHandler, deletePetHandler, getPetByIDHandler, listPetsByOwnerHandler)
+	healthLogRepository, err := mongodb.NewHealthLogRepository(database)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	createHealthLogHandler := command.NewCreateHealthLogHandler(healthLogRepository)
+	endpointEndpoint := endpoint.MakeCreateHealthLogEndpoint(createHealthLogHandler)
+	healthLogEndpoints := endpoint.NewHealthLogEndpoints(endpointEndpoint)
 	v := _wireValue
-	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, v)
+	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, healthLogEndpoints, v)
 	return handler, func() {
 		cleanup()
 	}, nil
