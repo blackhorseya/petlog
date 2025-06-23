@@ -42,11 +42,11 @@ func (pm *petMongo) toDomain() *model.Pet {
 	}
 }
 
-// fromDomain 將領域模型 (model.Pet) 轉換為持久化模型 (petMongo)。
+// petMongoFromDomain 將領域模型 (model.Pet) 轉換為持久化模型 (petMongo)。
 // 這個函式處理 ID 的轉換，從 string 到 bson.ObjectID。
 // 如果傳入的 ID 字串是空的，它會被當作一個新的物件，ID 欄位會是零值 ObjectID。
 // 如果 ID 字串無效，它會返回一個錯誤。
-func fromDomain(p *model.Pet) (*petMongo, error) {
+func petMongoFromDomain(p *model.Pet) (*petMongo, error) {
 	if p == nil {
 		return nil, nil
 	}

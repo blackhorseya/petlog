@@ -37,7 +37,7 @@ func (r *petMongoRepo) Create(c context.Context, pet *model.Pet) error {
 
 	// 將領域模型轉換為持久化模型。
 	// 因為是新建立，所以傳入的 pet.ID 是空的，fromDomain 會回傳一個沒有 _id 的 petDoc。
-	petDoc, err := fromDomain(pet)
+	petDoc, err := petMongoFromDomain(pet)
 	if err != nil {
 		ctx.Error("領域模型轉換失敗", "error", err)
 		return err
@@ -147,7 +147,7 @@ func (r *petMongoRepo) Update(c context.Context, pet *model.Pet) error {
 	ctx.Info("開始更新寵物資訊", "pet_id", pet.ID, "pet_name", pet.Name)
 
 	// 將領域模型轉換為持久化模型，這會處理 ID 字串到 ObjectID 的轉換
-	petDoc, err := fromDomain(pet)
+	petDoc, err := petMongoFromDomain(pet)
 	if err != nil {
 		ctx.Error("領域模型轉換失敗", "error", err, "pet_id", pet.ID)
 		return err
