@@ -286,7 +286,7 @@
             "description": "在 `internal/infra/mongodb` 目錄下實作 HealthLog 模型的 Repository 介面",
             "dependencies": [],
             "details": "建立 `health_log_repository_impl.go` 和 `health_log_repository_model.go` 檔案，遵循已建立的設計模式：\n\n1. 在 `health_log_repository_model.go` 中：\n   - 定義 `healthLogMongo` 持久化模型，包含適當的 `bson` 標籤\n   - 實作 `toDomain()` 和 `fromDomain()` 轉換函式\n   - 確保正確處理 `string` ID 和 `bson.ObjectID` 之間的轉換\n\n2. 在 `health_log_repository_impl.go` 中實作完整的 CRUD 操作：\n   - Create：使用 `bson.NewObjectID()` 生成 ID，設定時間戳記\n   - FindByID：根據 ID 查詢單一健康記錄\n   - FindByPetID：查詢特定寵物的所有健康記錄\n   - Update：更新健康記錄，保留 CreatedAt，更新 UpdatedAt\n   - Delete：刪除健康記錄\n\n3. 錯誤處理：\n   - 使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 適當地轉換 MongoDB 錯誤為領域錯誤\n   - 提供詳細的錯誤訊息和日誌記錄",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。測試應包括：\n1. 正常操作路徑\n2. 錯誤處理路徑（如 ID 無效、記錄不存在等）\n3. 驗證標準化錯誤的正確使用（如 ErrNotFound、ErrInvalidID）"
           },
           {
@@ -723,7 +723,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-23T02:50:34.426Z",
+      "updated": "2025-06-23T03:52:43.371Z",
       "description": "Tasks for master context"
     }
   }
