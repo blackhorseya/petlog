@@ -13,7 +13,7 @@ import (
 	"github.com/blackhorseya/petlog/internal/transport/gin"
 	"github.com/blackhorseya/petlog/internal/usecase/command"
 	"github.com/blackhorseya/petlog/internal/usecase/query"
-	kithttp "github.com/go-kit/kit/transport/http"
+	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/google/wire"
 )
 
@@ -23,21 +23,27 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 		// 資料庫層
 		mongodb.ProviderSet,
 		mongodb.NewPetMongoRepo,
+		mongodb.NewHealthLogRepository,
 
 		// 用例處理器
 		command.NewCreatePetHandler,
-		command.NewUpdatePetHandler,
 		command.NewDeletePetHandler,
+		command.NewUpdatePetHandler,
 		query.NewGetPetByIDHandler,
 		query.NewListPetsByOwnerHandler,
+		command.NewCreateHealthLogHandler,
 
-		// 端點和傳輸層
+		// 端點層
 		endpoint.MakePetEndpoints,
+		endpoint.NewHealthLogEndpoints,
+		endpoint.MakeCreateHealthLogEndpoint,
+
+		// Transport層
 		gin.NewGinEngine,
 		gin.NewHTTPHandler,
 
-		// 提供空的 HTTP 選項
-		wire.Value([]kithttp.ServerOption{}),
+		// Provide an empty slice of server options.
+		wire.Value([]httptransport.ServerOption{}),
 	)
 	return nil, nil, nil
 }

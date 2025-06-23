@@ -9,6 +9,66 @@
     "host": "localhost:8080",
     "basePath": "/",
     "paths": {
+        "/api/v1/health-logs": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "為指定的寵物建立一筆新的健康日誌紀錄",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health-logs"
+                ],
+                "summary": "建立健康日誌",
+                "parameters": [
+                    {
+                        "description": "健康日誌資訊",
+                        "name": "healthLog",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreateHealthLogRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreateHealthLogResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/pets": {
             "get": {
                 "security": [
@@ -262,6 +322,38 @@
         }
     },
     "definitions": {
+        "endpoint.CreateHealthLogRequest": {
+            "type": "object",
+            "properties": {
+                "behaviour_notes": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "food_gram": {
+                    "type": "integer"
+                },
+                "litter_notes": {
+                    "type": "string"
+                },
+                "pet_id": {
+                    "type": "string"
+                },
+                "weight_kg": {
+                    "type": "number"
+                }
+            }
+        },
+        "endpoint.CreateHealthLogResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "health_log": {
+                    "$ref": "#/definitions/model.HealthLog"
+                }
+            }
+        },
         "endpoint.CreatePetRequest": {
             "type": "object",
             "properties": {
@@ -345,6 +437,32 @@
             "type": "object",
             "properties": {
                 "error": {}
+            }
+        },
+        "model.HealthLog": {
+            "type": "object",
+            "properties": {
+                "behaviour_notes": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "food_gram": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "litter_notes": {
+                    "type": "string"
+                },
+                "pet_id": {
+                    "type": "string"
+                },
+                "weight_kg": {
+                    "type": "number"
+                }
             }
         },
         "model.Pet": {
