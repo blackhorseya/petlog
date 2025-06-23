@@ -470,10 +470,63 @@
         "priority": "high",
         "dependencies": [
           5,
-          9
+          9,
+          22
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up Calendar Component with Basic Views",
+            "description": "Implement the basic calendar component using react-big-calendar with day, week, and month views in the health logs page.",
+            "dependencies": [],
+            "details": "1. Install react-big-calendar and its dependencies\n2. Create a new component at `web/src/components/health-logs/health-log-calendar.tsx`\n3. Set up the basic calendar with day, week, and month view options\n4. Configure the calendar with appropriate styling and localization\n5. Add the calendar component to the health logs page at `web/src/app/health-logs/calendar/page.tsx`\n6. Set up routing for the calendar view",
+            "status": "pending",
+            "testStrategy": "Create unit tests to verify calendar renders correctly with different view options. Test responsive behavior on different screen sizes."
+          },
+          {
+            "id": 2,
+            "title": "Implement Health Log Data Integration and Event Rendering",
+            "description": "Create API integration to fetch health log data and implement custom event rendering for different log types with color coding.",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Extend the API helper in `web/src/lib/api/health-log.ts` to include a function for fetching health logs within a date range\n2. Create custom event components for different health log types (medication, vet visits, symptoms, etc.)\n3. Implement color coding based on log type\n4. Add tooltips to display detailed information when hovering over events\n5. Connect the calendar to the API to load and display real health log data\n6. Implement data transformation functions to convert API responses to calendar event format",
+            "status": "pending",
+            "testStrategy": "Test API integration with mock data. Verify correct rendering of different event types and color coding."
+          },
+          {
+            "id": 3,
+            "title": "Add Log Entry Creation and Editing Through Calendar",
+            "description": "Implement functionality to create and edit health log entries directly through the calendar interface.",
+            "dependencies": [
+              2
+            ],
+            "details": "1. Create a modal component at `web/src/components/health-logs/health-log-modal.tsx` using shadcn/ui components\n2. Integrate the existing health-log-form.tsx into the modal\n3. Add click handlers to calendar dates to open the creation modal\n4. Implement click handlers for existing events to open the edit modal\n5. Add form validation and submission handling\n6. Implement optimistic UI updates after creating or editing logs\n7. Add confirmation dialogs for deleting events",
+            "status": "pending",
+            "testStrategy": "Test form validation, submission process, and modal behavior. Verify that calendar updates correctly after CRUD operations."
+          },
+          {
+            "id": 4,
+            "title": "Implement Filtering and Advanced Calendar Features",
+            "description": "Add filtering capabilities for log types and date ranges, and implement drag-and-drop functionality for log entries.",
+            "dependencies": [
+              3
+            ],
+            "details": "1. Create filter controls above the calendar using shadcn/ui components\n2. Implement filter logic to show/hide events based on log type\n3. Add date range selector for quick navigation\n4. Implement drag-and-drop functionality to move and reschedule events\n5. Add event resizing for duration-based logs\n6. Optimize performance with lazy loading and virtualization\n7. Implement responsive design adjustments for mobile views\n8. Add keyboard navigation for accessibility",
+            "status": "pending",
+            "testStrategy": "Test filter functionality with various combinations. Verify drag-and-drop behavior works correctly and updates the backend. Test keyboard navigation and accessibility."
+          },
+          {
+            "id": 5,
+            "title": "建立新增健康日誌的表單頁面",
+            "description": "建立一個簡單的前端頁面，包含一個表單，讓使用者可以提交新的健康日誌。這包括建立新路由、API 呼叫輔助函式，以及使用 shadcn/ui 的表單元件。",
+            "details": "1. 在 `web/src/app/health/new/` 建立新頁面與路由。 2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。 3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。 4. 將表單整合到新頁面並連接 API。\n<info added on 2025-06-23T21:53:59.363Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T21:53:59.363Z>\n<info added on 2025-06-23T22:03:56.273Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T22:03:56.273Z>\n<info added on 2025-06-23T22:05:44.096Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T22:05:44.096Z>",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 11
+          }
+        ]
       },
       {
         "id": 12,
@@ -569,7 +622,7 @@
       {
         "id": 18,
         "title": "Implement API Documentation",
-        "description": "Create comprehensive API documentation using OpenAPI/Swagger.",
+        "description": "Create comprehensive API documentation using OpenAPI/Swagger. [Updated: 6/23/2025]",
         "status": "in-progress",
         "dependencies": [
           4,
@@ -577,7 +630,7 @@
           6
         ],
         "priority": "medium",
-        "details": "1. Use swaggo/swag to generate OpenAPI specification (completed for pet management APIs)\n2. Implement API annotations in Go code (completed for pet management endpoints)\n3. Set up Swagger UI for interactive documentation\n4. Validate and fine-tune the generated documentation\n5. Document authentication and error responses\n6. Implement API versioning\n7. Generate client SDKs using OpenAPI Generator\n8. Create Postman collection for API testing\n9. Extend Swagger annotations to remaining API endpoints",
+        "details": "1. Use swaggo/swag to generate OpenAPI specification (completed for pet management APIs)\n2. Implement API annotations in Go code (completed for pet management endpoints)\n3. Set up Swagger UI for interactive documentation\n4. Validate and fine-tune the generated documentation\n5. Document authentication and error responses\n6. Implement API versioning\n7. Generate client SDKs using OpenAPI Generator\n8. Create Postman collection for API testing\n9. Extend Swagger annotations to remaining API endpoints\n<info added on 2025-06-23T06:06:38.940Z>\n進度更新：已為 `POST /api/v1/health-logs` 端點添加並生成了完整的 Swagger/OpenAPI 註解，這是子任務 18.3 的一部分。\n</info added on 2025-06-23T06:06:38.940Z>",
         "testStrategy": "Verify OpenAPI spec correctness and completeness. Test Swagger UI functionality. Validate that all pet management endpoints are properly documented. Ensure documentation reflects the refactored Gin Transport layer. Validate generated client SDKs.",
         "subtasks": [
           {
@@ -719,11 +772,28 @@
         "details": "1. [已完成] 在 `internal/endpoint` 目錄中實作 Go-kit endpoints：\n   - 為每個 usecase 建立對應的 endpoint 函數：\n     - `MakePetCreateEndpoint`\n     - `MakePetUpdateEndpoint`\n     - `MakePetDeleteEndpoint`\n     - `MakePetGetByIDEndpoint`\n     - `MakePetListByOwnerEndpoint`\n   - 每個 endpoint 應接收對應的 usecase handler 作為依賴\n   - 實作請求/回應 DTO 結構體，用於序列化和反序列化\n\n2. [待辦] 在 `internal/transport/http` 目錄中實作 Gin HTTP handlers：\n   - 建立 RESTful API 路由：\n     - `POST /v1/pets` - 建立寵物\n     - `PUT /v1/pets/:id` - 更新寵物\n     - `DELETE /v1/pets/:id` - 刪除寵物\n     - `GET /v1/pets/:id` - 獲取寵物詳情\n     - `GET /v1/pets` - 列出使用者的寵物（需要認證）\n   - 實作 HTTP 請求驗證和錯誤處理\n   - 整合 Auth0 JWT 驗證中間件，確保適當的授權\n   - 實作適當的 HTTP 狀態碼和回應格式\n\n3. [待辦] 實作請求和回應的驗證：\n   - 使用 go-playground/validator 進行請求驗證\n   - 建立自定義驗證函數（如需要）\n   - 實作統一的錯誤回應格式\n\n4. [待辦] 實作跨域資源共享 (CORS) 支援：\n   - 設定允許的來源、方法和標頭\n   - 處理預檢請求 (preflight requests)\n\n5. [待辦] 實作 API 版本控制策略：\n   - 在 URL 路徑中包含版本號（如 `/v1/`）\n   - 為未來版本升級做準備\n\n6. [待辦] 實作請求日誌記錄：\n   - 使用 uber-go/zap 記錄 API 請求和回應\n   - 包含請求 ID、用戶 ID、請求時間等關鍵資訊\n\n7. [待辦] 實作速率限制：\n   - 使用 golang.org/x/time/rate 實作基本速率限制\n   - 根據 IP 或用戶 ID 進行限制\n\n8. [待辦] 實作健康檢查端點：\n   - 建立 `/health` 端點以供監控系統使用\n\n9. [待辦] 整合 Swagger/OpenAPI 文檔：\n   - 使用 swaggo/gin-swagger 生成 API 文檔\n   - 為每個端點添加適當的註釋",
         "testStrategy": "1. 為每個 endpoint 編寫單元測試：\n   - 測試正常路徑和錯誤情境\n   - 使用模擬 (mock) 替代 usecase 層\n   - 驗證請求處理和回應格式\n\n2. 為 HTTP transport handlers 編寫單元測試：\n   - 使用 `net/http/httptest` 和 Gin 的測試工具\n   - 測試路由註冊和請求處理\n   - 驗證 HTTP 狀態碼和回應內容\n   - 測試錯誤處理和邊界情況\n\n3. 編寫整合測試：\n   - 使用 HTTP 客戶端（如 Postman 或 curl）測試 API\n   - 建立測試腳本以自動化測試流程\n   - 測試完整的 CRUD 操作流程\n   - 驗證認證和授權機制\n\n4. 效能測試：\n   - 使用 Apache Bench 或 wrk 等工具進行負載測試\n   - 測試 API 在高負載下的表現\n   - 驗證速率限制功能\n\n5. 安全性測試：\n   - 測試未授權訪問的處理\n   - 驗證 CORS 設定\n   - 測試輸入驗證和防止注入攻擊\n\n6. 文檔驗證：\n   - 確保 Swagger 文檔準確反映 API 功能\n   - 驗證 API 文檔中的範例請求和回應",
         "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "Implement Health Log API Endpoints",
+        "description": "Implement backend API for the Health Log feature, including handlers in internal/usecase, internal/endpoint, and internal/transport/gin to provide a fully functional POST /api/v1/health-logs endpoint. This task also includes generating Swagger API documentation for the new endpoint.",
+        "details": "1. Create HealthLog usecase in internal/usecase:\n   - Implement CreateHealthLogHandler\n   - Define DTO structures for input and output\n\n2. Create HealthLog endpoint in internal/endpoint:\n   - Implement MakeCreateHealthLogEndpoint\n   - Define request and response structures\n\n3. Implement Gin HTTP handler in internal/transport/gin:\n   - Create POST /api/v1/health-logs route\n   - Implement request validation\n   - Call the corresponding endpoint\n   - Handle response serialization\n\n4. Update Swagger annotations:\n   - Add OpenAPI annotations to the new handler\n   - Include request body schema, response schema, and possible error responses\n\n5. Implement error handling:\n   - Define custom error types for health log-related errors\n   - Implement error wrapping and proper HTTP status code mapping\n\n6. Add logging:\n   - Use uber-go/zap for structured logging\n   - Log incoming requests, successful operations, and errors\n\n7. Implement input sanitization and validation:\n   - Validate required fields (PetID, Date, WeightKg, etc.)\n   - Sanitize input to prevent XSS and other injection attacks\n\n8. Update dependency injection in main.go:\n   - Wire up the new usecase, endpoint, and handler\n\n9. Generate updated Swagger documentation:\n   - Run swag init to update OpenAPI specification\n   - Verify the new endpoint is correctly documented",
+        "testStrategy": "1. Unit tests:\n   - Write tests for CreateHealthLogHandler in usecase\n   - Test MakeCreateHealthLogEndpoint\n   - Create unit tests for the Gin HTTP handler\n\n2. Integration tests:\n   - Write tests that cover the entire flow from HTTP request to database operation\n   - Use a test database (e.g., an in-memory MongoDB instance)\n   - Test various scenarios including valid input, invalid input, and error conditions\n\n3. API tests:\n   - Use a tool like Postman or write curl commands to test the API endpoint\n   - Verify correct handling of different content types (application/json)\n   - Test with various payloads including edge cases\n\n4. Swagger documentation test:\n   - Verify that the Swagger UI correctly displays the new endpoint\n   - Ensure all parameters, request body, and responses are accurately documented\n\n5. Error handling tests:\n   - Simulate various error conditions (e.g., database errors, validation errors)\n   - Verify correct error responses and status codes\n\n6. Performance tests:\n   - Conduct load testing to ensure the endpoint can handle expected traffic\n   - Use tools like Apache JMeter or k6 for performance testing\n\n7. Security tests:\n   - Attempt common attack vectors (SQL injection, XSS) to ensure proper input sanitization\n   - Verify that sensitive data is not exposed in logs or error messages",
+        "status": "done",
+        "dependencies": [
+          4,
+          5,
+          17,
+          18,
+          21
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-23T03:52:43.371Z",
+      "updated": "2025-06-23T06:06:16.575Z",
       "description": "Tasks for master context"
     }
   }
