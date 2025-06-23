@@ -18,6 +18,8 @@ func NewGinEngine() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
+	r.Use(GinContextToContextMiddleware())
+
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
 	corsConfig.AddAllowHeaders("Authorization", "Accept", "Cache-Control")
