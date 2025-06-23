@@ -2,7 +2,7 @@
 
 import { useUser } from "@auth0/nextjs-auth0";
 import { Heart, Plus } from "lucide-react";
-
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function HealthPage() {
@@ -34,9 +34,11 @@ export default function HealthPage() {
             追蹤寵物的體重、飲食、行為等健康指標
           </p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          新增記錄
+        <Button asChild>
+          <Link href="/health/new">
+            <Plus className="mr-2 h-4 w-4" />
+            新增記錄
+          </Link>
         </Button>
       </div>
 
@@ -49,9 +51,11 @@ export default function HealthPage() {
         <p className="text-muted-foreground mb-4">
           開始記錄寵物的日常健康狀況，建立完整的健康歷史
         </p>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          新增記錄
+        <Button asChild>
+          <Link href="/health/new">
+            <Plus className="mr-2 h-4 w-4" />
+            新增記錄
+          </Link>
         </Button>
       </div>
     </div>
