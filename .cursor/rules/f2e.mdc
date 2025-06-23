@@ -172,3 +172,33 @@ petlog/
 - **禁止 Default Export**: 一律採用 `named export`，以保持導入的一致性。
 - **日誌**: 禁止在正式程式碼中提交 `console.log`。應使用統一的 Logger 服務。
 
+---
+
+## 11. API 呼叫統一規範
+
+- **API 呼叫一律使用 axios**：
+  - `web/src/lib/api` 及所有 API 客戶端層必須統一使用 axios 作為 HTTP 請求工具，嚴禁混用 fetch。
+  - 請求時需自動帶入 access token（如使用 Auth0，請參考 getAccessToken 實作）。
+  - API base url 請統一使用 `NEXT_PUBLIC_API_BASE_URL` 環境變數。
+  - 請求失敗時應有一致的錯誤處理與訊息格式。
+  - 新增 API 時請依照下方範例模式實作。
+
+  ```typescript
+  import axios from 'axios';
+  import { getAccessToken } from '@auth0/nextjs-auth0';
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+
+  export async function createXXX(data: XXXInput) {
+    const accessToken = await getAccessToken();
+    await axios.post(`${baseUrl}/api/v1/xxx`, data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+  ```
+
+- **維護說明**：如需 refactor，請先統一所有 API 呼叫方式，再進行功能擴充。
+

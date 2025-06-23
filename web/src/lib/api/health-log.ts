@@ -1,20 +1,11 @@
-import axios from 'axios';
-import { getAccessToken } from '@auth0/nextjs-auth0';
-
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
-
-export interface CreateHealthLogInput {
-  date: string;
-  type: string;
-  description: string;
-}
+// 本檔案所有 API 呼叫皆統一使用 axios，並自動帶入 access token。
+// 如需新增 API，請依照此模式實作。
+import { apiRequest } from './request';
+import { CreateHealthLogInput } from '../types/health-log';
 
 export async function createHealthLog(input: CreateHealthLogInput) {
-  const accessToken = await getAccessToken();
-  await axios.post(`${baseUrl}/api/v1/health-logs`, input, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
+  await apiRequest('/api/v1/health-logs', {
+    method: 'POST',
+    data: input,
   });
 } 

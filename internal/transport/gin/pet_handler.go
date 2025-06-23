@@ -149,13 +149,13 @@ func decodeCreatePetRequest(_ context.Context, r *http.Request) (request interfa
 }
 
 func decodeGetPetRequest(c context.Context, r *http.Request) (request interface{}, err error) {
-	ginctx, _ := c.Value("GinContext").(*gin.Context)
+	ginctx, _ := c.Value(ginContextKey).(*gin.Context)
 	id := ginctx.Param("id")
 	return endpoint.GetPetRequest{ID: id}, nil
 }
 
 func decodeUpdatePetRequest(c context.Context, r *http.Request) (request interface{}, err error) {
-	ginctx, _ := c.Value("GinContext").(*gin.Context)
+	ginctx, _ := c.Value(ginContextKey).(*gin.Context)
 	id := ginctx.Param("id")
 
 	var req endpoint.UpdatePetRequest
@@ -167,7 +167,7 @@ func decodeUpdatePetRequest(c context.Context, r *http.Request) (request interfa
 }
 
 func decodeDeletePetRequest(c context.Context, r *http.Request) (request interface{}, err error) {
-	ginctx, _ := c.Value("GinContext").(*gin.Context)
+	ginctx, _ := c.Value(ginContextKey).(*gin.Context)
 	id := ginctx.Param("id")
 	return endpoint.DeletePetRequest{ID: id}, nil
 }
