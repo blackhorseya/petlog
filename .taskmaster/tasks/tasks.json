@@ -779,7 +779,7 @@
         "description": "Implement backend API for the Health Log feature, including handlers in internal/usecase, internal/endpoint, and internal/transport/gin to provide a fully functional POST /api/v1/health-logs endpoint. This task also includes generating Swagger API documentation for the new endpoint.",
         "details": "1. Create HealthLog usecase in internal/usecase:\n   - Implement CreateHealthLogHandler\n   - Define DTO structures for input and output\n\n2. Create HealthLog endpoint in internal/endpoint:\n   - Implement MakeCreateHealthLogEndpoint\n   - Define request and response structures\n\n3. Implement Gin HTTP handler in internal/transport/gin:\n   - Create POST /api/v1/health-logs route\n   - Implement request validation\n   - Call the corresponding endpoint\n   - Handle response serialization\n\n4. Update Swagger annotations:\n   - Add OpenAPI annotations to the new handler\n   - Include request body schema, response schema, and possible error responses\n\n5. Implement error handling:\n   - Define custom error types for health log-related errors\n   - Implement error wrapping and proper HTTP status code mapping\n\n6. Add logging:\n   - Use uber-go/zap for structured logging\n   - Log incoming requests, successful operations, and errors\n\n7. Implement input sanitization and validation:\n   - Validate required fields (PetID, Date, WeightKg, etc.)\n   - Sanitize input to prevent XSS and other injection attacks\n\n8. Update dependency injection in main.go:\n   - Wire up the new usecase, endpoint, and handler\n\n9. Generate updated Swagger documentation:\n   - Run swag init to update OpenAPI specification\n   - Verify the new endpoint is correctly documented",
         "testStrategy": "1. Unit tests:\n   - Write tests for CreateHealthLogHandler in usecase\n   - Test MakeCreateHealthLogEndpoint\n   - Create unit tests for the Gin HTTP handler\n\n2. Integration tests:\n   - Write tests that cover the entire flow from HTTP request to database operation\n   - Use a test database (e.g., an in-memory MongoDB instance)\n   - Test various scenarios including valid input, invalid input, and error conditions\n\n3. API tests:\n   - Use a tool like Postman or write curl commands to test the API endpoint\n   - Verify correct handling of different content types (application/json)\n   - Test with various payloads including edge cases\n\n4. Swagger documentation test:\n   - Verify that the Swagger UI correctly displays the new endpoint\n   - Ensure all parameters, request body, and responses are accurately documented\n\n5. Error handling tests:\n   - Simulate various error conditions (e.g., database errors, validation errors)\n   - Verify correct error responses and status codes\n\n6. Performance tests:\n   - Conduct load testing to ensure the endpoint can handle expected traffic\n   - Use tools like Apache JMeter or k6 for performance testing\n\n7. Security tests:\n   - Attempt common attack vectors (SQL injection, XSS) to ensure proper input sanitization\n   - Verify that sensitive data is not exposed in logs or error messages",
-        "status": "done",
+        "status": "pending",
         "dependencies": [
           4,
           5,
@@ -788,12 +788,58 @@
           21
         ],
         "priority": "high",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Create Health Log Functionality",
+            "description": "Implement the POST /api/v1/health-logs endpoint to create new health log entries for pets.",
+            "dependencies": [],
+            "details": "1. Create HealthLog model in internal/domain with fields like ID, PetID, Date, WeightKg, Notes, etc.\n2. Implement CreateHealthLogHandler in internal/usecase with input validation logic\n3. Define DTO structures for input (CreateHealthLogRequest) and output (CreateHealthLogResponse)\n4. Implement MakeCreateHealthLogEndpoint in internal/endpoint\n5. Create HTTP handler in internal/transport/gin for POST /api/v1/health-logs\n6. Add proper request validation and error handling\n7. Add Swagger annotations for the endpoint",
+            "status": "pending",
+            "testStrategy": "Write unit tests for usecase and endpoint layers using testify. Mock the repository layer to test business logic in isolation."
+          },
+          {
+            "id": 2,
+            "title": "Implement Get Health Log by ID Functionality",
+            "description": "Implement the GET /api/v1/health-logs/{id} endpoint to retrieve a specific health log entry.",
+            "dependencies": [],
+            "details": "1. Implement GetHealthLogByIDHandler in internal/usecase\n2. Define DTO structures for output (GetHealthLogResponse)\n3. Implement MakeGetHealthLogByIDEndpoint in internal/endpoint\n4. Create HTTP handler in internal/transport/gin for GET /api/v1/health-logs/{id}\n5. Add proper error handling for not found cases\n6. Add Swagger annotations for the endpoint",
+            "status": "pending",
+            "testStrategy": "Write unit tests covering the retrieval logic, including error cases like 'not found'."
+          },
+          {
+            "id": 3,
+            "title": "Implement List Health Logs Functionality",
+            "description": "Implement the GET /api/v1/health-logs endpoint to retrieve a list of health logs with optional filtering by pet ID.",
+            "dependencies": [],
+            "details": "1. Implement ListHealthLogsHandler in internal/usecase with filtering logic\n2. Define DTO structures for input (ListHealthLogsRequest with query parameters) and output (ListHealthLogsResponse)\n3. Implement MakeListHealthLogsEndpoint in internal/endpoint\n4. Create HTTP handler in internal/transport/gin for GET /api/v1/health-logs\n5. Implement pagination and filtering by pet ID\n6. Add Swagger annotations for the endpoint with query parameter documentation",
+            "status": "pending",
+            "testStrategy": "Test the filtering and pagination logic with various input combinations. Ensure empty results are handled correctly."
+          },
+          {
+            "id": 4,
+            "title": "Implement Update Health Log Functionality",
+            "description": "Implement the PUT /api/v1/health-logs/{id} endpoint to update an existing health log entry.",
+            "dependencies": [],
+            "details": "1. Implement UpdateHealthLogHandler in internal/usecase\n2. Define DTO structures for input (UpdateHealthLogRequest) and output (UpdateHealthLogResponse)\n3. Implement MakeUpdateHealthLogEndpoint in internal/endpoint\n4. Create HTTP handler in internal/transport/gin for PUT /api/v1/health-logs/{id}\n5. Add proper validation and error handling\n6. Add Swagger annotations for the endpoint",
+            "status": "pending",
+            "testStrategy": "Test update scenarios including successful updates and attempts to update non-existent records. Verify all fields are properly updated."
+          },
+          {
+            "id": 5,
+            "title": "Implement Delete Health Log Functionality",
+            "description": "Implement the DELETE /api/v1/health-logs/{id} endpoint to remove a health log entry.",
+            "dependencies": [],
+            "details": "1. Implement DeleteHealthLogHandler in internal/usecase\n2. Define DTO structures for output (DeleteHealthLogResponse)\n3. Implement MakeDeleteHealthLogEndpoint in internal/endpoint\n4. Create HTTP handler in internal/transport/gin for DELETE /api/v1/health-logs/{id}\n5. Add proper error handling\n6. Add Swagger annotations for the endpoint\n7. Update dependency injection in main.go to wire up all the new handlers\n8. Run swag init to generate updated OpenAPI documentation",
+            "status": "pending",
+            "testStrategy": "Test deletion of existing records and verify proper error responses when attempting to delete non-existent records."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-23T06:06:16.575Z",
+      "updated": "2025-06-23T22:43:08.729Z",
       "description": "Tasks for master context"
     }
   }
