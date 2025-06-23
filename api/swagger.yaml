@@ -40,15 +40,35 @@ definitions:
       pet:
         $ref: '#/definitions/model.Pet'
     type: object
+  endpoint.DeleteHealthLogResponse:
+    properties:
+      error: {}
+      success:
+        type: boolean
+    type: object
   endpoint.DeletePetResponse:
     properties:
       error: {}
+    type: object
+  endpoint.GetHealthLogByIDResponse:
+    properties:
+      error: {}
+      health_log:
+        $ref: '#/definitions/model.HealthLog'
     type: object
   endpoint.GetPetResponse:
     properties:
       error: {}
       pet:
         $ref: '#/definitions/model.Pet'
+    type: object
+  endpoint.ListHealthLogsByPetResponse:
+    properties:
+      error: {}
+      health_logs:
+        items:
+          $ref: '#/definitions/model.HealthLog'
+        type: array
     type: object
   endpoint.ListPetsResponse:
     properties:
@@ -57,6 +77,29 @@ definitions:
         items:
           $ref: '#/definitions/model.Pet'
         type: array
+    type: object
+  endpoint.UpdateHealthLogRequest:
+    properties:
+      behaviour_notes:
+        type: string
+      date:
+        type: string
+      food_gram:
+        type: integer
+      id:
+        type: string
+      litter_notes:
+        type: string
+      pet_id:
+        type: string
+      weight_kg:
+        type: number
+    type: object
+  endpoint.UpdateHealthLogResponse:
+    properties:
+      error: {}
+      health_log:
+        $ref: '#/definitions/model.HealthLog'
     type: object
   endpoint.UpdatePetRequest:
     properties:
@@ -123,6 +166,51 @@ info:
   version: "0.1"
 paths:
   /api/v1/health-logs:
+    get:
+      consumes:
+      - application/json
+      description: 根據寵物 ID 和可選的日期範圍列出健康日誌
+      parameters:
+      - description: 寵物 ID
+        in: query
+        name: pet_id
+        required: true
+        type: string
+      - description: 開始日期 (RFC3339 格式)
+        in: query
+        name: start_date
+        type: string
+      - description: 結束日期 (RFC3339 格式)
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.ListHealthLogsByPetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 列出寵物的健康日誌
+      tags:
+      - health-logs
     post:
       consumes:
       - application/json
@@ -159,6 +247,139 @@ paths:
       security:
       - BearerAuth: []
       summary: 建立健康日誌
+      tags:
+      - health-logs
+  /api/v1/health-logs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 刪除指定 ID 的健康日誌
+      parameters:
+      - description: 健康日誌 ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.DeleteHealthLogResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 刪除健康日誌
+      tags:
+      - health-logs
+    get:
+      consumes:
+      - application/json
+      description: 取得指定 ID 的健康日誌詳細資訊
+      parameters:
+      - description: 健康日誌 ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.GetHealthLogByIDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 根據 ID 取得健康日誌
+      tags:
+      - health-logs
+    put:
+      consumes:
+      - application/json
+      description: 更新指定 ID 的健康日誌資訊
+      parameters:
+      - description: 健康日誌 ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新的健康日誌資訊
+        in: body
+        name: healthLog
+        required: true
+        schema:
+          $ref: '#/definitions/endpoint.UpdateHealthLogRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.UpdateHealthLogResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 更新健康日誌
       tags:
       - health-logs
   /api/v1/pets:

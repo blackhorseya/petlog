@@ -25,18 +25,25 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 		mongodb.NewPetMongoRepo,
 		mongodb.NewHealthLogRepository,
 
-		// 用例處理器
+		// Pet 用例處理器
 		command.NewCreatePetHandler,
 		command.NewDeletePetHandler,
 		command.NewUpdatePetHandler,
 		query.NewGetPetByIDHandler,
 		query.NewListPetsByOwnerHandler,
-		command.NewCreateHealthLogHandler,
 
-		// 端點層
+		// HealthLog 用例處理器
+		command.NewCreateHealthLogHandler,
+		command.NewUpdateHealthLogHandler,
+		command.NewDeleteHealthLogHandler,
+		query.NewGetHealthLogByIDHandler,
+		query.NewListHealthLogsByPetHandler,
+
+		// Pet 端點層
 		endpoint.MakePetEndpoints,
-		endpoint.NewHealthLogEndpoints,
-		endpoint.MakeCreateHealthLogEndpoint,
+
+		// HealthLog 端點層
+		endpoint.ProvideHealthLogEndpoints,
 
 		// Transport層
 		gin.NewGinEngine,
