@@ -7,8 +7,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { createHealthLog } from '@/lib/api/health-log';
 
+function getTodayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function toRFC3339(dateStr: string) {
+  // 將 yyyy-MM-dd 轉為 yyyy-MM-ddT00:00:00Z
+  return new Date(dateStr + 'T00:00:00Z').toISOString();
+}
+
 export default function HealthLogForm() {
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(getTodayISO());
   const [type, setType] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +27,11 @@ export default function HealthLogForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      await createHealthLog({ date, type, description });
+      await createHealthLog({
+        date: toRFC3339(date),
+        type,
+        description,
+      });
       router.push('/health');
     } finally {
       setLoading(false);
