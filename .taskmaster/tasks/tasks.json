@@ -465,66 +465,75 @@
         "id": 11,
         "title": "Implement Health Log Calendar View",
         "description": "Create a calendar view to display and manage pet health logs.",
-        "details": "1. Use react-big-calendar for the calendar component\n2. Implement day, week, and month views\n3. Create custom event rendering for different log types\n4. Implement log entry creation and editing through calendar interface\n5. Add color coding for different log types\n6. Implement filters for log types and date ranges\n7. Create a heatmap view for quick overview (use d3.js)\n8. Implement infinite scrolling for performance\n9. Add drag-and-drop functionality for log entries",
-        "testStrategy": "Write unit tests for calendar components. Test different view modes and interactions. Perform performance testing with large datasets.",
-        "priority": "high",
+        "status": "pending",
         "dependencies": [
           5,
           9,
           22
         ],
-        "status": "pending",
+        "priority": "high",
+        "details": "1. Use react-big-calendar for the calendar component\n2. Implement day, week, and month views\n3. Create custom event rendering for different log types\n4. Implement log entry creation and editing through calendar interface\n5. Add color coding for different log types\n6. Implement filters for log types and date ranges\n7. Create a heatmap view for quick overview (use d3.js)\n8. Implement infinite scrolling for performance\n9. Add drag-and-drop functionality for log entries",
+        "testStrategy": "Write unit tests for calendar components. Test different view modes and interactions. Perform performance testing with large datasets.",
         "subtasks": [
           {
             "id": 1,
             "title": "Set up Calendar Component with Basic Views",
             "description": "Implement the basic calendar component using react-big-calendar with day, week, and month views in the health logs page.",
+            "status": "pending",
             "dependencies": [],
             "details": "1. Install react-big-calendar and its dependencies\n2. Create a new component at `web/src/components/health-logs/health-log-calendar.tsx`\n3. Set up the basic calendar with day, week, and month view options\n4. Configure the calendar with appropriate styling and localization\n5. Add the calendar component to the health logs page at `web/src/app/health-logs/calendar/page.tsx`\n6. Set up routing for the calendar view",
-            "status": "pending",
             "testStrategy": "Create unit tests to verify calendar renders correctly with different view options. Test responsive behavior on different screen sizes."
           },
           {
             "id": 2,
             "title": "Implement Health Log Data Integration and Event Rendering",
             "description": "Create API integration to fetch health log data and implement custom event rendering for different log types with color coding.",
+            "status": "pending",
             "dependencies": [
               1
             ],
             "details": "1. Extend the API helper in `web/src/lib/api/health-log.ts` to include a function for fetching health logs within a date range\n2. Create custom event components for different health log types (medication, vet visits, symptoms, etc.)\n3. Implement color coding based on log type\n4. Add tooltips to display detailed information when hovering over events\n5. Connect the calendar to the API to load and display real health log data\n6. Implement data transformation functions to convert API responses to calendar event format",
-            "status": "pending",
             "testStrategy": "Test API integration with mock data. Verify correct rendering of different event types and color coding."
           },
           {
             "id": 3,
             "title": "Add Log Entry Creation and Editing Through Calendar",
             "description": "Implement functionality to create and edit health log entries directly through the calendar interface.",
+            "status": "pending",
             "dependencies": [
               2
             ],
             "details": "1. Create a modal component at `web/src/components/health-logs/health-log-modal.tsx` using shadcn/ui components\n2. Integrate the existing health-log-form.tsx into the modal\n3. Add click handlers to calendar dates to open the creation modal\n4. Implement click handlers for existing events to open the edit modal\n5. Add form validation and submission handling\n6. Implement optimistic UI updates after creating or editing logs\n7. Add confirmation dialogs for deleting events",
-            "status": "pending",
             "testStrategy": "Test form validation, submission process, and modal behavior. Verify that calendar updates correctly after CRUD operations."
           },
           {
             "id": 4,
             "title": "Implement Filtering and Advanced Calendar Features",
             "description": "Add filtering capabilities for log types and date ranges, and implement drag-and-drop functionality for log entries.",
+            "status": "pending",
             "dependencies": [
               3
             ],
             "details": "1. Create filter controls above the calendar using shadcn/ui components\n2. Implement filter logic to show/hide events based on log type\n3. Add date range selector for quick navigation\n4. Implement drag-and-drop functionality to move and reschedule events\n5. Add event resizing for duration-based logs\n6. Optimize performance with lazy loading and virtualization\n7. Implement responsive design adjustments for mobile views\n8. Add keyboard navigation for accessibility",
-            "status": "pending",
             "testStrategy": "Test filter functionality with various combinations. Verify drag-and-drop behavior works correctly and updates the backend. Test keyboard navigation and accessibility."
           },
           {
             "id": 5,
             "title": "建立新增健康日誌的表單頁面",
             "description": "建立一個簡單的前端頁面，包含一個表單，讓使用者可以提交新的健康日誌。這包括建立新路由、API 呼叫輔助函式，以及使用 shadcn/ui 的表單元件。",
-            "details": "1. 在 `web/src/app/health/new/` 建立新頁面與路由。 2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。 3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。 4. 將表單整合到新頁面並連接 API。\n<info added on 2025-06-23T21:53:59.363Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T21:53:59.363Z>\n<info added on 2025-06-23T22:03:56.273Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T22:03:56.273Z>\n<info added on 2025-06-23T22:05:44.096Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T22:05:44.096Z>",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 11
+            "details": "1. 在 `web/src/app/health/new/` 建立新頁面與路由。 2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。 3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。 4. 將表單整合到新頁面並連接 API。\n<info added on 2025-06-23T21:53:59.363Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T21:53:59.363Z>\n<info added on 2025-06-23T22:03:56.273Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T22:03:56.273Z>\n<info added on 2025-06-23T22:05:44.096Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T22:05:44.096Z>",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "健康日誌列表顯示功能",
+            "description": "實作健康日誌列表顯示功能，包括串接API、動態渲染表格及基本操作功能。",
+            "status": "completed",
+            "dependencies": [],
+            "details": "1. 串接 useHealthLogs hook 並依寵物切換查詢\n2. 動態渲染健康日誌表格，顯示日期、行為、備註\n3. 每筆日誌右側新增「編輯」與「刪除」按鈕\n4. 實作刪除功能，支援 API 呼叫並自動刷新列表\n5. 編輯按鈕目前顯示 alert，為日後擴充 modal 編輯做準備",
+            "testStrategy": "測試不同寵物切換時資料是否正確顯示。確認刪除功能正常運作並能自動刷新列表。"
           }
         ]
       },
@@ -777,8 +786,6 @@
         "id": 22,
         "title": "Implement Health Log API Endpoints",
         "description": "Implement backend API for the Health Log feature, including handlers in internal/usecase, internal/endpoint, and internal/transport/gin to provide a fully functional POST /api/v1/health-logs endpoint. This task also includes generating Swagger API documentation for the new endpoint.",
-        "details": "1. Create HealthLog usecase in internal/usecase:\n   - Implement CreateHealthLogHandler\n   - Define DTO structures for input and output\n\n2. Create HealthLog endpoint in internal/endpoint:\n   - Implement MakeCreateHealthLogEndpoint\n   - Define request and response structures\n\n3. Implement Gin HTTP handler in internal/transport/gin:\n   - Create POST /api/v1/health-logs route\n   - Implement request validation\n   - Call the corresponding endpoint\n   - Handle response serialization\n\n4. Update Swagger annotations:\n   - Add OpenAPI annotations to the new handler\n   - Include request body schema, response schema, and possible error responses\n\n5. Implement error handling:\n   - Define custom error types for health log-related errors\n   - Implement error wrapping and proper HTTP status code mapping\n\n6. Add logging:\n   - Use uber-go/zap for structured logging\n   - Log incoming requests, successful operations, and errors\n\n7. Implement input sanitization and validation:\n   - Validate required fields (PetID, Date, WeightKg, etc.)\n   - Sanitize input to prevent XSS and other injection attacks\n\n8. Update dependency injection in main.go:\n   - Wire up the new usecase, endpoint, and handler\n\n9. Generate updated Swagger documentation:\n   - Run swag init to update OpenAPI specification\n   - Verify the new endpoint is correctly documented",
-        "testStrategy": "1. Unit tests:\n   - Write tests for CreateHealthLogHandler in usecase\n   - Test MakeCreateHealthLogEndpoint\n   - Create unit tests for the Gin HTTP handler\n\n2. Integration tests:\n   - Write tests that cover the entire flow from HTTP request to database operation\n   - Use a test database (e.g., an in-memory MongoDB instance)\n   - Test various scenarios including valid input, invalid input, and error conditions\n\n3. API tests:\n   - Use a tool like Postman or write curl commands to test the API endpoint\n   - Verify correct handling of different content types (application/json)\n   - Test with various payloads including edge cases\n\n4. Swagger documentation test:\n   - Verify that the Swagger UI correctly displays the new endpoint\n   - Ensure all parameters, request body, and responses are accurately documented\n\n5. Error handling tests:\n   - Simulate various error conditions (e.g., database errors, validation errors)\n   - Verify correct error responses and status codes\n\n6. Performance tests:\n   - Conduct load testing to ensure the endpoint can handle expected traffic\n   - Use tools like Apache JMeter or k6 for performance testing\n\n7. Security tests:\n   - Attempt common attack vectors (SQL injection, XSS) to ensure proper input sanitization\n   - Verify that sensitive data is not exposed in logs or error messages",
         "status": "pending",
         "dependencies": [
           4,
@@ -788,51 +795,68 @@
           21
         ],
         "priority": "high",
+        "details": "1. Create HealthLog usecase in internal/usecase:\n   - Implement CreateHealthLogHandler\n   - Define DTO structures for input and output\n\n2. Create HealthLog endpoint in internal/endpoint:\n   - Implement MakeCreateHealthLogEndpoint\n   - Define request and response structures\n\n3. Implement Gin HTTP handler in internal/transport/gin:\n   - Create POST /api/v1/health-logs route\n   - Implement request validation\n   - Call the corresponding endpoint\n   - Handle response serialization\n\n4. Update Swagger annotations:\n   - Add OpenAPI annotations to the new handler\n   - Include request body schema, response schema, and possible error responses\n\n5. Implement error handling:\n   - Define custom error types for health log-related errors\n   - Implement error wrapping and proper HTTP status code mapping\n\n6. Add logging:\n   - Use uber-go/zap for structured logging\n   - Log incoming requests, successful operations, and errors\n\n7. Implement input sanitization and validation:\n   - Validate required fields (PetID, Date, WeightKg, etc.)\n   - Sanitize input to prevent XSS and other injection attacks\n\n8. Update dependency injection in main.go:\n   - Wire up the new usecase, endpoint, and handler\n\n9. Generate updated Swagger documentation:\n   - Run swag init to update OpenAPI specification\n   - Verify the new endpoint is correctly documented",
+        "testStrategy": "1. Unit tests:\n   - Write tests for CreateHealthLogHandler in usecase\n   - Test MakeCreateHealthLogEndpoint\n   - Create unit tests for the Gin HTTP handler\n\n2. Integration tests:\n   - Write tests that cover the entire flow from HTTP request to database operation\n   - Use a test database (e.g., an in-memory MongoDB instance)\n   - Test various scenarios including valid input, invalid input, and error conditions\n\n3. API tests:\n   - Use a tool like Postman or write curl commands to test the API endpoint\n   - Verify correct handling of different content types (application/json)\n   - Test with various payloads including edge cases\n\n4. Swagger documentation test:\n   - Verify that the Swagger UI correctly displays the new endpoint\n   - Ensure all parameters, request body, and responses are accurately documented\n\n5. Error handling tests:\n   - Simulate various error conditions (e.g., database errors, validation errors)\n   - Verify correct error responses and status codes\n\n6. Performance tests:\n   - Conduct load testing to ensure the endpoint can handle expected traffic\n   - Use tools like Apache JMeter or k6 for performance testing\n\n7. Security tests:\n   - Attempt common attack vectors (SQL injection, XSS) to ensure proper input sanitization\n   - Verify that sensitive data is not exposed in logs or error messages",
         "subtasks": [
           {
             "id": 1,
             "title": "Implement Create Health Log Functionality",
             "description": "Implement the POST /api/v1/health-logs endpoint to create new health log entries for pets.",
+            "status": "completed",
             "dependencies": [],
             "details": "1. Create HealthLog model in internal/domain with fields like ID, PetID, Date, WeightKg, Notes, etc.\n2. Implement CreateHealthLogHandler in internal/usecase with input validation logic\n3. Define DTO structures for input (CreateHealthLogRequest) and output (CreateHealthLogResponse)\n4. Implement MakeCreateHealthLogEndpoint in internal/endpoint\n5. Create HTTP handler in internal/transport/gin for POST /api/v1/health-logs\n6. Add proper request validation and error handling\n7. Add Swagger annotations for the endpoint",
-            "status": "pending",
             "testStrategy": "Write unit tests for usecase and endpoint layers using testify. Mock the repository layer to test business logic in isolation."
           },
           {
             "id": 2,
             "title": "Implement Get Health Log by ID Functionality",
             "description": "Implement the GET /api/v1/health-logs/{id} endpoint to retrieve a specific health log entry.",
+            "status": "completed",
             "dependencies": [],
             "details": "1. Implement GetHealthLogByIDHandler in internal/usecase\n2. Define DTO structures for output (GetHealthLogResponse)\n3. Implement MakeGetHealthLogByIDEndpoint in internal/endpoint\n4. Create HTTP handler in internal/transport/gin for GET /api/v1/health-logs/{id}\n5. Add proper error handling for not found cases\n6. Add Swagger annotations for the endpoint",
-            "status": "pending",
             "testStrategy": "Write unit tests covering the retrieval logic, including error cases like 'not found'."
           },
           {
             "id": 3,
             "title": "Implement List Health Logs Functionality",
             "description": "Implement the GET /api/v1/health-logs endpoint to retrieve a list of health logs with optional filtering by pet ID.",
+            "status": "completed",
             "dependencies": [],
             "details": "1. Implement ListHealthLogsHandler in internal/usecase with filtering logic\n2. Define DTO structures for input (ListHealthLogsRequest with query parameters) and output (ListHealthLogsResponse)\n3. Implement MakeListHealthLogsEndpoint in internal/endpoint\n4. Create HTTP handler in internal/transport/gin for GET /api/v1/health-logs\n5. Implement pagination and filtering by pet ID\n6. Add Swagger annotations for the endpoint with query parameter documentation",
-            "status": "pending",
             "testStrategy": "Test the filtering and pagination logic with various input combinations. Ensure empty results are handled correctly."
           },
           {
             "id": 4,
             "title": "Implement Update Health Log Functionality",
             "description": "Implement the PUT /api/v1/health-logs/{id} endpoint to update an existing health log entry.",
+            "status": "completed",
             "dependencies": [],
             "details": "1. Implement UpdateHealthLogHandler in internal/usecase\n2. Define DTO structures for input (UpdateHealthLogRequest) and output (UpdateHealthLogResponse)\n3. Implement MakeUpdateHealthLogEndpoint in internal/endpoint\n4. Create HTTP handler in internal/transport/gin for PUT /api/v1/health-logs/{id}\n5. Add proper validation and error handling\n6. Add Swagger annotations for the endpoint",
-            "status": "pending",
             "testStrategy": "Test update scenarios including successful updates and attempts to update non-existent records. Verify all fields are properly updated."
           },
           {
             "id": 5,
             "title": "Implement Delete Health Log Functionality",
             "description": "Implement the DELETE /api/v1/health-logs/{id} endpoint to remove a health log entry.",
+            "status": "completed",
             "dependencies": [],
             "details": "1. Implement DeleteHealthLogHandler in internal/usecase\n2. Define DTO structures for output (DeleteHealthLogResponse)\n3. Implement MakeDeleteHealthLogEndpoint in internal/endpoint\n4. Create HTTP handler in internal/transport/gin for DELETE /api/v1/health-logs/{id}\n5. Add proper error handling\n6. Add Swagger annotations for the endpoint\n7. Update dependency injection in main.go to wire up all the new handlers\n8. Run swag init to generate updated OpenAPI documentation",
-            "status": "pending",
             "testStrategy": "Test deletion of existing records and verify proper error responses when attempting to delete non-existent records."
+          },
+          {
+            "id": 6,
+            "title": "Frontend Integration and Testing",
+            "description": "Integrate all Health Log API endpoints with the frontend and verify functionality.",
+            "status": "completed",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "details": "1. Connect all Health Log API endpoints to the frontend components\n2. Test the complete flow from frontend to backend for all operations\n3. Verify proper error handling and user feedback\n4. Ensure all data is correctly displayed and updated in the UI",
+            "testStrategy": "Perform end-to-end testing of all Health Log features through the UI. Verify that all operations (create, read, update, delete) work correctly and data is properly persisted and displayed."
           }
         ]
       },
@@ -840,55 +864,55 @@
         "id": 23,
         "title": "Implement HealthLog Validation",
         "description": "Add dedicated field validation for HealthLog to ensure PetID is required, dates are not in the future, and numeric fields have reasonable values when creating or updating health logs.",
-        "details": "1. Create a new file `internal/usecase/behavior/healthlog_validator.go` with the following components:\n\n- Define a `HealthLogValidator` struct that will contain validation methods\n- Implement validation methods:\n  - `ValidatePetID(petID string) error`: Check if PetID is provided and valid\n  - `ValidateDate(date time.Time) error`: Ensure date is not in the future\n  - `ValidateNumericFields(fields map[string]float64) error`: Validate numeric fields are within reasonable ranges (e.g., weight, temperature, etc.)\n  - `ValidateCreate(healthLog *model.HealthLog) error`: Comprehensive validation for creation\n  - `ValidateUpdate(healthLog *model.HealthLog) error`: Comprehensive validation for updates\n\n2. Update the existing handlers in the usecase layer:\n   - Modify `CreateHealthLogHandler` to call the validator before processing\n   - Modify `UpdateHealthLogHandler` to call the validator before processing\n   - Return appropriate error responses when validation fails\n\n3. Implement reasonable validation rules:\n   - PetID must be a non-empty string and follow the expected format\n   - Date must not be in the future (compare with current time)\n   - Numeric fields should have reasonable min/max values:\n     - Weight: > 0 and < 1000 (kg)\n     - Temperature: between 35-45°C for most pets\n     - Other measurements with appropriate ranges\n\n4. Ensure validation errors return clear, user-friendly messages that can be displayed in the UI\n\n5. Add proper error handling to propagate validation errors to the API response",
-        "testStrategy": "1. Unit tests for the validator:\n   - Write test cases for each validation method in `healthlog_validator_test.go`\n   - Test both valid and invalid inputs\n   - Include edge cases (empty values, boundary values)\n   - Mock time.Now() for date validation tests\n\n2. Integration tests:\n   - Test the integration of validators with the CreateHealthLogHandler and UpdateHealthLogHandler\n   - Verify that invalid inputs are properly rejected\n   - Ensure error messages are clear and helpful\n\n3. API tests:\n   - Use tools like Postman or curl to test the API endpoints with invalid data\n   - Verify that appropriate HTTP status codes (400 Bad Request) are returned\n   - Check that error messages in the response body correctly identify validation issues\n\n4. Test specific validation scenarios:\n   - Missing PetID\n   - Future dates\n   - Negative or unreasonably large numeric values\n   - Edge cases for each field",
         "status": "pending",
         "dependencies": [
           4,
           22
         ],
         "priority": "medium",
+        "details": "1. Create a new file `internal/usecase/behavior/healthlog_validator.go` with the following components:\n\n- Define a `HealthLogValidator` struct that will contain validation methods\n- Implement validation methods:\n  - `ValidatePetID(petID string) error`: Check if PetID is provided and valid\n  - `ValidateDate(date time.Time) error`: Ensure date is not in the future\n  - `ValidateNumericFields(fields map[string]float64) error`: Validate numeric fields are within reasonable ranges (e.g., weight, temperature, etc.)\n  - `ValidateCreate(healthLog *model.HealthLog) error`: Comprehensive validation for creation\n  - `ValidateUpdate(healthLog *model.HealthLog) error`: Comprehensive validation for updates\n\n2. Update the existing handlers in the usecase layer:\n   - Modify `CreateHealthLogHandler` to call the validator before processing\n   - Modify `UpdateHealthLogHandler` to call the validator before processing\n   - Return appropriate error responses when validation fails\n\n3. Implement reasonable validation rules:\n   - PetID must be a non-empty string and follow the expected format\n   - Date must not be in the future (compare with current time)\n   - Numeric fields should have reasonable min/max values:\n     - Weight: > 0 and < 1000 (kg)\n     - Temperature: between 35-45°C for most pets\n     - Other measurements with appropriate ranges\n\n4. Ensure validation errors return clear, user-friendly messages that can be displayed in the UI\n\n5. Add proper error handling to propagate validation errors to the API response",
+        "testStrategy": "1. Unit tests for the validator:\n   - Write test cases for each validation method in `healthlog_validator_test.go`\n   - Test both valid and invalid inputs\n   - Include edge cases (empty values, boundary values)\n   - Mock time.Now() for date validation tests\n\n2. Integration tests:\n   - Test the integration of validators with the CreateHealthLogHandler and UpdateHealthLogHandler\n   - Verify that invalid inputs are properly rejected\n   - Ensure error messages are clear and helpful\n\n3. API tests:\n   - Use tools like Postman or curl to test the API endpoints with invalid data\n   - Verify that appropriate HTTP status codes (400 Bad Request) are returned\n   - Check that error messages in the response body correctly identify validation issues\n\n4. Test specific validation scenarios:\n   - Missing PetID\n   - Future dates\n   - Negative or unreasonably large numeric values\n   - Edge cases for each field",
         "subtasks": [
           {
             "id": 1,
             "title": "Implement HealthLogValidator struct with PetID validation",
             "description": "Create the HealthLogValidator struct and implement the ValidatePetID method to ensure PetID is provided and valid.",
+            "status": "completed",
             "dependencies": [],
             "details": "1. Create a new file `internal/usecase/behavior/healthlog_validator.go`\n2. Define the `HealthLogValidator` struct\n3. Implement `ValidatePetID(petID string) error` method that checks:\n   - PetID is not empty\n   - PetID follows the expected format (e.g., UUID format if applicable)\n4. Return appropriate error messages for validation failures\n5. Add unit tests for the validator in a separate test file\n<info added on 2025-06-24T00:09:09.764Z>\n6. 實作最佳實踐：\n   - 定義自訂 `ValidationError` 型別，包含欄位名稱與錯誤訊息\n   - 實作 `ValidationErrors` 型別作為 `ValidationError` 的集合，支援多欄位錯誤情況\n   - 確保所有驗證方法統一回傳 `ValidationError` 或 `ValidationErrors`\n   - 在 `internal/handler` 層實作錯誤處理中介軟體，使用 `errors.As` 檢測 `ValidationError` 型別\n   - 當發現 `ValidationError` 時自動回傳 HTTP 400 狀態碼，並在回應中包含欄位名稱與錯誤訊息\n   - 撰寫單元測試確認錯誤處理機制正常運作\n</info added on 2025-06-24T00:09:09.764Z>",
-            "status": "in-progress",
             "testStrategy": "Write unit tests that check validation passes with valid PetIDs and fails with empty or malformed PetIDs."
           },
           {
             "id": 2,
             "title": "Implement date and numeric field validation methods",
             "description": "Add methods to validate that dates are not in the future and numeric fields have reasonable values.",
+            "status": "completed",
             "dependencies": [
               1
             ],
             "details": "1. Implement `ValidateDate(date time.Time) error` method that:\n   - Compares the provided date with the current time\n   - Returns an error if the date is in the future\n2. Implement `ValidateNumericFields(fields map[string]float64) error` method that checks:\n   - Weight is > 0 and < 1000 kg\n   - Temperature is between 35-45°C\n   - Food amount is > 0 and < reasonable maximum\n   - Any other numeric fields have appropriate ranges\n3. Return clear, user-friendly error messages for each validation failure",
-            "status": "pending",
             "testStrategy": "Create tests with various date and numeric values, including edge cases, to verify validation logic works correctly."
           },
           {
             "id": 3,
             "title": "Implement comprehensive Create and Update validation methods",
             "description": "Create the ValidateCreate and ValidateUpdate methods that combine all validation rules for health log creation and updates.",
+            "status": "completed",
             "dependencies": [
               2
             ],
             "details": "1. Implement `ValidateCreate(healthLog *model.HealthLog) error` method that:\n   - Calls ValidatePetID\n   - Calls ValidateDate\n   - Calls ValidateNumericFields\n   - Performs any additional validations specific to creation\n   - Returns the first validation error encountered\n2. Implement `ValidateUpdate(healthLog *model.HealthLog) error` method that:\n   - Performs the same validations as ValidateCreate\n   - Adds any update-specific validations (e.g., checking if ID exists)\n   - Returns appropriate error messages",
-            "status": "pending",
             "testStrategy": "Test with complete HealthLog objects containing various combinations of valid and invalid fields to ensure all validation rules are applied correctly."
           },
           {
             "id": 4,
             "title": "Integrate validator with HealthLog handlers",
             "description": "Update the existing CreateHealthLogHandler and UpdateHealthLogHandler to use the new validator before processing requests.",
+            "status": "completed",
             "dependencies": [
               3
             ],
             "details": "1. Modify `CreateHealthLogHandler` to:\n   - Create an instance of HealthLogValidator\n   - Call validator.ValidateCreate() with the incoming HealthLog\n   - Return appropriate error responses when validation fails\n   - Only proceed with creation if validation passes\n2. Modify `UpdateHealthLogHandler` to:\n   - Create an instance of HealthLogValidator\n   - Call validator.ValidateUpdate() with the incoming HealthLog\n   - Return appropriate error responses when validation fails\n   - Only proceed with update if validation passes\n3. Ensure validation errors are properly propagated to API responses with clear messages\n4. Update any relevant tests for the handlers",
-            "status": "pending",
             "testStrategy": "Test the handlers with both valid and invalid HealthLog data to verify that validation is performed and appropriate responses are returned."
           }
         ]
