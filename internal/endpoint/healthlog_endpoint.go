@@ -27,6 +27,8 @@ type CreateHealthLogResponse struct {
 	Err       error            `json:"error,omitempty"`
 }
 
+func (r CreateHealthLogResponse) Failed() error { return r.Err }
+
 // GetHealthLogByIDRequest defines the request structure for getting a health log by ID.
 type GetHealthLogByIDRequest struct {
 	ID string `json:"id"`
@@ -37,6 +39,8 @@ type GetHealthLogByIDResponse struct {
 	HealthLog *model.HealthLog `json:"health_log"`
 	Err       error            `json:"error,omitempty"`
 }
+
+func (r GetHealthLogByIDResponse) Failed() error { return r.Err }
 
 // ListHealthLogsByPetRequest defines the request structure for listing health logs by pet.
 type ListHealthLogsByPetRequest struct {
@@ -50,6 +54,8 @@ type ListHealthLogsByPetResponse struct {
 	HealthLogs []*model.HealthLog `json:"health_logs"`
 	Err        error              `json:"error,omitempty"`
 }
+
+func (r ListHealthLogsByPetResponse) Failed() error { return r.Err }
 
 // UpdateHealthLogRequest defines the request structure for updating a health log.
 type UpdateHealthLogRequest struct {
@@ -68,6 +74,8 @@ type UpdateHealthLogResponse struct {
 	Err       error            `json:"error,omitempty"`
 }
 
+func (r UpdateHealthLogResponse) Failed() error { return r.Err }
+
 // DeleteHealthLogRequest defines the request structure for deleting a health log.
 type DeleteHealthLogRequest struct {
 	ID string `json:"id"`
@@ -78,6 +86,8 @@ type DeleteHealthLogResponse struct {
 	Success bool  `json:"success"`
 	Err     error `json:"error,omitempty"`
 }
+
+func (r DeleteHealthLogResponse) Failed() error { return r.Err }
 
 // MakeCreateHealthLogEndpoint creates an endpoint for the create health log handler.
 func MakeCreateHealthLogEndpoint(ch *command.CreateHealthLogHandler) endpoint.Endpoint {
@@ -216,11 +226,11 @@ func NewHealthLogEndpoints(
 	deleteHealthLog endpoint.Endpoint,
 ) HealthLogEndpoints {
 	return HealthLogEndpoints{
-		CreateHealthLogEndpoint:      createHealthLog,
-		GetHealthLogByIDEndpoint:     getHealthLogByID,
-		ListHealthLogsByPetEndpoint:  listHealthLogsByPet,
-		UpdateHealthLogEndpoint:      updateHealthLog,
-		DeleteHealthLogEndpoint:      deleteHealthLog,
+		CreateHealthLogEndpoint:     createHealthLog,
+		GetHealthLogByIDEndpoint:    getHealthLogByID,
+		ListHealthLogsByPetEndpoint: listHealthLogsByPet,
+		UpdateHealthLogEndpoint:     updateHealthLog,
+		DeleteHealthLogEndpoint:     deleteHealthLog,
 	}
 }
 
@@ -233,19 +243,19 @@ func ProvideHealthLogEndpoints(
 	qh2 *query.ListHealthLogsByPetHandler,
 ) HealthLogEndpoints {
 	return HealthLogEndpoints{
-		CreateHealthLogEndpoint:      MakeCreateHealthLogEndpoint(ch1),
-		GetHealthLogByIDEndpoint:     MakeGetHealthLogByIDEndpoint(qh1),
-		ListHealthLogsByPetEndpoint:  MakeListHealthLogsByPetEndpoint(qh2),
-		UpdateHealthLogEndpoint:      MakeUpdateHealthLogEndpoint(ch2),
-		DeleteHealthLogEndpoint:      MakeDeleteHealthLogEndpoint(ch3),
+		CreateHealthLogEndpoint:     MakeCreateHealthLogEndpoint(ch1),
+		GetHealthLogByIDEndpoint:    MakeGetHealthLogByIDEndpoint(qh1),
+		ListHealthLogsByPetEndpoint: MakeListHealthLogsByPetEndpoint(qh2),
+		UpdateHealthLogEndpoint:     MakeUpdateHealthLogEndpoint(ch2),
+		DeleteHealthLogEndpoint:     MakeDeleteHealthLogEndpoint(ch3),
 	}
 }
 
 // HealthLogEndpoints collects all the endpoints that compose a health log service.
 type HealthLogEndpoints struct {
-	CreateHealthLogEndpoint      endpoint.Endpoint
-	GetHealthLogByIDEndpoint     endpoint.Endpoint
-	ListHealthLogsByPetEndpoint  endpoint.Endpoint
-	UpdateHealthLogEndpoint      endpoint.Endpoint
-	DeleteHealthLogEndpoint      endpoint.Endpoint
+	CreateHealthLogEndpoint     endpoint.Endpoint
+	GetHealthLogByIDEndpoint    endpoint.Endpoint
+	ListHealthLogsByPetEndpoint endpoint.Endpoint
+	UpdateHealthLogEndpoint     endpoint.Endpoint
+	DeleteHealthLogEndpoint     endpoint.Endpoint
 }

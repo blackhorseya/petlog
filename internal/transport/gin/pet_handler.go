@@ -175,25 +175,3 @@ func decodeDeletePetRequest(c context.Context, r *http.Request) (request interfa
 func decodeListPetsRequest(_ context.Context, _ *http.Request) (request interface{}, err error) {
 	return endpoint.ListPetsRequest{}, nil
 }
-
-// encodeResponse is the common response encoder.
-func encodeResponse(c context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-	if f, ok := response.(endpoint.Failer); ok && f.Failed() != nil {
-		encodeError(c, f.Failed(), w)
-		return nil
-	}
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-// encodeError is a custom error encoder.
-func encodeError(_ context.Context, err error, w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	// TODO: Map domain errors to HTTP status codes
-	w.WriteHeader(http.StatusInternalServerError)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"error": err.Error(),
-	})
-}
