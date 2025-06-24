@@ -39,11 +39,17 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 		query.NewGetHealthLogByIDHandler,
 		query.NewListHealthLogsByPetHandler,
 
+		// Dashboard 用例處理器
+		query.NewGetDashboardOverviewHandler,
+
 		// Pet 端點層
 		endpoint.MakePetEndpoints,
 
 		// HealthLog 端點層
 		endpoint.ProvideHealthLogEndpoints,
+
+		// Dashboard 端點層
+		endpoint.NewDashboardEndpoints,
 
 		// Transport層
 		gin.NewGinEngine,

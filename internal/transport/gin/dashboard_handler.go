@@ -39,7 +39,7 @@ func RegisterDashboardRoutes(r *gin.Engine, cfg config.Config, e endpoint.Dashbo
 // @Router       /api/v1/dashboard/overview [get]
 func GetDashboardOverview(e endpoint.DashboardEndpoints, options ...httptransport.ServerOption) gin.HandlerFunc {
 	return gin.WrapH(httptransport.NewServer(
-		e.GetDashboardOverviewEndpoint,
+		e.GetOverviewEndpoint,
 		decodeGetDashboardOverviewRequest,
 		encodeResponse,
 		options...,
