@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Heart, PawPrint, Calendar, FileText, ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useDashboardOverview } from "@/hooks/use-dashboard";
 
 const features = [
   {
@@ -35,6 +36,7 @@ const features = [
 
 export default function Home() {
   const { user, error, isLoading } = useUser();
+  const { data: dashboardData, isLoading: isDashboardLoading, error: dashboardError } = useDashboardOverview();
 
   if (isLoading) {
     return (
@@ -135,20 +137,35 @@ export default function Home() {
       {user && (
         <div className="rounded-lg border border-border bg-card p-6">
           <h2 className="text-2xl font-semibold mb-4">快速概覽</h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">0</div>
-              <p className="text-sm text-muted-foreground">寵物數量</p>
+          
+          {isDashboardLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">0</div>
-              <p className="text-sm text-muted-foreground">健康記錄</p>
+          ) : dashboardError ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-destructive">載入概覽資料時發生錯誤</p>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">0</div>
-              <p className="text-sm text-muted-foreground">醫療記錄</p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {dashboardData?.petCount ?? 0}
+                </div>
+                <p className="text-sm text-muted-foreground">寵物數量</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {dashboardData?.healthRecordCount ?? 0}
+                </div>
+                <p className="text-sm text-muted-foreground">健康記錄</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">0</div>
+                <p className="text-sm text-muted-foreground">醫療記錄</p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>
