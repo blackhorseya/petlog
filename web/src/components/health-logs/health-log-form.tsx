@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { createHealthLog } from "@/lib/api/health-log";
 import { usePets } from "@/hooks/use-pets";
+import { useQueryClient } from '@tanstack/react-query';
 
 function getTodayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -28,6 +29,7 @@ export default function HealthLogForm() {
   const router = useRouter();
   const [behavior, setBehavior] = useState("");
   const [customBehavior, setCustomBehavior] = useState("");
+  const queryClient = useQueryClient();
 
   // 預設選第一隻寵物 - 修正依賴陣列
   useEffect(() => {
@@ -63,6 +65,7 @@ export default function HealthLogForm() {
         date: toRFC3339(date),
         behaviour_notes: behavior === '其他' ? customBehavior.trim() : behavior,
       });
+      await queryClient.invalidateQueries({ queryKey: ['health-logs'] });
       router.push("/health");
     } catch (err) {
       setError(err instanceof Error ? err.message : '建立健康日誌失敗，請重試');
