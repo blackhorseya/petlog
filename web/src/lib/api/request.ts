@@ -1,12 +1,12 @@
-import axios from 'axios';
-import { getAccessToken } from '@auth0/nextjs-auth0';
+import axios from "axios";
+import { getAccessToken } from "@auth0/nextjs-auth0";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export async function apiRequest<T>(
   endpoint: string,
   options: {
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    method?: "GET" | "POST" | "PUT" | "DELETE";
     data?: any;
     params?: any;
     headers?: Record<string, string>;
@@ -16,13 +16,13 @@ export async function apiRequest<T>(
   try {
     const accessToken = await getAccessToken();
     const headers = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
       ...options.headers,
     };
     const response = await axios({
       url,
-      method: options.method || 'GET',
+      method: options.method || "GET",
       data: options.data,
       params: options.params,
       headers,
@@ -33,12 +33,12 @@ export async function apiRequest<T>(
     }
     return data;
   } catch (error: any) {
-    let errorMessage = 'API 請求錯誤';
+    let errorMessage = "API 請求錯誤";
     if (error.response) {
       // 伺服器有回應
       errorMessage = `API 請求失敗: ${error.response.status} ${error.response.statusText}`;
       if (error.response.data) {
-        if (typeof error.response.data === 'string') {
+        if (typeof error.response.data === "string") {
           errorMessage += ` - ${error.response.data}`;
         } else if (error.response.data.error) {
           errorMessage += ` - ${error.response.data.error}`;
@@ -48,10 +48,10 @@ export async function apiRequest<T>(
       }
     } else if (error.request) {
       // 沒有收到伺服器回應
-      errorMessage = 'API 無回應';
+      errorMessage = "API 無回應";
     } else if (error.message) {
       errorMessage = error.message;
     }
     throw new Error(errorMessage);
   }
-} 
+}
