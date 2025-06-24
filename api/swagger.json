@@ -9,6 +9,49 @@
     "host": "localhost:8080",
     "basePath": "/",
     "paths": {
+        "/api/v1/dashboard/overview": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "回傳目前登入使用者的寵物數量與健康日誌數量",
+                "consumes": [
+                    
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dashboard"
+                ],
+                "summary": "首頁快速概覽",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetDashboardOverviewResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/health-logs": {
             "get": {
                 "security": [
@@ -664,6 +707,19 @@
             "type": "object",
             "properties": {
                 "error": {}
+            }
+        },
+        "endpoint.GetDashboardOverviewResponse": {
+            "type": "object",
+            "properties": {
+                "healthRecordCount": {
+                    "description": "健康日誌數量\nexample: 10",
+                    "type": "integer"
+                },
+                "petCount": {
+                    "description": "寵物數量\nexample: 2",
+                    "type": "integer"
+                }
             }
         },
         "endpoint.GetHealthLogByIDResponse": {
