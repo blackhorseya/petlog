@@ -45,11 +45,5 @@ func (v *HealthLogValidator) ValidateCreate(petID string, date time.Time, weight
 	if err := v.ValidatePetID(petID); err != nil {
 		return err
 	}
-	if err := v.ValidateDate(date); err != nil {
-		return err
-	}
-	if err := v.ValidateNumericFields(weightKg, foodGram); err != nil {
-		return err
-	}
 	return nil
 }
