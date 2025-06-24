@@ -192,3 +192,28 @@ func (r *HealthLogRepositoryImpl) Delete(c context.Context, id string) error {
 	ctx.Info("成功刪除健康日誌", "log_id", id)
 	return nil
 }
+
+// CountByPetIDs 實作根據寵物 ID 列表統計健康日誌總數的功能，用於聚合查詢
+func (r *HealthLogRepositoryImpl) CountByPetIDs(c context.Context, petIDs []string) (int, error) {
+	ctx := contextx.WithContext(c)
+	ctx.Info("開始根據寵物 ID 列表統計健康日誌數量", "pet_ids_count", len(petIDs))
+
+	// 驗證輸入參數
+	if len(petIDs) == 0 {
+		ctx.Warn("寵物 ID 列表不能為空")
+		return 0, domain.ErrInvalidID
+	}
+
+	// 建立查詢過濾器，使用 $in 操作符
+	filter := bson.D{{Key: "pet_id", Value: bson.D{{Key: "$in", Value: petIDs}}}}
+
+	// 執行計數操作
+	count, err := r.collection().CountDocuments(ctx, filter)
+	if err != nil {
+		ctx.Error("統計健康日誌數量時發生錯誤", "error", err, "pet_ids_count", len(petIDs))
+		return 0, fmt.Errorf("統計健康日誌數量失敗: %w", err)
+	}
+
+	ctx.Info("成功統計健康日誌數量", "pet_ids_count", len(petIDs), "total_count", count)
+	return int(count), nil
+}

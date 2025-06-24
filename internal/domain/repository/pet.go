@@ -13,6 +13,7 @@ type PetRepository interface {
 	Create(c context.Context, pet *model.Pet) error
 	FindByID(c context.Context, id string) (*model.Pet, error)
 	FindByOwnerID(c context.Context, ownerID string) ([]*model.Pet, error)
+	FindIDsByOwnerID(c context.Context, ownerID string) ([]string, error)
 	Update(c context.Context, pet *model.Pet) error
 	Delete(c context.Context, id string) error
 }

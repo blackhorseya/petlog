@@ -42,6 +42,21 @@ func (m *MockHealthLogRepository) EXPECT() *MockHealthLogRepositoryMockRecorder 
 	return m.recorder
 }
 
+// CountByPetIDs mocks base method.
+func (m *MockHealthLogRepository) CountByPetIDs(c context.Context, petIDs []string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountByPetIDs", c, petIDs)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountByPetIDs indicates an expected call of CountByPetIDs.
+func (mr *MockHealthLogRepositoryMockRecorder) CountByPetIDs(c, petIDs any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountByPetIDs", reflect.TypeOf((*MockHealthLogRepository)(nil).CountByPetIDs), c, petIDs)
+}
+
 // Create mocks base method.
 func (m *MockHealthLogRepository) Create(c context.Context, log *model.HealthLog) error {
 	m.ctrl.T.Helper()

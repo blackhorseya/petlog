@@ -212,3 +212,51 @@ func (r *petMongoRepo) Delete(c context.Context, id string) error {
 	ctx.Info("成功刪除寵物", "pet_id", id, "deleted_count", result.DeletedCount)
 	return nil
 }
+
+// FindIDsByOwnerID 實作根據擁有者 ID 取得所有寵物 ID 的功能，用於聚合查詢
+func (r *petMongoRepo) FindIDsByOwnerID(c context.Context, ownerID string) ([]string, error) {
+	ctx := contextx.WithContext(c)
+	ctx.Info("開始根據擁有者 ID 查找寵物 ID 列表", "owner_id", ownerID)
+
+	// 驗證擁有者 ID
+	if ownerID == "" {
+		ctx.Warn("擁有者 ID 不能為空")
+		return nil, domain.ErrInvalidID
+	}
+
+	// 建立查詢過濾器
+	filter := bson.D{{Key: "owner_id", Value: ownerID}}
+
+	// 執行查詢操作，在 MongoDB v2 中直接使用 Find
+	collection := r.db.Collection(petCollection)
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		ctx.Error("查詢寵物 ID 時發生錯誤", "error", err, "owner_id", ownerID)
+		return nil, fmt.Errorf("查詢寵物 ID 失敗: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	// 迭代查詢結果
+	var petIDs []string
+	for cursor.Next(ctx) {
+		var result struct {
+			ID bson.ObjectID `bson:"_id"`
+		}
+		if err := cursor.Decode(&result); err != nil {
+			ctx.Error("解碼寵物 ID 時發生錯誤", "error", err, "owner_id", ownerID)
+			return nil, fmt.Errorf("解碼寵物 ID 失敗: %w", err)
+		}
+
+		// 將 ObjectID 轉換為字串並加入結果列表
+		petIDs = append(petIDs, result.ID.Hex())
+	}
+
+	// 檢查 cursor 是否有錯誤
+	if err := cursor.Err(); err != nil {
+		ctx.Error("遍歷查詢結果時發生錯誤", "error", err, "owner_id", ownerID)
+		return nil, fmt.Errorf("遍歷查詢結果失敗: %w", err)
+	}
+
+	ctx.Info("成功查找寵物 ID", "owner_id", ownerID, "count", len(petIDs))
+	return petIDs, nil
+}
