@@ -173,11 +173,11 @@ func decodeGetHealthLogByIDRequest(_ context.Context, r *http.Request) (interfac
 			break
 		}
 	}
-	
+
 	if lastSlashIndex == -1 || lastSlashIndex == len(pathParts)-1 {
 		return nil, gin.Error{Err: gin.Error{Type: gin.ErrorTypeBind, Meta: "invalid path"}.Err}
 	}
-	
+
 	id := string(pathParts[lastSlashIndex+1:])
 	return endpoint.GetHealthLogByIDRequest{ID: id}, nil
 }
@@ -222,21 +222,21 @@ func decodeUpdateHealthLogRequest(_ context.Context, r *http.Request) (interface
 			break
 		}
 	}
-	
+
 	if lastSlashIndex == -1 || lastSlashIndex == len(pathParts)-1 {
 		return nil, gin.Error{Err: gin.Error{Type: gin.ErrorTypeBind, Meta: "invalid path"}.Err}
 	}
-	
+
 	id := string(pathParts[lastSlashIndex+1:])
 
 	var req endpoint.UpdateHealthLogRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
-	
+
 	// 確保 ID 來自 URL 路徑
 	req.ID = id
-	
+
 	return req, nil
 }
 
@@ -252,11 +252,11 @@ func decodeDeleteHealthLogRequest(_ context.Context, r *http.Request) (interface
 			break
 		}
 	}
-	
+
 	if lastSlashIndex == -1 || lastSlashIndex == len(pathParts)-1 {
 		return nil, gin.Error{Err: gin.Error{Type: gin.ErrorTypeBind, Meta: "invalid path"}.Err}
 	}
-	
+
 	id := string(pathParts[lastSlashIndex+1:])
 	return endpoint.DeleteHealthLogRequest{ID: id}, nil
 }

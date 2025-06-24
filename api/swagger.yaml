@@ -50,6 +50,19 @@ definitions:
     properties:
       error: {}
     type: object
+  endpoint.GetDashboardOverviewResponse:
+    properties:
+      healthRecordCount:
+        description: |-
+          健康日誌數量
+          example: 10
+        type: integer
+      petCount:
+        description: |-
+          寵物數量
+          example: 2
+        type: integer
+    type: object
   endpoint.GetHealthLogByIDResponse:
     properties:
       error: {}
@@ -165,6 +178,33 @@ info:
   title: PetLog API
   version: "0.1"
 paths:
+  /api/v1/dashboard/overview:
+    get:
+      consumes:
+      - application/json
+      description: 回傳目前登入使用者的寵物數量與健康日誌數量
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.GetDashboardOverviewResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 首頁快速概覽
+      tags:
+      - dashboard
   /api/v1/health-logs:
     get:
       consumes:
