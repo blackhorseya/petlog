@@ -23,5 +23,6 @@ export function useHealthLogs(options: UseHealthLogsOptions = {}) {
     },
     enabled: !!petId, // 必須有 petId 才會發起查詢
     staleTime: 2 * 60 * 1000,
+    initialData: { health_logs: [] },
   });
 } 

@@ -15,13 +15,13 @@ export default function HealthPage() {
   const { data: pets, isLoading: petsLoading } = usePets();
   const [selectedPetId, setSelectedPetId] = useState<string>("");
   const queryClient = useQueryClient();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // 預設選第一隻寵物
   useEffect(() => {
-    if (Array.isArray(pets) && pets.length > 0 && !selectedPetId) {
+    if (Array.isArray(pets) && pets.length > 0) {
       setSelectedPetId(pets[0].id);
     }
-  }, [pets, selectedPetId]);
+  }, [pets]);
 
   const {
     data: healthLogsData = { health_logs: [] },
@@ -31,11 +31,14 @@ export default function HealthPage() {
 
   async function handleDelete(logId: string) {
     if (!window.confirm("確定要刪除此健康日誌嗎？")) return;
+    setDeletingId(logId);
     try {
       await deleteHealthLog(logId);
-      await queryClient.invalidateQueries({ queryKey: ["health-logs"] });
+      await queryClient.invalidateQueries({ queryKey: ["health-logs", selectedPetId] });
     } catch (err) {
       alert("刪除失敗，請重試");
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -121,11 +124,11 @@ export default function HealthPage() {
                   <td className="px-4 py-2 border">{log.behaviour_notes || '-'}</td>
                   <td className="px-4 py-2 border">{log.litter_notes || '-'}</td>
                   <td className="px-4 py-2 border text-right space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(log.id)}>
+                    <Button size="sm" variant="outline" onClick={() => handleEdit(log.id)} disabled={deletingId === log.id}>
                       編輯
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(log.id)}>
-                      刪除
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(log.id)} disabled={deletingId === log.id}>
+                      {deletingId === log.id ? '刪除中...' : '刪除'}
                     </Button>
                   </td>
                 </tr>

@@ -65,7 +65,7 @@ export default function HealthLogForm() {
         date: toRFC3339(date),
         behaviour_notes: behavior === '其他' ? customBehavior.trim() : behavior,
       });
-      await queryClient.invalidateQueries({ queryKey: ['health-logs'] });
+      await queryClient.invalidateQueries({ queryKey: ['health-logs', selectedPetId] });
       router.push("/health");
     } catch (err) {
       setError(err instanceof Error ? err.message : '建立健康日誌失敗，請重試');
