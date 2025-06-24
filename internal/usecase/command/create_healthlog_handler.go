@@ -7,6 +7,7 @@ import (
 
 	"github.com/blackhorseya/petlog/internal/domain/model"
 	"github.com/blackhorseya/petlog/internal/domain/repository"
+	"github.com/blackhorseya/petlog/internal/usecase/behavior"
 	"github.com/blackhorseya/petlog/pkg/contextx"
 )
 
@@ -48,6 +49,11 @@ func (h *CreateHealthLogHandler) Handle(c context.Context, cmd CreateHealthLogCo
 
 	// Here you might want to add a validation step to ensure the user owns the pet.
 	// This would involve the PetRepository. For now, we'll skip this to keep it simple.
+	validator := &behavior.HealthLogValidator{}
+	if err := validator.ValidateCreate(cmd.PetID, cmd.Date, cmd.WeightKg, cmd.FoodGram); err != nil {
+		ctx.Warn("health log validation failed", "error", err)
+		return nil, err
+	}
 
 	log := &model.HealthLog{
 		PetID:          cmd.PetID,
