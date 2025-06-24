@@ -935,7 +935,9 @@
         "details": "1. 於 web/src/lib/api/dashboard.ts 建立 fetchDashboardOverview 函式，統一使用 axios。\n2. 串接 /api/v1/dashboard/overview，帶入 access token。\n3. 處理 API 錯誤與異常狀態。\n4. 撰寫單元測試與 mock API 回應。",
         "testStrategy": "Jest 測試 API 呼叫、錯誤處理與異常情境。",
         "priority": "high",
-        "dependencies": [24],
+        "dependencies": [
+          24
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -946,7 +948,10 @@
         "details": "1. 於 web/src/app/page.tsx 匯入並使用 DashboardOverview 元件。\n2. 使用 React hooks 管理資料、載入與錯誤狀態。\n3. 顯示 API 回傳的 petCount、healthRecordCount。\n4. 處理 API 載入與錯誤訊息顯示。",
         "testStrategy": "React Testing Library 驗證整合行為，手動測試首頁資料顯示與異常處理。",
         "priority": "medium",
-        "dependencies": [24,25],
+        "dependencies": [
+          24,
+          25
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -965,11 +970,13 @@
         "id": 28,
         "title": "調整 Domain Repository 介面支援聚合查詢 (後端)",
         "description": "於 PetRepository 新增 FindIDsByOwnerID，HealthLogRepository 新增 CountByPetIDs，並補上正體中文註解。",
-        "details": "1. internal/domain/repository/pet.go 新增：\n   - FindIDsByOwnerID(c context.Context, ownerID string) ([]string, error)\n2. internal/domain/repository/healthlog.go 新增：\n   - CountByPetIDs(c context.Context, petIDs []string) (int, error)\n3. 撰寫正體中文註解，說明方法用途。\n4. infra/mongodb 層同步實作。",
+        "details": "1. internal/domain/repository/pet.go 新增：\n   - FindIDsByOwnerID(c context.Context, ownerID string) ([]string, error)\n2. internal/domain/repository/healthlog.go 新增：\n   - CountByPetIDs(c context.Context, petIDs []string) (int, error)\n3. 撰寫正體中文註解，說明方法用途。\n4. infra/mongodb 層同步實作。\n<info added on 2025-06-24T03:40:41.921Z>\n## 已完成的工作\n\n### 1. Domain Repository 介面更新\n- ✅ 在 `internal/domain/repository/pet.go` 新增了 `FindIDsByOwnerID(c context.Context, ownerID string) ([]string, error)` 方法\n- ✅ 在 `internal/domain/repository/healthlog.go` 新增了 `CountByPetIDs(c context.Context, petIDs []string) (int, error)` 方法\n- ✅ 所有註解都已改為正體中文\n\n### 2. MongoDB 實作層更新\n- ✅ 在 `internal/infra/mongodb/pet_repository_impl.go` 實作了 `FindIDsByOwnerID` 方法\n  - 使用正確的 MongoDB v2 語法\n  - 包含完整的錯誤處理和日誌記錄\n  - 只查詢 _id 欄位以提高效能\n  - 將 ObjectID 轉換為字串返回\n- ✅ 在 `internal/infra/mongodb/healthlog_repository_impl.go` 實作了 `CountByPetIDs` 方法\n  - 使用 `$in` 操作符進行批量查詢\n  - 使用 `CountDocuments` 進行高效計數\n  - 包含參數驗證和錯誤處理\n\n### 3. 技術細節\n- ✅ 使用 MongoDB Go Driver v2 的正確語法\n- ✅ 遵循 contextx 套件進行日誌記錄\n- ✅ 所有註解和日誌訊息使用正體中文\n- ✅ 錯誤處理使用標準化的領域錯誤（`domain.ErrNotFound`、`domain.ErrInvalidID`）\n- ✅ 移除了不需要的 options import\n\n## 測試建議\n建議在後續任務中為這兩個新方法撰寫單元測試，確保功能正確性。\n</info added on 2025-06-24T03:40:41.921Z>",
         "testStrategy": "單元測試驗證聚合查詢正確性，mock repository 驗證 usecase 聚合流程。",
         "priority": "high",
-        "dependencies": [27],
-        "status": "pending",
+        "dependencies": [
+          27
+        ],
+        "status": "done",
         "subtasks": []
       },
       {
@@ -979,7 +986,9 @@
         "details": "1. internal/usecase/query/dashboard/get_overview.go 建立 GetDashboardOverviewHandler。\n2. Handle 方法流程：\n   - 先呼叫 PetRepository.FindIDsByOwnerID 取得 petIDs\n   - 呼叫 HealthLogRepository.CountByPetIDs 統計健康日誌數量\n   - 回傳 petCount 與 healthRecordCount\n3. 加入 1 秒查詢 timeout、錯誤處理與日誌。",
         "testStrategy": "mock repository 單元測試聚合流程與錯誤情境。",
         "priority": "high",
-        "dependencies": [28],
+        "dependencies": [
+          28
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -990,7 +999,9 @@
         "details": "1. internal/endpoint/dashboard.go 建立 DashboardEndpoint，呼叫 usecase handler。\n2. internal/transport/gin/dashboard_handler.go 建立 DashboardHandler，實作 GetOverview Gin handler。\n3. 註冊 /api/v1/dashboard/overview 路由，整合 JWT 驗證。\n4. 加上 Swagger 註解與 API 文件。",
         "testStrategy": "Gin 測試與整合測試，驗證 API 回應、權限驗證與文件正確性。",
         "priority": "high",
-        "dependencies": [29],
+        "dependencies": [
+          29
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -1001,14 +1012,17 @@
         "details": "1. 啟動後端 API，前端串接 dashboard overview。\n2. 測試不同用戶資料顯示正確。\n3. 驗證 API 權限、錯誤處理與效能。\n4. 撰寫 E2E 測試（如 Playwright/Cypress）。",
         "testStrategy": "E2E 測試驗證資料流、權限與異常情境。手動測試跨瀏覽器與裝置。",
         "priority": "high",
-        "dependencies": [26,30],
+        "dependencies": [
+          26,
+          30
+        ],
         "status": "pending",
         "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-24T02:56:05.530Z",
+      "updated": "2025-06-24T03:40:47.385Z",
       "description": "Tasks for master context"
     }
   }

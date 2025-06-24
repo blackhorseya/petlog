@@ -99,6 +99,21 @@ func (mr *MockPetRepositoryMockRecorder) FindByOwnerID(c, ownerID any) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByOwnerID", reflect.TypeOf((*MockPetRepository)(nil).FindByOwnerID), c, ownerID)
 }
 
+// FindIDsByOwnerID mocks base method.
+func (m *MockPetRepository) FindIDsByOwnerID(c context.Context, ownerID string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindIDsByOwnerID", c, ownerID)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindIDsByOwnerID indicates an expected call of FindIDsByOwnerID.
+func (mr *MockPetRepositoryMockRecorder) FindIDsByOwnerID(c, ownerID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindIDsByOwnerID", reflect.TypeOf((*MockPetRepository)(nil).FindIDsByOwnerID), c, ownerID)
+}
+
 // Update mocks base method.
 func (m *MockPetRepository) Update(c context.Context, pet *model.Pet) error {
 	m.ctrl.T.Helper()
