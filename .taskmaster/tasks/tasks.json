@@ -854,7 +854,7 @@
             "title": "Implement HealthLogValidator struct with PetID validation",
             "description": "Create the HealthLogValidator struct and implement the ValidatePetID method to ensure PetID is provided and valid.",
             "dependencies": [],
-            "details": "1. Create a new file `internal/usecase/behavior/healthlog_validator.go`\n2. Define the `HealthLogValidator` struct\n3. Implement `ValidatePetID(petID string) error` method that checks:\n   - PetID is not empty\n   - PetID follows the expected format (e.g., UUID format if applicable)\n4. Return appropriate error messages for validation failures\n5. Add unit tests for the validator in a separate test file",
+            "details": "1. Create a new file `internal/usecase/behavior/healthlog_validator.go`\n2. Define the `HealthLogValidator` struct\n3. Implement `ValidatePetID(petID string) error` method that checks:\n   - PetID is not empty\n   - PetID follows the expected format (e.g., UUID format if applicable)\n4. Return appropriate error messages for validation failures\n5. Add unit tests for the validator in a separate test file\n<info added on 2025-06-24T00:09:09.764Z>\n6. 實作最佳實踐：\n   - 定義自訂 `ValidationError` 型別，包含欄位名稱與錯誤訊息\n   - 實作 `ValidationErrors` 型別作為 `ValidationError` 的集合，支援多欄位錯誤情況\n   - 確保所有驗證方法統一回傳 `ValidationError` 或 `ValidationErrors`\n   - 在 `internal/handler` 層實作錯誤處理中介軟體，使用 `errors.As` 檢測 `ValidationError` 型別\n   - 當發現 `ValidationError` 時自動回傳 HTTP 400 狀態碼，並在回應中包含欄位名稱與錯誤訊息\n   - 撰寫單元測試確認錯誤處理機制正常運作\n</info added on 2025-06-24T00:09:09.764Z>",
             "status": "in-progress",
             "testStrategy": "Write unit tests that check validation passes with valid PetIDs and fails with empty or malformed PetIDs."
           },
