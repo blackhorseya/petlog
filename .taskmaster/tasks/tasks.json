@@ -959,11 +959,11 @@
         "id": 27,
         "title": "設計 Dashboard Overview API 介面與回應格式 (後端)",
         "description": "定義 /api/v1/dashboard/overview API 的回應 DTO 結構，並於 Swagger 註解中明確標示。",
-        "details": "1. 於 internal/usecase/query/dashboard_dto.go 定義 GetDashboardOverviewResponse struct，僅含 petCount、healthRecordCount 欄位。\n2. 加上 JSON 標籤與 Swagger 註解。\n3. 文件化 API 回應格式。",
+        "details": "1. 於 internal/endpoint/dashboard_endpoint.go 定義 GetDashboardOverviewResponse struct，僅含 petCount、healthRecordCount 欄位。\n2. 加上 JSON 標籤與 Swagger 註解。\n3. 文件化 API 回應格式，內容與現有 code base 完全一致。",
         "testStrategy": "單元測試驗證 DTO JSON 序列化/反序列化正確。Swagger UI 顯示正確。",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -989,7 +989,7 @@
         "dependencies": [
           28
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -1022,7 +1022,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-24T03:40:47.385Z",
+      "updated": "2025-06-24T03:48:25.857Z",
       "description": "Tasks for master context"
     }
   }
