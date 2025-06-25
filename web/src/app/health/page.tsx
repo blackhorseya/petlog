@@ -18,13 +18,13 @@ export default function HealthPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (Array.isArray(pets) && pets.length > 0) {
+    if (Array.isArray(pets) && pets.length > 0 && !selectedPetId) {
       setSelectedPetId(pets[0].id);
     }
-  }, [pets]);
+  }, [pets, selectedPetId]);
 
   const {
-    data: healthLogsData = { health_logs: [] },
+    data: healthLogsData,
     isLoading: logsLoading,
     error: logsError,
   } = useHealthLogs({ petId: selectedPetId });
@@ -106,7 +106,7 @@ export default function HealthPage() {
         <div className="text-destructive bg-destructive/10 p-4 rounded-md">
           載入健康日誌失敗：{logsError.message}
         </div>
-      ) : Array.isArray(healthLogsData.health_logs) && healthLogsData.health_logs.length > 0 ? (
+      ) : Array.isArray(healthLogsData?.health_logs) && healthLogsData.health_logs.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="min-w-full border text-sm">
             <thead>
