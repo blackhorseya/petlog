@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"errors"
 
 	"github.com/blackhorseya/petlog/internal/domain/repository"
 )
@@ -37,5 +38,5 @@ func (h *GetDashboardOverviewHandler) Handle(c context.Context, q GetDashboardOv
 	// TODO: 1. 取得該 owner 的所有 petIDs
 	// TODO: 2. 統計寵物數量
 	// TODO: 3. 統計健康日誌數量（用 petIDs）
-	return nil, nil
+	return nil, errors.New("not implemented")
 }
