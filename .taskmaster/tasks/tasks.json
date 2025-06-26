@@ -294,8 +294,8 @@
             "title": "實作 MedicalRecord Repository",
             "description": "在 `internal/infra/mongodb` 目錄下實作 MedicalRecord 模型的 Repository 介面",
             "dependencies": [],
-            "details": "建立 `medical_record_repository_impl.go` 和 `medical_record_repository_model.go` 檔案，遵循已建立的設計模式：\n\n1. 在 `medical_record_repository_model.go` 中：\n   - 定義 `medicalRecordMongo` 持久化模型，包含適當的 `bson` 標籤\n   - 實作 `toDomain()` 和 `fromDomain()` 轉換函式\n   - 確保正確處理 `string` ID 和 `bson.ObjectID` 之間的轉換\n\n2. 在 `medical_record_repository_impl.go` 中實作完整的 CRUD 操作：\n   - Create：使用 `bson.NewObjectID()` 生成 ID，設定時間戳記\n   - FindByID：根據 ID 查詢單一醫療記錄\n   - FindByPetID：查詢特定寵物的所有醫療記錄\n   - Update：更新醫療記錄，保留 CreatedAt，更新 UpdatedAt\n   - Delete：刪除醫療記錄\n\n3. 錯誤處理：\n   - 使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 適當地轉換 MongoDB 錯誤為領域錯誤\n   - 提供詳細的錯誤訊息和日誌記錄",
-            "status": "pending",
+            "details": "建立 `medical_record_repository_impl.go` 和 `medical_record_repository_model.go` 檔案，遵循已建立的設計模式：\n\n1. 在 `medical_record_repository_model.go` 中：\n   - 定義 `medicalRecordMongo` 持久化模型，包含適當的 `bson` 標籤\n   - 實作 `toDomain()` 和 `fromDomain()` 轉換函式\n   - 確保正確處理 `string` ID 和 `bson.ObjectID` 之間的轉換\n\n2. 在 `medical_record_repository_impl.go` 中實作完整的 CRUD 操作：\n   - Create：使用 `bson.NewObjectID()` 生成 ID，設定時間戳記\n   - FindByID：根據 ID 查詢單一醫療記錄\n   - FindByPetID：查詢特定寵物的所有醫療記錄\n   - Update：更新醫療記錄，保留 CreatedAt，更新 UpdatedAt\n   - Delete：刪除醫療記錄\n\n3. 錯誤處理：\n   - 使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 適當地轉換 MongoDB 錯誤為領域錯誤\n   - 提供詳細的錯誤訊息和日誌記錄\n<info added on 2025-06-26T02:29:52.748Z>\n【實作前規劃】\n\n1. 目標：\n- 在 internal/infra/mongodb/ 下，依照現有 healthlog、pet repository 的模式，實作 medicalrecord 的 MongoDB repository。\n\n2. 主要步驟：\n- 新增 medical_record_repository_model.go：\n  - 定義 medicalRecordMongo struct，欄位含 bson 標籤，並提供 toDomain()、fromDomain() 轉換方法。\n  - 處理 string ID <-> ObjectID 轉換。\n- 新增 medical_record_repository_impl.go：\n  - 實作 MedicalRecordRepository 介面的 CRUD 方法（Create、FindByID、FindByPetID、Update、Delete）。\n  - 建立/查詢/更新/刪除時，正確處理時間戳記（CreatedAt、UpdatedAt）。\n  - 依據 internal/domain/errors.go 標準化錯誤處理。\n  - MongoDB 錯誤需轉換為領域錯誤，並記錄詳細日誌。\n- 單元測試：\n  - 為每個 CRUD 方法撰寫 mock 測試，覆蓋正常與錯誤路徑。\n\n3. 參考檔案：\n- internal/infra/mongodb/pet_repository_model.go\n- internal/infra/mongodb/pet_repository_impl.go\n- internal/domain/repository/medicalrecord.go\n- internal/domain/model/medicalrecord.go\n- internal/domain/errors.go\n\n4. 命名慣例：\n- struct: medicalRecordMongo\n- model 檔案：medical_record_repository_model.go\n- impl 檔案：medical_record_repository_impl.go\n\n5. 其他：\n- 僅在 infra/mongodb 層使用 bson 標籤，domain model 僅保留 json 標籤。\n- context 參數命名為 c。\n- 產生 RFC3339 格式時間戳記。\n\n【下一步】\n- 先比對 pet repository model/impl，設計 medicalRecordMongo struct 與轉換方法。\n</info added on 2025-06-26T02:29:52.748Z>",
+            "status": "done",
             "testStrategy": "為每個 CRUD 操作編寫單元測試，使用 mock MongoDB 客戶端進行測試。測試應包括：\n1. 正常操作路徑\n2. 錯誤處理路徑（如 ID 無效、記錄不存在等）\n3. 驗證標準化錯誤的正確使用（如 ErrNotFound、ErrInvalidID）"
           },
           {
@@ -1103,7 +1103,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-26T01:52:32.339Z",
+      "updated": "2025-06-26T02:42:20.713Z",
       "description": "Tasks for master context"
     }
   }
