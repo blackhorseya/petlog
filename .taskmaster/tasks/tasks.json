@@ -465,7 +465,7 @@
         "id": 11,
         "title": "Implement Health Log Calendar View",
         "description": "Create a calendar view to display and manage pet health logs.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           5,
           9,
@@ -479,7 +479,7 @@
             "id": 1,
             "title": "Set up Calendar Component with Basic Views",
             "description": "Implement the basic calendar component using react-big-calendar with day, week, and month views in the health logs page.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "1. Install react-big-calendar and its dependencies\n2. Create a new component at `web/src/components/health-logs/health-log-calendar.tsx`\n3. Set up the basic calendar with day, week, and month view options\n4. Configure the calendar with appropriate styling and localization\n5. Add the calendar component to the health logs page at `web/src/app/health-logs/calendar/page.tsx`\n6. Set up routing for the calendar view",
             "testStrategy": "Create unit tests to verify calendar renders correctly with different view options. Test responsive behavior on different screen sizes."
@@ -488,7 +488,7 @@
             "id": 2,
             "title": "Implement Health Log Data Integration and Event Rendering",
             "description": "Create API integration to fetch health log data and implement custom event rendering for different log types with color coding.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               1
             ],
@@ -499,7 +499,7 @@
             "id": 3,
             "title": "Add Log Entry Creation and Editing Through Calendar",
             "description": "Implement functionality to create and edit health log entries directly through the calendar interface.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               2
             ],
@@ -510,7 +510,7 @@
             "id": 4,
             "title": "Implement Filtering and Advanced Calendar Features",
             "description": "Add filtering capabilities for log types and date ranges, and implement drag-and-drop functionality for log entries.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               3
             ],
@@ -521,7 +521,7 @@
             "id": 5,
             "title": "建立新增健康日誌的表單頁面",
             "description": "建立一個簡單的前端頁面，包含一個表單，讓使用者可以提交新的健康日誌。這包括建立新路由、API 呼叫輔助函式，以及使用 shadcn/ui 的表單元件。",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "1. 在 `web/src/app/health/new/` 建立新頁面與路由。 2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。 3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。 4. 將表單整合到新頁面並連接 API。\n<info added on 2025-06-23T21:53:59.363Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T21:53:59.363Z>\n<info added on 2025-06-23T22:03:56.273Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T22:03:56.273Z>\n<info added on 2025-06-23T22:05:44.096Z>\n1. 在 `web/src/app/health/new/page.tsx` 建立新增健康日誌的表單頁面，並放置 `HealthLogForm` 元件。\n2. 在 `web/src/lib/api/health-log.ts` 中建立 `createHealthLog` 函式。\n3. 在 `web/src/components/health-logs/` 中建立 `health-log-form.tsx`。\n4. 將表單整合到新頁面並連接 API。\n</info added on 2025-06-23T22:05:44.096Z>",
             "testStrategy": ""
@@ -1103,7 +1103,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-26T01:29:50.086Z",
+      "updated": "2025-06-26T01:52:32.339Z",
       "description": "Tasks for master context"
     }
   }

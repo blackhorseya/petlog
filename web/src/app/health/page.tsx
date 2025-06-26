@@ -38,7 +38,9 @@ export default function HealthPage() {
     setDeletingId(logId);
     try {
       await deleteHealthLog(logId);
-      await queryClient.invalidateQueries({ queryKey: ["health-logs", selectedPetId] });
+      await queryClient.invalidateQueries({
+        queryKey: ["health-logs", selectedPetId],
+      });
     } catch (err) {
       alert("刪除失敗，請重試");
     } finally {
@@ -107,12 +109,6 @@ export default function HealthPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button asChild variant="outline" disabled={!selectedPetId}>
-            <Link href="/health-logs/calendar">
-              <Calendar className="mr-2 h-4 w-4" />
-              日曆檢視
-            </Link>
-          </Button>
           <Button asChild disabled={!selectedPetId}>
             <Link href="/health/new">
               <Plus className="mr-2 h-4 w-4" />
@@ -124,7 +120,12 @@ export default function HealthPage() {
 
       {Array.isArray(pets) && pets.length > 0 && (
         <div className="max-w-xs">
-          <label htmlFor="pet-select" className="block text-sm font-medium mb-1">選擇寵物</label>
+          <label
+            htmlFor="pet-select"
+            className="block text-sm font-medium mb-1"
+          >
+            選擇寵物
+          </label>
           <select
             id="pet-select"
             value={selectedPetId}
@@ -136,8 +137,10 @@ export default function HealthPage() {
                 請選擇寵物
               </option>
             )}
-            {pets.map(pet => (
-              <option key={pet.id} value={pet.id}>{pet.name}</option>
+            {pets.map((pet) => (
+              <option key={pet.id} value={pet.id}>
+                {pet.name}
+              </option>
             ))}
           </select>
         </div>
@@ -151,7 +154,8 @@ export default function HealthPage() {
         <div className="text-destructive bg-destructive/10 p-4 rounded-md">
           載入健康日誌失敗：{logsError.message}
         </div>
-      ) : Array.isArray(healthLogsData?.health_logs) && healthLogsData.health_logs.length > 0 ? (
+      ) : Array.isArray(healthLogsData?.health_logs) &&
+        healthLogsData.health_logs.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="min-w-full border text-sm">
             <thead>
@@ -163,17 +167,31 @@ export default function HealthPage() {
               </tr>
             </thead>
             <tbody>
-              {healthLogsData.health_logs.map(log => (
+              {healthLogsData.health_logs.map((log) => (
                 <tr key={log.id} className="hover:bg-accent">
                   <td className="px-4 py-2 border">{log.date.slice(0, 10)}</td>
-                  <td className="px-4 py-2 border">{log.behaviour_notes || '-'}</td>
-                  <td className="px-4 py-2 border">{log.litter_notes || '-'}</td>
+                  <td className="px-4 py-2 border">
+                    {log.behaviour_notes || "-"}
+                  </td>
+                  <td className="px-4 py-2 border">
+                    {log.litter_notes || "-"}
+                  </td>
                   <td className="px-4 py-2 border text-right space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(log.id)} disabled={deletingId === log.id}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(log.id)}
+                      disabled={deletingId === log.id}
+                    >
                       編輯
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(log.id)} disabled={deletingId === log.id}>
-                      {deletingId === log.id ? '刪除中...' : '刪除'}
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDelete(log.id)}
+                      disabled={deletingId === log.id}
+                    >
+                      {deletingId === log.id ? "刪除中..." : "刪除"}
                     </Button>
                   </td>
                 </tr>
@@ -188,7 +206,9 @@ export default function HealthPage() {
           </div>
           <h3 className="text-lg font-semibold mb-2">還沒有健康記錄</h3>
           <p className="text-muted-foreground mb-4">
-            {selectedPetId ? '開始記錄寵物的日常健康狀況，建立完整的健康歷史' : '請先選擇寵物，然後開始記錄健康狀況'}
+            {selectedPetId
+              ? "開始記錄寵物的日常健康狀況，建立完整的健康歷史"
+              : "請先選擇寵物，然後開始記錄健康狀況"}
           </p>
           <Button asChild disabled={!selectedPetId}>
             <Link href="/health/new">
