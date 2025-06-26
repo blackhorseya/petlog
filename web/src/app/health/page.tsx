@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@auth0/nextjs-auth0";
-import { Heart, Plus } from "lucide-react";
+import { Heart, Plus, Calendar } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { usePets } from "@/hooks/use-pets";
@@ -106,12 +106,20 @@ export default function HealthPage() {
             追蹤寵物的體重、飲食、行為等健康指標
           </p>
         </div>
-        <Button asChild disabled={!selectedPetId}>
-          <Link href="/health/new">
-            <Plus className="mr-2 h-4 w-4" />
-            新增記錄
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline" disabled={!selectedPetId}>
+            <Link href="/health-logs/calendar">
+              <Calendar className="mr-2 h-4 w-4" />
+              日曆檢視
+            </Link>
+          </Button>
+          <Button asChild disabled={!selectedPetId}>
+            <Link href="/health/new">
+              <Plus className="mr-2 h-4 w-4" />
+              新增記錄
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {Array.isArray(pets) && pets.length > 0 && (
