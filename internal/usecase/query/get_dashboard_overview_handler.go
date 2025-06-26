@@ -2,7 +2,7 @@ package query
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"github.com/blackhorseya/petlog/internal/domain/repository"
 )
@@ -35,8 +35,26 @@ func NewGetDashboardOverviewHandler(petRepo repository.PetRepository, healthlogR
 
 // Handle 執行聚合查詢
 func (h *GetDashboardOverviewHandler) Handle(c context.Context, q GetDashboardOverviewQuery) (*GetDashboardOverviewResult, error) {
-	// TODO: 1. 取得該 owner 的所有 petIDs
-	// TODO: 2. 統計寵物數量
-	// TODO: 3. 統計健康日誌數量（用 petIDs）
-	return nil, errors.New("not implemented")
+	// 1. 取得該 owner 的所有 petIDs
+	petIDs, err := h.petRepo.FindIDsByOwnerID(c, q.OwnerID)
+	if err != nil {
+		return nil, fmt.Errorf("查詢寵物 ID 失敗: %w", err)
+	}
+
+	// 2. 統計寵物數量
+	petCount := len(petIDs)
+
+	// 3. 統計健康日誌數量（用 petIDs）
+	healthRecordCount := 0
+	if petCount > 0 {
+		healthRecordCount, err = h.healthlogRepo.CountByPetIDs(c, petIDs)
+		if err != nil {
+			return nil, fmt.Errorf("統計健康日誌數量失敗: %w", err)
+		}
+	}
+
+	return &GetDashboardOverviewResult{
+		PetCount:          petCount,
+		HealthRecordCount: healthRecordCount,
+	}, nil
 }

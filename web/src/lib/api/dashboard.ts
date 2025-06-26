@@ -9,8 +9,8 @@ export const dashboardApi = {
   async getDashboardOverview(): Promise<DashboardOverview> {
     const response = await apiRequest<GetDashboardOverviewResponse>('/api/v1/dashboard/overview');
     return {
-      petCount: response.petCount,
-      healthRecordCount: response.healthRecordCount,
+      petCount: response.pet_count,
+      healthRecordCount: response.health_record_count,
     };
   },
 };

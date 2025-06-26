@@ -52,12 +52,13 @@ definitions:
     type: object
   endpoint.GetDashboardOverviewResponse:
     properties:
-      healthRecordCount:
+      error: {}
+      health_record_count:
         description: |-
           健康日誌數量
           example: 10
         type: integer
-      petCount:
+      pet_count:
         description: |-
           寵物數量
           example: 2

@@ -717,11 +717,12 @@ const docTemplate = `{
         "endpoint.GetDashboardOverviewResponse": {
             "type": "object",
             "properties": {
-                "healthRecordCount": {
+                "error": {},
+                "health_record_count": {
                     "description": "健康日誌數量\nexample: 10",
                     "type": "integer"
                 },
-                "petCount": {
+                "pet_count": {
                     "description": "寵物數量\nexample: 2",
                     "type": "integer"
                 }
