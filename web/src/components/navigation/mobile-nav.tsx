@@ -36,7 +36,7 @@ const mobileNavigation = [
   },
   {
     name: "醫療",
-    href: "/medical",
+    href: "/medical-records",
     icon: FileText,
   },
 ]

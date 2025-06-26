@@ -66,7 +66,7 @@ export function Header({ onMenuToggle, isMenuOpen }: HeaderProps) {
             健康記錄
           </Link>
           <Link
-            href="/medical"
+            href="/medical-records"
             className="transition-colors hover:text-foreground/80 text-foreground/60"
           >
             醫療記錄
