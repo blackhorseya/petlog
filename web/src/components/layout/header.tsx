@@ -8,6 +8,12 @@ import { Menu, X, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface HeaderProps {
   onMenuToggle?: () => void
@@ -83,33 +89,38 @@ export function Header({ onMenuToggle, isMenuOpen }: HeaderProps) {
                   {user.email}
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative h-8 w-8 rounded-full"
-                aria-label="用戶選單"
-              >
-                {user.picture ? (
-                  <img
-                    src={user.picture}
-                    alt={user.name || "用戶頭像"}
-                    className="h-8 w-8 rounded-full"
-                  />
-                ) : (
-                  <User className="h-4 w-4" />
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="hidden sm:inline-flex"
-              >
-                <a href="/auth/logout">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  登出
-                </a>
-              </Button>
+              {/* Avatar Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative h-8 w-8 rounded-full"
+                    aria-label="用戶選單"
+                  >
+                    {user.picture ? (
+                      <img
+                        src={user.picture}
+                        alt={user.name || "用戶頭像"}
+                        className="h-8 w-8 rounded-full"
+                      />
+                    ) : (
+                      <User className="h-4 w-4" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <a
+                      href="/auth/logout"
+                      className="flex items-center text-red-600"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      登出
+                    </a>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <Button asChild>
