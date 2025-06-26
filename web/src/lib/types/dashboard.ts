@@ -6,7 +6,7 @@ export interface DashboardOverview {
 
 // Dashboard API 回應類型
 export interface GetDashboardOverviewResponse {
-  petCount: number;
-  healthRecordCount: number;
+  pet_count: number;
+  health_record_count: number;
   error?: any;
 }

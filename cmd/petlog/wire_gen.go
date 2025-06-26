@@ -49,8 +49,10 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 	getHealthLogByIDHandler := query.NewGetHealthLogByIDHandler(healthLogRepository)
 	listHealthLogsByPetHandler := query.NewListHealthLogsByPetHandler(healthLogRepository)
 	healthLogEndpoints := endpoint.ProvideHealthLogEndpoints(createHealthLogHandler, updateHealthLogHandler, deleteHealthLogHandler, getHealthLogByIDHandler, listHealthLogsByPetHandler)
+	getDashboardOverviewHandler := query.NewGetDashboardOverviewHandler(petRepository, healthLogRepository)
+	dashboardEndpoints := endpoint.NewDashboardEndpoints(getDashboardOverviewHandler)
 	v := _wireValue
-	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, healthLogEndpoints, v)
+	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, healthLogEndpoints, dashboardEndpoints, v)
 	return handler, func() {
 		cleanup()
 	}, nil
