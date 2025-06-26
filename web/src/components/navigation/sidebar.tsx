@@ -41,7 +41,7 @@ const navigation = [
   },
   {
     name: "醫療記錄",
-    href: "/medical",
+    href: "/medical-records",
     icon: FileText,
   },
   {
