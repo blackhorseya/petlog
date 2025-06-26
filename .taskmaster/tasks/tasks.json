@@ -340,14 +340,87 @@
         "id": 6,
         "title": "Implement Medical Record CRUD API",
         "description": "Create REST API endpoints for managing pet medical records.",
-        "details": "1. Implement endpoints:\n   - GET /v1/pets/{id}/medical-records\n   - POST /v1/pets/{id}/medical-records\n   - PUT /v1/pets/{id}/medical-records/{recordId}\n   - DELETE /v1/pets/{id}/medical-records/{recordId}\n2. Implement sorting and filtering options\n3. Add support for file attachments (store in S3-compatible storage)\n4. Implement reminder system for upcoming medical events\n5. Use go-kit for service layer implementation\n6. Implement rate limiting using golang.org/x/time/rate",
-        "testStrategy": "Write unit tests for medical record use cases. Test file upload and download. Verify reminder system functionality.",
-        "priority": "high",
+        "status": "done",
         "dependencies": [
           4
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "high",
+        "details": "1. Implement endpoints:\n   - GET /v1/pets/{id}/medical-records\n   - POST /v1/pets/{id}/medical-records\n   - PUT /v1/pets/{id}/medical-records/{recordId}\n   - DELETE /v1/pets/{id}/medical-records/{recordId}\n2. Implement sorting and filtering options\n3. Add support for file attachments (store in S3-compatible storage)\n4. Implement reminder system for upcoming medical events\n5. Use go-kit for service layer implementation\n6. Implement rate limiting using golang.org/x/time/rate",
+        "testStrategy": "Write unit tests for medical record use cases. Test file upload and download. Verify reminder system functionality.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement MedicalRecord use cases",
+            "description": "Implement all required use case handlers for medical records following CQRS architecture",
+            "status": "done",
+            "dependencies": [],
+            "details": "Completed implementation of:\n- CreateMedicalRecordHandler\n- UpdateMedicalRecordHandler\n- DeleteMedicalRecordHandler\n- GetMedicalRecordByIDHandler\n- ListMedicalRecordsByPetHandler\n\nAll handlers have been connected to the repository layer following project standards and CQRS architecture.",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement REST API endpoints",
+            "description": "Create HTTP endpoints and transport handlers for medical records",
+            "status": "done",
+            "dependencies": [],
+            "details": "Implement HTTP transport layer for all medical record endpoints:\n- GET /v1/pets/{id}/medical-records\n- POST /v1/pets/{id}/medical-records\n- PUT /v1/pets/{id}/medical-records/{recordId}\n- DELETE /v1/pets/{id}/medical-records/{recordId}\n\nFollow the same pattern as existing pet and health log endpoints.",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Add Swagger documentation",
+            "description": "Document all medical record API endpoints with Swagger annotations",
+            "status": "done",
+            "dependencies": [],
+            "details": "Add comprehensive Swagger annotations for all medical record endpoints following project documentation standards.",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement file attachment support",
+            "description": "Add functionality for uploading and managing file attachments for medical records",
+            "status": "done",
+            "dependencies": [],
+            "details": "Implement S3-compatible storage integration for medical record attachments.",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement sorting and filtering",
+            "description": "Add query parameter support for sorting and filtering medical records",
+            "status": "done",
+            "dependencies": [],
+            "details": "Implement query parameter handling for filtering and sorting medical records in the ListMedicalRecordsByPetHandler.",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement reminder system",
+            "description": "Create functionality for setting and managing reminders for medical events",
+            "status": "done",
+            "dependencies": [],
+            "details": "Implement reminder system for upcoming medical events like vaccinations or check-ups.",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Implement rate limiting",
+            "description": "Add rate limiting to medical record API endpoints",
+            "status": "done",
+            "dependencies": [],
+            "details": "Use golang.org/x/time/rate to implement rate limiting for medical record endpoints.",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Write comprehensive tests",
+            "description": "Create unit and integration tests for medical record functionality",
+            "status": "done",
+            "dependencies": [],
+            "details": "Write tests for all medical record use cases, API endpoints, and special features like file attachments and reminders.",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 7,
@@ -1103,7 +1176,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-26T02:42:20.713Z",
+      "updated": "2025-06-26T03:08:02.349Z",
       "description": "Tasks for master context"
     }
   }

@@ -21,6 +21,32 @@ definitions:
       health_log:
         $ref: '#/definitions/model.HealthLog'
     type: object
+  endpoint.CreateMedicalRecordRequest:
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      dosage:
+        type: string
+      next_due_date:
+        type: string
+      pet_id:
+        type: string
+      type:
+        $ref: '#/definitions/model.MedicalRecordType'
+    required:
+    - date
+    - description
+    - pet_id
+    - type
+    type: object
+  endpoint.CreateMedicalRecordResponse:
+    properties:
+      error: {}
+      medical_record:
+        $ref: '#/definitions/model.MedicalRecord'
+    type: object
   endpoint.CreatePetRequest:
     properties:
       avatar_url:
@@ -46,6 +72,10 @@ definitions:
       success:
         type: boolean
     type: object
+  endpoint.DeleteMedicalRecordResponse:
+    properties:
+      error: {}
+    type: object
   endpoint.DeletePetResponse:
     properties:
       error: {}
@@ -70,6 +100,12 @@ definitions:
       health_log:
         $ref: '#/definitions/model.HealthLog'
     type: object
+  endpoint.GetMedicalRecordResponse:
+    properties:
+      error: {}
+      medical_record:
+        $ref: '#/definitions/model.MedicalRecord'
+    type: object
   endpoint.GetPetResponse:
     properties:
       error: {}
@@ -82,6 +118,14 @@ definitions:
       health_logs:
         items:
           $ref: '#/definitions/model.HealthLog'
+        type: array
+    type: object
+  endpoint.ListMedicalRecordsByPetResponse:
+    properties:
+      error: {}
+      medical_records:
+        items:
+          $ref: '#/definitions/model.MedicalRecord'
         type: array
     type: object
   endpoint.ListPetsResponse:
@@ -114,6 +158,34 @@ definitions:
       error: {}
       health_log:
         $ref: '#/definitions/model.HealthLog'
+    type: object
+  endpoint.UpdateMedicalRecordRequest:
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      dosage:
+        type: string
+      id:
+        type: string
+      next_due_date:
+        type: string
+      pet_id:
+        type: string
+      type:
+        $ref: '#/definitions/model.MedicalRecordType'
+    required:
+    - date
+    - description
+    - pet_id
+    - type
+    type: object
+  endpoint.UpdateMedicalRecordResponse:
+    properties:
+      error: {}
+      medical_record:
+        $ref: '#/definitions/model.MedicalRecord'
     type: object
   endpoint.UpdatePetRequest:
     properties:
@@ -151,6 +223,37 @@ definitions:
       weight_kg:
         type: number
     type: object
+  model.MedicalRecord:
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      dosage:
+        type: string
+      id:
+        type: string
+      next_due_date:
+        type: string
+      pet_id:
+        type: string
+      type:
+        $ref: '#/definitions/model.MedicalRecordType'
+    type: object
+  model.MedicalRecordType:
+    enum:
+    - vaccination
+    - deworming
+    - medication
+    - vet_visit
+    - other
+    type: string
+    x-enum-varnames:
+    - RecordTypeVaccination
+    - RecordTypeDeworming
+    - RecordTypeMedication
+    - RecordTypeVetVisit
+    - RecordTypeOther
   model.Pet:
     properties:
       avatar_url:
@@ -423,6 +526,213 @@ paths:
       summary: 更新健康日誌
       tags:
       - health-logs
+  /api/v1/medical-records:
+    get:
+      consumes:
+      - application/json
+      description: 根據寵物 ID 和可選的日期範圍列出醫療記錄
+      parameters:
+      - description: 寵物 ID
+        in: query
+        name: pet_id
+        required: true
+        type: string
+      - description: 開始日期 (RFC3339 格式)
+        in: query
+        name: start_date
+        type: string
+      - description: 結束日期 (RFC3339 格式)
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.ListMedicalRecordsByPetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 列出寵物的醫療記錄
+      tags:
+      - medical-records
+    post:
+      consumes:
+      - application/json
+      description: 為指定的寵物建立一筆新的醫療記錄（疫苗、驅蟲、藥物治療、獸醫檢查等）
+      parameters:
+      - description: 醫療記錄資訊
+        in: body
+        name: medicalRecord
+        required: true
+        schema:
+          $ref: '#/definitions/endpoint.CreateMedicalRecordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.CreateMedicalRecordResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 建立醫療記錄
+      tags:
+      - medical-records
+  /api/v1/medical-records/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 根據醫療記錄 ID 刪除醫療記錄資料
+      parameters:
+      - description: 醫療記錄 ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.DeleteMedicalRecordResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 刪除醫療記錄
+      tags:
+      - medical-records
+    get:
+      consumes:
+      - application/json
+      description: 根據醫療記錄 ID 取得詳細資訊
+      parameters:
+      - description: 醫療記錄 ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.GetMedicalRecordResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 取得醫療記錄詳情
+      tags:
+      - medical-records
+    put:
+      consumes:
+      - application/json
+      description: 根據醫療記錄 ID 更新現有醫療記錄資料
+      parameters:
+      - description: 醫療記錄 ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 要更新的醫療記錄資訊
+        in: body
+        name: medicalRecord
+        required: true
+        schema:
+          $ref: '#/definitions/endpoint.UpdateMedicalRecordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.UpdateMedicalRecordResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 更新醫療記錄
+      tags:
+      - medical-records
   /api/v1/pets:
     get:
       consumes:

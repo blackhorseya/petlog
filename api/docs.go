@@ -385,6 +385,320 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/medical-records": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根據寵物 ID 和可選的日期範圍列出醫療記錄",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "medical-records"
+                ],
+                "summary": "列出寵物的醫療記錄",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "寵物 ID",
+                        "name": "pet_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "開始日期 (RFC3339 格式)",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "結束日期 (RFC3339 格式)",
+                        "name": "end_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ListMedicalRecordsByPetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "為指定的寵物建立一筆新的醫療記錄（疫苗、驅蟲、藥物治療、獸醫檢查等）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "medical-records"
+                ],
+                "summary": "建立醫療記錄",
+                "parameters": [
+                    {
+                        "description": "醫療記錄資訊",
+                        "name": "medicalRecord",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreateMedicalRecordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreateMedicalRecordResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/medical-records/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根據醫療記錄 ID 取得詳細資訊",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "medical-records"
+                ],
+                "summary": "取得醫療記錄詳情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "醫療記錄 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetMedicalRecordResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根據醫療記錄 ID 更新現有醫療記錄資料",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "medical-records"
+                ],
+                "summary": "更新醫療記錄",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "醫療記錄 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "要更新的醫療記錄資訊",
+                        "name": "medicalRecord",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateMedicalRecordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateMedicalRecordResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根據醫療記錄 ID 刪除醫療記錄資料",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "medical-records"
+                ],
+                "summary": "刪除醫療記錄",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "醫療記錄 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.DeleteMedicalRecordResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/pets": {
             "get": {
                 "security": [
@@ -670,6 +984,44 @@ const docTemplate = `{
                 }
             }
         },
+        "endpoint.CreateMedicalRecordRequest": {
+            "type": "object",
+            "required": [
+                "date",
+                "description",
+                "pet_id",
+                "type"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dosage": {
+                    "type": "string"
+                },
+                "next_due_date": {
+                    "type": "string"
+                },
+                "pet_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.MedicalRecordType"
+                }
+            }
+        },
+        "endpoint.CreateMedicalRecordResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "medical_record": {
+                    "$ref": "#/definitions/model.MedicalRecord"
+                }
+            }
+        },
         "endpoint.CreatePetRequest": {
             "type": "object",
             "properties": {
@@ -708,6 +1060,12 @@ const docTemplate = `{
                 }
             }
         },
+        "endpoint.DeleteMedicalRecordResponse": {
+            "type": "object",
+            "properties": {
+                "error": {}
+            }
+        },
         "endpoint.DeletePetResponse": {
             "type": "object",
             "properties": {
@@ -737,6 +1095,15 @@ const docTemplate = `{
                 }
             }
         },
+        "endpoint.GetMedicalRecordResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "medical_record": {
+                    "$ref": "#/definitions/model.MedicalRecord"
+                }
+            }
+        },
         "endpoint.GetPetResponse": {
             "type": "object",
             "properties": {
@@ -754,6 +1121,18 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.HealthLog"
+                    }
+                }
+            }
+        },
+        "endpoint.ListMedicalRecordsByPetResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "medical_records": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.MedicalRecord"
                     }
                 }
             }
@@ -802,6 +1181,47 @@ const docTemplate = `{
                 "error": {},
                 "health_log": {
                     "$ref": "#/definitions/model.HealthLog"
+                }
+            }
+        },
+        "endpoint.UpdateMedicalRecordRequest": {
+            "type": "object",
+            "required": [
+                "date",
+                "description",
+                "pet_id",
+                "type"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dosage": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "next_due_date": {
+                    "type": "string"
+                },
+                "pet_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.MedicalRecordType"
+                }
+            }
+        },
+        "endpoint.UpdateMedicalRecordResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "medical_record": {
+                    "$ref": "#/definitions/model.MedicalRecord"
                 }
             }
         },
@@ -859,6 +1279,49 @@ const docTemplate = `{
                     "type": "number"
                 }
             }
+        },
+        "model.MedicalRecord": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dosage": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "next_due_date": {
+                    "type": "string"
+                },
+                "pet_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.MedicalRecordType"
+                }
+            }
+        },
+        "model.MedicalRecordType": {
+            "type": "string",
+            "enum": [
+                "vaccination",
+                "deworming",
+                "medication",
+                "vet_visit",
+                "other"
+            ],
+            "x-enum-varnames": [
+                "RecordTypeVaccination",
+                "RecordTypeDeworming",
+                "RecordTypeMedication",
+                "RecordTypeVetVisit",
+                "RecordTypeOther"
+            ]
         },
         "model.Pet": {
             "type": "object",
