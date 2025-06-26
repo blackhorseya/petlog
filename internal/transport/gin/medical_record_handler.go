@@ -3,6 +3,8 @@ package gin
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -188,24 +190,27 @@ func decodeDeleteMedicalRecordRequest(c context.Context, r *http.Request) (reque
 func decodeListMedicalRecordsByPetRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
 	petID := r.URL.Query().Get("pet_id")
 	if petID == "" {
-		return nil, gin.Error{Err: gin.Error{Type: gin.ErrorTypeBind, Meta: "pet_id is required"}.Err}
+		return nil, errors.New("pet_id is required")
 	}
 
 	req := endpoint.ListMedicalRecordsByPetRequest{
 		PetID: petID,
 	}
 
-	// 解析可選的日期參數
 	if startDateStr := r.URL.Query().Get("start_date"); startDateStr != "" {
-		if startDate, err := time.Parse(time.RFC3339, startDateStr); err == nil {
-			req.StartDate = startDate
+		startDate, err := time.Parse(time.RFC3339, startDateStr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid start_date: %w", err)
 		}
+		req.StartDate = startDate
 	}
 
 	if endDateStr := r.URL.Query().Get("end_date"); endDateStr != "" {
-		if endDate, err := time.Parse(time.RFC3339, endDateStr); err == nil {
-			req.EndDate = endDate
+		endDate, err := time.Parse(time.RFC3339, endDateStr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid end_date: %w", err)
 		}
+		req.EndDate = endDate
 	}
 
 	return req, nil

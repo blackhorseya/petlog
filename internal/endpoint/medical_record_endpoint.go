@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/blackhorseya/petlog/internal/domain/model"
@@ -153,13 +154,14 @@ func MakeGetMedicalRecordEndpoint(handler *query.GetMedicalRecordByIDHandler) en
 // MakeListMedicalRecordsByPetEndpoint 建立依寵物 ID 列出醫療記錄的 endpoint
 func MakeListMedicalRecordsByPetEndpoint(handler *query.ListMedicalRecordsByPetHandler) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(ListMedicalRecordsByPetRequest)
-
+		req, ok := request.(ListMedicalRecordsByPetRequest)
+		if !ok {
+			return ListMedicalRecordsByPetResponse{Err: errors.New("invalid request type")}, nil
+		}
 		medicalRecords, err := handler.Handle(ctx, req.PetID, req.StartDate, req.EndDate)
 		if err != nil {
 			return ListMedicalRecordsByPetResponse{Err: err}, nil
 		}
-
 		return ListMedicalRecordsByPetResponse{MedicalRecords: medicalRecords}, nil
 	}
 }
