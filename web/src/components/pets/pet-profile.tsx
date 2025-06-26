@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { ArrowLeft, Edit, Calendar, Hash, Clock } from "lucide-react";
+import { ArrowLeft, Edit, Calendar, Hash, Clock, FileText, Stethoscope, Syringe } from "lucide-react";
+import { useState } from "react";
 
 import {
   Card,
@@ -12,6 +13,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Pet } from "@/lib/types/pet";
+import { MedicalRecordList } from "@/components/medical-records";
+
+// 暫時的類型定義，等後端 API 定義完成後會替換
+type MedicalRecordType = 
+  | "vaccination"
+  | "deworming" 
+  | "medication"
+  | "vet_visit"
+  | "other";
+
+interface MedicalRecord {
+  id: string;
+  pet_id: string;
+  type: MedicalRecordType;
+  description: string;
+  date: string;
+  next_due_date?: string;
+  dosage?: string;
+}
 
 interface PetProfileProps {
   pet: Pet;
@@ -20,6 +40,44 @@ interface PetProfileProps {
 }
 
 export function PetProfile({ pet, onBack, onEdit }: PetProfileProps) {
+  const [activeTab, setActiveTab] = useState<"overview" | "medical">("overview");
+  
+  // TODO: 等後端 API 完成後，這裡會用真實的 API 來獲取醫療記錄
+  // 目前使用 mock 資料來展示功能
+  const mockMedicalRecords: MedicalRecord[] = [
+    {
+      id: "1",
+      pet_id: pet.id,
+      type: "vaccination",
+      description: "狂犬病疫苗注射",
+      date: "2024-01-15T09:00:00Z",
+      next_due_date: "2025-01-15T09:00:00Z",
+      dosage: "1 劑"
+    },
+    {
+      id: "2", 
+      pet_id: pet.id,
+      type: "deworming",
+      description: "定期驅蟲治療",
+      date: "2024-02-01T10:30:00Z",
+      next_due_date: "2024-05-01T10:30:00Z",
+      dosage: "1 錠"
+    },
+    {
+      id: "3",
+      pet_id: pet.id, 
+      type: "vet_visit",
+      description: "健康檢查",
+      date: "2024-03-10T14:00:00Z",
+    }
+  ];
+  
+  const medicalRecords = mockMedicalRecords;
+  const medicalRecordsLoading = false;
+  const refetchMedicalRecords = () => {
+    console.log('重新整理醫療記錄');
+  };
+  
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -81,6 +139,26 @@ export function PetProfile({ pet, onBack, onEdit }: PetProfileProps) {
 
   const age = calculateAge(pet.dob);
 
+  // 醫療記錄統計
+  const medicalRecordStats = {
+    total: medicalRecords.length,
+    vaccination: medicalRecords.filter(r => r.type === 'vaccination').length,
+    vetVisit: medicalRecords.filter(r => r.type === 'vet_visit').length,
+    upcoming: medicalRecords.filter(record => {
+      if (!record.next_due_date) return false;
+      const nextDue = new Date(record.next_due_date);
+      const now = new Date();
+      const diffDays = Math.ceil((nextDue.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return diffDays <= 7 && diffDays >= 0;
+    }).length,
+    overdue: medicalRecords.filter(record => {
+      if (!record.next_due_date) return false;
+      const nextDue = new Date(record.next_due_date);
+      const now = new Date();
+      return nextDue < now;
+    }).length,
+  };
+
   return (
     <div className="space-y-6">
       {/* 標題列 */}
@@ -105,7 +183,46 @@ export function PetProfile({ pet, onBack, onEdit }: PetProfileProps) {
         )}
       </div>
 
-      {/* 主要資訊卡片 */}
+      {/* 分頁導航 */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab("overview")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "overview"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            基本資料
+          </button>
+          <button
+            onClick={() => setActiveTab("medical")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "medical"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            醫療記錄
+            {medicalRecordStats.total > 0 && (
+              <span className="ml-2 bg-blue-100 text-blue-600 py-0.5 px-2 rounded-full text-xs">
+                {medicalRecordStats.total}
+              </span>
+            )}
+            {medicalRecordStats.overdue > 0 && (
+              <span className="ml-1 bg-red-100 text-red-600 py-0.5 px-1.5 rounded-full text-xs">
+                !
+              </span>
+            )}
+          </button>
+        </nav>
+      </div>
+
+      {/* 分頁內容 */}
+      {activeTab === "overview" && (
+        <>
+          {/* 主要資訊卡片 */}
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-4">
@@ -200,29 +317,75 @@ export function PetProfile({ pet, onBack, onEdit }: PetProfileProps) {
         </CardContent>
       </Card>
 
-      {/* 快捷操作卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
-          <CardContent className="p-6 text-center">
-            <div className="text-2xl font-bold text-primary">0</div>
-            <p className="text-sm text-muted-foreground">健康記錄</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
-          <CardContent className="p-6 text-center">
-            <div className="text-2xl font-bold text-primary">0</div>
-            <p className="text-sm text-muted-foreground">醫療記錄</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
-          <CardContent className="p-6 text-center">
-            <div className="text-2xl font-bold text-primary">0</div>
-            <p className="text-sm text-muted-foreground">疫苗記錄</p>
-          </CardContent>
-        </Card>
-      </div>
+          {/* 快捷操作卡片 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card 
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => setActiveTab("medical")}
+            >
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <FileText className="h-6 w-6 text-primary" />
+                </div>
+                <div className="text-2xl font-bold text-primary">
+                  {medicalRecordStats.total}
+                </div>
+                <p className="text-sm text-muted-foreground">醫療記錄</p>
+                {medicalRecordStats.overdue > 0 && (
+                  <p className="text-xs text-red-600 mt-1">
+                    {medicalRecordStats.overdue} 項已過期
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card 
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => setActiveTab("medical")}
+            >
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Syringe className="h-6 w-6 text-primary" />
+                </div>
+                <div className="text-2xl font-bold text-primary">
+                  {medicalRecordStats.vaccination}
+                </div>
+                <p className="text-sm text-muted-foreground">疫苗記錄</p>
+              </CardContent>
+            </Card>
+            
+            <Card 
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => setActiveTab("medical")}
+            >
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Stethoscope className="h-6 w-6 text-primary" />
+                </div>
+                <div className="text-2xl font-bold text-primary">
+                  {medicalRecordStats.vetVisit}
+                </div>
+                <p className="text-sm text-muted-foreground">獸醫門診</p>
+                {medicalRecordStats.upcoming > 0 && (
+                  <p className="text-xs text-yellow-600 mt-1">
+                    {medicalRecordStats.upcoming} 項即將到期
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
+
+      {/* 醫療記錄分頁 */}
+      {activeTab === "medical" && (
+        <MedicalRecordList
+          petId={pet.id}
+          records={medicalRecords}
+          loading={medicalRecordsLoading}
+          onRefresh={refetchMedicalRecords}
+        />
+      )}
     </div>
   );
 }
