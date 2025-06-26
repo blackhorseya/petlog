@@ -30,7 +30,7 @@ const features = [
     name: "醫療記錄",
     description: "管理疫苗接種、體檢報告和醫療文件",
     icon: FileText,
-    href: "/medical",
+    href: "/medical-records",
   },
 ];
 
