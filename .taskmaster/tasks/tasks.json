@@ -1001,8 +1001,8 @@
           29
         ],
         "priority": "high",
-        "details": "1. internal/endpoint/dashboard_endpoint.go 建立 DashboardEndpoints 結構、NewDashboardEndpoints provider、MakeGetDashboardOverviewEndpoint endpoint 工廠，符合 go-kit 標準。\n2. GetDashboardOverviewResponse struct 使用 snake_case json tag（pet_count, health_record_count），並包含 Err 欄位與 Failed() 方法。\n3. 從 contextx 取得 userID，並將其傳遞給 usecase handler，確保權限與資料隔離。\n4. 在 cmd/petlog/wire.go 注入 Dashboard 用例處理器與 endpoint provider。\n5. 在 internal/transport/gin/dashboard_handler.go 實作 DashboardHandler，確保 endpoint 欄位名稱與 DashboardEndpoints 結構一致。\n6. 註冊 /api/v1/dashboard/overview 路由，整合 JWT 驗證。\n7. 加上 Swagger 註解與 API 文件，確保與專案規範一致。",
-        "testStrategy": "Gin 測試與整合測試，驗證 API 回應、權限驗證與文件正確性。確認 API 能正確回傳登入用戶的寵物數量與健康日誌數量，並支援權限驗證與標準化錯誤處理。",
+        "details": "1. internal/endpoint/dashboard_endpoint.go 建立 DashboardEndpoints 結構、NewDashboardEndpoints provider、MakeGetDashboardOverviewEndpoint endpoint 工廠，符合 go-kit 標準。\n2. GetDashboardOverviewResponse struct 使用 snake_case json tag（pet_count, health_record_count），並包含 Err 欄位與 Failed() 方法。\n3. 從 contextx 取得 userID，並將其傳遞給 usecase handler，確保權限與資料隔離。\n4. 在 cmd/petlog/wire.go 注入 Dashboard 用例處理器與 endpoint provider。\n5. 在 internal/transport/gin/dashboard_handler.go 實作 DashboardHandler，確保 endpoint 欄位名稱與 DashboardEndpoints 結構一致。\n6. 註冊 /api/v1/dashboard/overview 路由，整合 JWT 驗證。\n7. 加上 Swagger 註解與 API 文件，確保與專案規範一致。\n8. 實作 endpoint 內部對 usecase 回傳 nil 的防呆機制，避免 result 為 nil 時 panic。",
+        "testStrategy": "Gin 測試與整合測試，驗證 API 回應、權限驗證與文件正確性。確認 API 能正確回傳登入用戶的寵物數量與健康日誌數量，並支援權限驗證與標準化錯誤處理。確保 API 不會因 usecase 回傳 nil 而 panic。",
         "subtasks": [
           {
             "id": 1,
@@ -1057,6 +1057,32 @@
             "dependencies": [],
             "details": "",
             "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "實作 nil 回傳防呆機制",
+            "description": "修正 endpoint 內部對 usecase 回傳 nil 的防呆，避免 result 為 nil 時 panic。",
+            "status": "completed",
+            "dependencies": [],
+            "details": "確保 endpoint 層能夠安全處理 usecase 可能回傳的 nil 值，避免系統 panic，提高系統穩定性。",
+            "testStrategy": "測試 usecase 回傳 nil 的情況，確認 API 能正確處理並回傳適當的錯誤訊息，而非直接 panic。"
+          },
+          {
+            "id": 8,
+            "title": "驗證 API 功能與穩定性",
+            "description": "驗證 API 可正確回傳登入用戶的寵物數量與健康日誌數量，並支援權限驗證與標準化錯誤處理。",
+            "status": "completed",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "details": "確認 API 在各種情境下的穩定性，包括正常使用、權限錯誤、資料不存在等情況，確保前端能獲得一致且可靠的回應。",
+            "testStrategy": "進行端對端測試，模擬各種使用情境，確認 API 回應符合預期。"
           }
         ]
       },
