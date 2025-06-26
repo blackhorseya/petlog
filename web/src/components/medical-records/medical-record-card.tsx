@@ -2,11 +2,33 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  MedicalRecord, 
-  MedicalRecordTypeLabels 
-} from "@/lib/types/medical-record";
 import { Calendar, FileText, Clock, Pill } from "lucide-react";
+
+// 暫時的類型定義，等後端 API 定義完成後會替換
+type MedicalRecordType = 
+  | "vaccination"
+  | "deworming" 
+  | "medication"
+  | "vet_visit"
+  | "other";
+
+const MedicalRecordTypeLabels: Record<MedicalRecordType, string> = {
+  vaccination: "疫苗接種",
+  deworming: "驅蟲",
+  medication: "用藥",
+  vet_visit: "獸醫門診",
+  other: "其他",
+};
+
+interface MedicalRecord {
+  id: string;
+  pet_id: string;
+  type: MedicalRecordType;
+  description: string;
+  date: string;
+  next_due_date?: string;
+  dosage?: string;
+}
 
 interface MedicalRecordCardProps {
   record: MedicalRecord;

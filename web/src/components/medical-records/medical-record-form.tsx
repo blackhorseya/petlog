@@ -6,11 +6,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  MedicalRecordFormData, 
-  MedicalRecordType, 
-  MedicalRecordTypeLabels 
-} from "@/lib/types/medical-record";
+
+// 暫時的類型定義，等後端 API 定義完成後會替換
+type MedicalRecordType = 
+  | "vaccination"
+  | "deworming" 
+  | "medication"
+  | "vet_visit"
+  | "other";
+
+const MedicalRecordTypeLabels: Record<MedicalRecordType, string> = {
+  vaccination: "疫苗接種",
+  deworming: "驅蟲",
+  medication: "用藥",
+  vet_visit: "獸醫門診",
+  other: "其他",
+};
+
+interface MedicalRecordFormData {
+  pet_id: string;
+  type: MedicalRecordType;
+  description: string;
+  date: string;
+  next_due_date?: string;
+  dosage?: string;
+}
 
 interface MedicalRecordFormProps {
   initialData?: Partial<MedicalRecordFormData>;

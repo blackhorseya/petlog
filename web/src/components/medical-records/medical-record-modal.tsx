@@ -2,18 +2,37 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MedicalRecordForm } from "./medical-record-form";
-import { 
-  MedicalRecord, 
-  MedicalRecordFormData 
-} from "@/lib/types/medical-record";
-import { 
-  useCreateMedicalRecord, 
-  useUpdateMedicalRecord, 
-  useDeleteMedicalRecord 
-} from "@/hooks/use-medical-records";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+
+// 暫時的類型定義，等後端 API 定義完成後會替換
+type MedicalRecordType = 
+  | "vaccination"
+  | "deworming" 
+  | "medication"
+  | "vet_visit"
+  | "other";
+
+interface MedicalRecord {
+  id: string;
+  pet_id: string;
+  type: MedicalRecordType;
+  description: string;
+  date: string;
+  next_due_date?: string;
+  dosage?: string;
+}
+
+interface MedicalRecordFormData {
+  pet_id: string;
+  type: MedicalRecordType;
+  description: string;
+  date: string;
+  next_due_date?: string;
+  dosage?: string;
+}
 
 interface MedicalRecordModalProps {
   isOpen: boolean;
@@ -31,40 +50,53 @@ export function MedicalRecordModal({
   onSuccess,
 }: MedicalRecordModalProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  
-  const createMutation = useCreateMedicalRecord();
-  const updateMutation = useUpdateMedicalRecord();
-  const deleteMutation = useDeleteMedicalRecord();
+  const [loading, setLoading] = useState(false);
 
   const isEditing = !!editingRecord;
-  const loading = createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
   const handleSubmit = async (data: MedicalRecordFormData) => {
+    setLoading(true);
     try {
-      if (isEditing && editingRecord) {
-        await updateMutation.mutateAsync({
-          id: editingRecord.id,
-          data,
-        });
+      // TODO: 等後端 API 完成後，這裡會實際呼叫 API
+      console.log('醫療記錄資料:', data);
+      
+      // 模擬 API 延遲
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (isEditing) {
+        toast.success('醫療記錄更新成功！');
       } else {
-        await createMutation.mutateAsync(data);
+        toast.success('醫療記錄建立成功！');
       }
+      
       onSuccess?.();
     } catch (error) {
-      // 錯誤處理已在 hooks 中完成
       console.error('Form submission error:', error);
+      toast.error('操作失敗，請稍後重試');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async () => {
     if (!editingRecord) return;
     
+    setLoading(true);
     try {
-      await deleteMutation.mutateAsync(editingRecord.id);
+      // TODO: 等後端 API 完成後，這裡會實際呼叫刪除 API
+      console.log('刪除醫療記錄:', editingRecord.id);
+      
+      // 模擬 API 延遲
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success('醫療記錄已成功刪除');
       setShowDeleteConfirm(false);
       onSuccess?.();
     } catch (error) {
       console.error('Delete error:', error);
+      toast.error('刪除失敗，請稍後重試');
+    } finally {
+      setLoading(false);
     }
   };
 

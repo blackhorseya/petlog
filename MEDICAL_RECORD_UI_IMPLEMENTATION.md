@@ -2,31 +2,20 @@
 
 ## 📋 已完成的功能
 
-### 1. 類型定義 (`web/src/lib/types/medical-record.ts`)
-- 定義了醫療記錄的完整類型系統
-- 包含五種醫療記錄類型：疫苗接種、驅蟲、用藥、獸醫門診、其他
-- 支援 RFC3339 時間格式
-- 完整的 API 請求/回應類型定義
+### 1. UI 元件實作（使用 Mock 資料）
+- **不串接後端 API**：目前使用 mock 資料展示功能
+- **完整 UI 流程**：包含新增、編輯、刪除、查看等操作的完整介面
+- **類型定義**：每個元件內部定義了必要的 TypeScript 類型
+- **等後端 API 完成**：預留了 TODO 註解，標明後續需要串接真實 API 的位置
 
-### 2. API 服務層 (`web/src/lib/api/medical-record.ts`)
-- 實作了完整的醫療記錄 CRUD 操作
-- 支援依據寵物 ID 和時間範圍篩選
-- 使用統一的 API 請求格式
-- 包含 React Query 的 key 工廠函式
-
-### 3. React Hooks (`web/src/hooks/use-medical-records.ts`)
-- 提供 CRUD 操作的 React Query hooks
-- 包含樂觀更新功能
-- 自動錯誤處理和成功提示
-- 智慧快取管理
-
-### 4. UI 元件
+### 2. UI 元件
 
 #### 醫療記錄表單 (`web/src/components/medical-records/medical-record-form.tsx`)
 - 動態表單，根據醫療記錄類型顯示相關欄位
 - 支援日期選擇和下次預定日期
 - 表單驗證和錯誤顯示
 - RFC3339 時間格式轉換
+- **使用 mock 功能**：表單提交時顯示成功訊息，但不實際呼叫 API
 
 #### 醫療記錄卡片 (`web/src/components/medical-records/medical-record-card.tsx`)
 - 美觀的卡片顯示設計
@@ -39,27 +28,31 @@
 - 提醒統計（即將到期、已過期）
 - 響應式網格佈局
 - 空狀態處理
+- **使用 mock 資料**：顯示預設的範例醫療記錄
 
 #### 醫療記錄模態框 (`web/src/components/medical-records/medical-record-modal.tsx`)
 - 統一的新增/編輯界面
 - 刪除確認功能
 - 載入狀態處理
+- **模擬 API 操作**：包含載入動畫和成功/錯誤訊息
 
-### 5. 頁面整合
+### 3. 頁面整合
 
 #### 寵物檔案頁面整合 (`web/src/components/pets/pet-profile.tsx`)
 - 新增醫療記錄分頁
 - 即時統計顯示
 - 快捷操作卡片
 - 過期提醒通知
+- **使用 mock 資料**：顯示範例醫療記錄和統計資訊
 
 #### 獨立醫療記錄頁面 (`web/src/app/medical-records/page.tsx`)
 - 多寵物醫療記錄管理
 - 統計儀表板
 - 寵物選擇器
 - 綜合數據視圖
+- **使用 mock 資料**：展示不同寵物的範例醫療記錄
 
-### 6. 導航更新 (`web/src/components/navigation/sidebar.tsx`)
+### 4. 導航更新 (`web/src/components/navigation/sidebar.tsx`)
 - 更新側邊欄連結指向醫療記錄頁面
 
 ## 🎯 功能特色
@@ -90,40 +83,66 @@
 
 ```
 web/src/
-├── lib/
-│   ├── types/medical-record.ts          # 類型定義
-│   └── api/medical-record.ts            # API 服務
-├── hooks/
-│   └── use-medical-records.ts           # React Hooks
 ├── components/
 │   └── medical-records/
 │       ├── index.ts                     # 匯出索引
-│       ├── medical-record-form.tsx      # 表單元件
-│       ├── medical-record-card.tsx      # 卡片元件
-│       ├── medical-record-list.tsx      # 列表元件
-│       └── medical-record-modal.tsx     # 模態框元件
+│       ├── medical-record-form.tsx      # 表單元件（含內部類型定義）
+│       ├── medical-record-card.tsx      # 卡片元件（含內部類型定義）
+│       ├── medical-record-list.tsx      # 列表元件（含內部類型定義）
+│       └── medical-record-modal.tsx     # 模態框元件（含 mock 功能）
 ├── app/
-│   └── medical-records/page.tsx         # 獨立頁面
+│   └── medical-records/page.tsx         # 獨立頁面（使用 mock 資料）
 └── components/
-    ├── pets/pet-profile.tsx             # 更新的寵物檔案
+    ├── pets/pet-profile.tsx             # 更新的寵物檔案（使用 mock 資料）
     └── navigation/sidebar.tsx           # 更新的導航
+
+注意：暫時移除了以下檔案（等後端 API 完成後再實作）：
+- lib/types/medical-record.ts            # 將在 API 定義完成後重新建立
+- lib/api/medical-record.ts              # 將在 API 端點完成後重新建立
+- hooks/use-medical-records.ts           # 將在 API 完成後重新建立
 ```
 
-## 🚀 使用方式
+## 🚀 使用方式（目前使用 Mock 資料）
 
 ### 在寵物檔案中使用
 1. 進入寵物管理頁面
 2. 選擇一個寵物
 3. 切換到「醫療記錄」分頁
-4. 新增、編輯或查看醫療記錄
+4. 查看 mock 醫療記錄資料
+5. 可以操作新增/編輯表單（顯示成功訊息但不實際儲存）
 
 ### 在獨立頁面中使用
 1. 點擊側邊欄的「醫療記錄」
-2. 查看所有寵物的統計摘要
-3. 選擇特定寵物查看其記錄
-4. 進行記錄管理操作
+2. 查看 mock 統計摘要
+3. 選擇特定寵物查看其 mock 記錄
+4. 測試記錄管理操作（UI 流程完整但不實際執行 API）
 
-## 📝 後續可擴展功能
+## 📝 下一步：API 串接
+
+當後端 API 完成後，需要進行以下步驟：
+
+1. **重新建立類型定義**：`web/src/lib/types/medical-record.ts`
+   - 根據後端 swagger 定義完整的類型系統
+
+2. **建立 API 服務層**：`web/src/lib/api/medical-record.ts`
+   - 實作 CRUD API 呼叫
+   - 配置正確的端點和請求格式
+
+3. **建立 React Hooks**：`web/src/hooks/use-medical-records.ts`
+   - 使用 React Query 管理 API 狀態
+   - 實作快取和樂觀更新
+
+4. **更新 UI 元件**：
+   - 移除各元件內部的類型定義
+   - 導入統一的類型定義
+   - 移除 mock 資料，改用真實 API hooks
+
+5. **測試與優化**：
+   - 測試完整的 CRUD 流程
+   - 驗證錯誤處理
+   - 效能優化
+
+## 📝 未來可擴展功能
 
 1. **檔案上傳**：支援上傳醫療文件和影像
 2. **提醒通知**：郵件或推播通知即將到期的項目
@@ -132,10 +151,10 @@ web/src/
 5. **分享功能**：與獸醫師分享醫療記錄
 6. **備註系統**：為每筆記錄添加詳細備註
 
-## ✅ 測試建議
+## ✅ 目前可測試的功能
 
-1. 測試各種醫療記錄類型的新增/編輯
-2. 驗證日期計算和提醒邏輯
-3. 測試響應式佈局在不同裝置上的表現
-4. 驗證錯誤處理和載入狀態
-5. 測試篩選和排序功能
+1. **UI 流程測試**：測試各種醫療記錄類型的新增/編輯介面
+2. **視覺呈現**：驗證不同類型記錄的顏色標籤和狀態顯示
+3. **響應式設計**：測試在不同裝置尺寸下的佈局表現
+4. **互動體驗**：測試篩選、排序、模態框等互動功能
+5. **載入狀態**：測試按鈕載入動畫和成功/錯誤訊息顯示

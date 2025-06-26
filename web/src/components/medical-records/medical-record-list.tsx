@@ -4,11 +4,32 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MedicalRecordCard } from "./medical-record-card";
 import { MedicalRecordModal } from "./medical-record-modal";
-import { 
-  MedicalRecord, 
-  MedicalRecordType, 
-  MedicalRecordTypeLabels,
-} from "@/lib/types/medical-record";
+
+// 暫時的類型定義，等後端 API 定義完成後會替換
+export type MedicalRecordType = 
+  | "vaccination"
+  | "deworming" 
+  | "medication"
+  | "vet_visit"
+  | "other";
+
+export const MedicalRecordTypeLabels: Record<MedicalRecordType, string> = {
+  vaccination: "疫苗接種",
+  deworming: "驅蟲",
+  medication: "用藥",
+  vet_visit: "獸醫門診",
+  other: "其他",
+};
+
+export interface MedicalRecord {
+  id: string;
+  pet_id: string;
+  type: MedicalRecordType;
+  description: string;
+  date: string;
+  next_due_date?: string;
+  dosage?: string;
+}
 import { Plus, Filter, Calendar, FileX } from "lucide-react";
 
 interface MedicalRecordListProps {

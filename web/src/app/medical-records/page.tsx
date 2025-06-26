@@ -4,11 +4,28 @@ import { useUser } from "@auth0/nextjs-auth0";
 import { useState } from "react";
 import { MedicalRecordList } from "@/components/medical-records";
 import { usePets } from "@/hooks/use-pets";
-import { useMedicalRecords } from "@/hooks/use-medical-records";
 import { Pet } from "@/lib/types/pet";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, AlertTriangle, PawPrint } from "lucide-react";
+
+// 暫時的類型定義，等後端 API 定義完成後會替換
+type MedicalRecordType = 
+  | "vaccination"
+  | "deworming" 
+  | "medication"
+  | "vet_visit"
+  | "other";
+
+interface MedicalRecord {
+  id: string;
+  pet_id: string;
+  type: MedicalRecordType;
+  description: string;
+  date: string;
+  next_due_date?: string;
+  dosage?: string;
+}
 
 export default function MedicalRecordsPage() {
   const { user, isLoading: userLoading } = useUser();
@@ -17,12 +34,41 @@ export default function MedicalRecordsPage() {
   // 獲取寵物列表
   const { data: pets = [], isLoading: petsLoading } = usePets();
   
-  // 獲取選中寵物的醫療記錄
-  const { 
-    data: medicalRecords = [], 
-    isLoading: medicalRecordsLoading, 
-    refetch: refetchMedicalRecords 
-  } = useMedicalRecords(selectedPetId, undefined);
+  // TODO: 等後端 API 完成後，這裡會用真實的 API 來獲取醫療記錄
+  // 目前使用 mock 資料來展示功能
+  const mockMedicalRecords: MedicalRecord[] = selectedPetId ? [
+    {
+      id: "1",
+      pet_id: selectedPetId,
+      type: "vaccination",
+      description: "狂犬病疫苗注射",
+      date: "2024-01-15T09:00:00Z",
+      next_due_date: "2025-01-15T09:00:00Z",
+      dosage: "1 劑"
+    },
+    {
+      id: "2", 
+      pet_id: selectedPetId,
+      type: "deworming",
+      description: "定期驅蟲治療",
+      date: "2024-02-01T10:30:00Z",
+      next_due_date: "2024-05-01T10:30:00Z",
+      dosage: "1 錠"
+    },
+    {
+      id: "3",
+      pet_id: selectedPetId, 
+      type: "vet_visit",
+      description: "健康檢查",
+      date: "2024-03-10T14:00:00Z",
+    }
+  ] : [];
+  
+  const medicalRecords = mockMedicalRecords;
+  const medicalRecordsLoading = false;
+  const refetchMedicalRecords = () => {
+    console.log('重新整理醫療記錄');
+  };
 
   if (userLoading) {
     return (
