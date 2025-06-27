@@ -1,37 +1,41 @@
-name: 'Serverless Framework 部署 Lambda'
-description: '使用 Serverless Framework v4 自動部署 Go 應用到 AWS Lambda'
+name: "Serverless Framework 部署 Lambda"
+description: "使用 Serverless Framework v4 自動部署 Go 應用到 AWS Lambda"
 inputs:
   aws-access-key-id:
-    description: 'AWS Access Key ID'
+    description: "AWS Access Key ID"
     required: true
   aws-secret-access-key:
-    description: 'AWS Secret Access Key'
+    description: "AWS Secret Access Key"
     required: true
   aws-region:
-    description: 'AWS 區域'
+    description: "AWS 區域"
     required: true
-    default: 'ap-northeast-1'
+    default: "ap-northeast-1"
   stage:
-    description: '部署階段（如 int, prod）'
+    description: "部署階段（如 int, prod）"
     required: false
-    default: 'int'
+    default: "int"
   serverless-access-key:
-    description: 'Serverless Dashboard Access Key (可選)'
+    description: "Serverless Dashboard Access Key (可選)"
     required: false
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     # 安裝 Node.js 並啟用 pnpm 快取，加速依賴安裝
     - name: 安裝 Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: "20"
 
     - name: 安裝 Go
       uses: actions/setup-go@v5
       with:
         go-version: "1.22"
         cache: true # 內建 module + build 快取
+
+    - name: 下載 Go modules
+      run: go mod download
+      shell: bash
 
     # 安裝 pnpm
     - name: 安裝 pnpm
