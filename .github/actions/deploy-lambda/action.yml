@@ -40,12 +40,11 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: ${{ inputs.aws-region }}
 
-    # （可選）設定 Serverless Dashboard Access Key
-    - name: 設定 Serverless Dashboard Access Key
+    # 使用 Serverless CLI 登入（非互動式）
+    - name: Serverless CLI 登入
       if: inputs.serverless-access-key != ''
       run: |
-        serverless config credentials --provider aws --key ${{ inputs.aws-access-key-id }} --secret ${{ inputs.aws-secret-access-key }}
-        export SERVERLESS_ACCESS_KEY=${{ inputs.serverless-access-key }}
+        sls login --key ${{ inputs.serverless-access-key }}
       shell: bash
 
     # 部署到 AWS Lambda
