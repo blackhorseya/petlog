@@ -1,0 +1,13 @@
+name: Go Test
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true # 內建 module + build 快取
+      - run: go test -v -race ./...
