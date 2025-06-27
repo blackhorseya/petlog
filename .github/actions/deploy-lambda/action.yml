@@ -32,6 +32,11 @@ runs:
       run: npm install -g serverless@4
       shell: bash
 
+    # 安裝 依賴
+    - name: 安裝 依賴
+      run: pnpm install
+      shell: bash
+
     # 設定 AWS 認證
     - name: 設定 AWS 認證
       uses: aws-actions/configure-aws-credentials@v4
