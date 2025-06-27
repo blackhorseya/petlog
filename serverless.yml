@@ -7,11 +7,8 @@ service: petlog
 
 frameworkVersion: "4"
 
-useDotenv: false
-
 plugins:
   - serverless-go-plugin
-  - serverless-dotenv-plugin
 
 custom:
   go:
@@ -29,8 +26,6 @@ custom:
     supportedRuntimes: ["provided.al2"]
     # 如果為 true，則將提供的 runtime 函式建立為單一的 "bootstrap" 二進位檔
     buildProvidedRuntimeAsBootstrap: true
-  dotenv:
-    logging: true
 
 provider:
   name: aws
