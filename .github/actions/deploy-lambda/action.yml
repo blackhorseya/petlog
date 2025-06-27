@@ -40,13 +40,6 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: ${{ inputs.aws-region }}
 
-    # 使用 Serverless CLI 登入（非互動式）
-    - name: Serverless CLI 登入
-      if: inputs.serverless-access-key != ''
-      run: |
-        sls login --key ${{ inputs.serverless-access-key }}
-      shell: bash
-
     # 部署到 AWS Lambda
     - name: 使用 Serverless Framework 部署
       run: |
