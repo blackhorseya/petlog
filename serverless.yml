@@ -7,7 +7,7 @@ service: petlog
 
 frameworkVersion: "4"
 
-useDotenv: true
+useDotenv: false
 
 plugins:
   - serverless-go-plugin
@@ -38,11 +38,14 @@ provider:
   runtime: provided.al2
   region: ap-northeast-1 # 請根據您的需求修改區域
   stage: ${opt:stage, 'int'}
+  # 指定 Lambda 執行角色，由 Terraform 建立
+  role: arn:aws:iam::${aws:accountId}:role/petlog-lambda-exec-${self:provider.stage}
   environment:
-    MONGO_URI: ${param:MONGO_URI}
-    MONGO_DATABASE: ${param:MONGO_DATABASE}
-    AUTH0_DOMAIN: ${param:AUTH0_DOMAIN}
-    AUTH0_AUDIENCE: ${param:AUTH0_AUDIENCE} # 以上皆改為 param 參數，建議於部署時以 --param 傳入或於 serverless dashboard 設定
+    # 直接從 SSM Parameter Store 讀取環境變數
+    MONGO_URI: ${ssm:/petlog/${self:provider.stage}/MONGO_URI}
+    MONGO_DATABASE: ${ssm:/petlog/${self:provider.stage}/MONGO_DATABASE}
+    AUTH0_DOMAIN: ${ssm:/petlog/${self:provider.stage}/AUTH0_DOMAIN}
+    AUTH0_AUDIENCE: ${ssm:/petlog/${self:provider.stage}/AUTH0_AUDIENCE}
   # httpApi:
   #   cors: true
 
