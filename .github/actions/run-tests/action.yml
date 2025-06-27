@@ -1,0 +1,14 @@
+name: '執行後端測試'
+description: '執行 Go 後端依賴安裝與測試'
+runs:
+  using: 'composite'
+  steps:
+    # 安裝 Go 依賴
+    - name: 下載 Go modules
+      run: go mod download
+      shell: bash
+
+    # 執行 Go 測試
+    - name: 執行 Go 測試
+      run: go test ./... -v -race
+      shell: bash 
