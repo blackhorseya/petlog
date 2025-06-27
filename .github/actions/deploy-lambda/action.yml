@@ -26,16 +26,10 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'pnpm'
 
     # 安裝 pnpm
     - name: 安裝 pnpm
       run: npm install -g pnpm
-      shell: bash
-
-    # 安裝 Serverless Framework v4
-    - name: 安裝 Serverless Framework v4
-      run: pnpm install -g serverless@4
       shell: bash
 
     # 安裝 依賴
