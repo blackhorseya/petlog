@@ -54,7 +54,7 @@ func (r *petMongoRepo) Create(c context.Context, pet *model.Pet) error {
 	if err != nil {
 		// 這裡可以加入對 MongoDB 特定錯誤的判斷，例如唯一索引衝突
 		ctx.Error("建立寵物失敗", "error", err, "pet_name", pet.Name)
-		return fmt.Errorf("建立寵物失敗: %w", err)
+		return convertMongoError(err)
 	}
 
 	// 將 MongoDB 生成的新 ID 回寫到傳入的 pet model 中
@@ -91,7 +91,7 @@ func (r *petMongoRepo) FindByID(c context.Context, id string) (*model.Pet, error
 			return nil, domain.ErrNotFound // 返回標準的領域錯誤
 		}
 		ctx.Error("查找寵物時發生錯誤", "error", err, "pet_id", id)
-		return nil, fmt.Errorf("查找寵物失敗: %w", err)
+		return nil, convertMongoError(err)
 	}
 
 	// 轉換為領域模型
@@ -114,7 +114,7 @@ func (r *petMongoRepo) FindByOwnerID(c context.Context, ownerID string) ([]*mode
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
 		ctx.Error("查詢寵物時發生錯誤", "error", err, "owner_id", ownerID)
-		return nil, fmt.Errorf("查詢寵物失敗: %w", err)
+		return nil, convertMongoError(err)
 	}
 	defer cursor.Close(ctx)
 
@@ -124,7 +124,7 @@ func (r *petMongoRepo) FindByOwnerID(c context.Context, ownerID string) ([]*mode
 		var petDoc petMongo
 		if err := cursor.Decode(&petDoc); err != nil {
 			ctx.Error("解碼寵物資料時發生錯誤", "error", err, "owner_id", ownerID)
-			return nil, fmt.Errorf("解碼寵物資料失敗: %w", err)
+			return nil, convertMongoError(err)
 		}
 
 		// 轉換為領域模型並加入結果列表
@@ -134,7 +134,7 @@ func (r *petMongoRepo) FindByOwnerID(c context.Context, ownerID string) ([]*mode
 	// 檢查 cursor 是否有錯誤
 	if err := cursor.Err(); err != nil {
 		ctx.Error("遍歷查詢結果時發生錯誤", "error", err, "owner_id", ownerID)
-		return nil, fmt.Errorf("遍歷查詢結果失敗: %w", err)
+		return nil, convertMongoError(err)
 	}
 
 	ctx.Info("成功查找寵物", "owner_id", ownerID, "count", len(pets))
@@ -167,7 +167,7 @@ func (r *petMongoRepo) Update(c context.Context, pet *model.Pet) error {
 	result, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		ctx.Error("更新寵物失敗", "error", err, "pet_id", pet.ID)
-		return fmt.Errorf("更新寵物失敗: %w", err)
+		return convertMongoError(err)
 	}
 
 	// 檢查是否有文件被更新
@@ -200,7 +200,7 @@ func (r *petMongoRepo) Delete(c context.Context, id string) error {
 	result, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		ctx.Error("刪除寵物失敗", "error", err, "pet_id", id)
-		return fmt.Errorf("刪除寵物失敗: %w", err)
+		return convertMongoError(err)
 	}
 
 	// 檢查是否有文件被刪除

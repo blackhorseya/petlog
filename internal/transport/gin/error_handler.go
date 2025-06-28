@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/blackhorseya/petlog/internal/domain"
 	"github.com/blackhorseya/petlog/internal/endpoint"
 	"github.com/blackhorseya/petlog/pkg/contextx"
 )
@@ -39,8 +40,22 @@ func encodeResponse(c context.Context, w http.ResponseWriter, response interface
 // encodeError is a custom error encoder.
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	// TODO: Map domain errors to HTTP status codes
-	w.WriteHeader(http.StatusInternalServerError)
+
+	// 根據 domain error 對應正確的 HTTP status code
+	status := http.StatusInternalServerError
+
+	// domain error mapping
+	if domain.IsNotFound(err) {
+		status = http.StatusNotFound // 404
+	} else if domain.IsInvalidID(err) || domain.IsInvalidParameter(err) {
+		status = http.StatusBadRequest // 400
+	} else if domain.IsDuplicateEntry(err) {
+		status = http.StatusConflict // 409
+	} else if domain.IsUpdateConflict(err) {
+		status = http.StatusConflict // 409
+	}
+
+	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"error": err.Error(),
 	})

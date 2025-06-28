@@ -50,7 +50,7 @@ func (r *MedicalRecordRepositoryImpl) Create(c context.Context, record *model.Me
 	result, err := r.collection().InsertOne(ctx, doc)
 	if err != nil {
 		ctx.Error("建立醫療記錄失敗", "error", err, "pet_id", record.PetID)
-		return fmt.Errorf("建立醫療記錄失敗: %w", err)
+		return convertMongoError(err)
 	}
 
 	if oid, ok := result.InsertedID.(bson.ObjectID); ok {
@@ -82,7 +82,7 @@ func (r *MedicalRecordRepositoryImpl) FindByID(c context.Context, id string) (*m
 			return nil, domain.ErrNotFound
 		}
 		ctx.Error("查找醫療記錄時發生錯誤", "error", err, "record_id", id)
-		return nil, fmt.Errorf("查找醫療記錄失敗: %w", err)
+		return nil, convertMongoError(err)
 	}
 
 	record := doc.toDomain()
@@ -147,7 +147,7 @@ func (r *MedicalRecordRepositoryImpl) Update(c context.Context, record *model.Me
 	result, err := r.collection().UpdateOne(ctx, filter, update)
 	if err != nil {
 		ctx.Error("更新醫療記錄失敗", "error", err, "record_id", record.ID)
-		return fmt.Errorf("更新醫療記錄失敗: %w", err)
+		return convertMongoError(err)
 	}
 
 	if result.MatchedCount == 0 {
@@ -175,7 +175,7 @@ func (r *MedicalRecordRepositoryImpl) Delete(c context.Context, id string) error
 	result, err := r.collection().DeleteOne(ctx, filter)
 	if err != nil {
 		ctx.Error("刪除醫療記錄失敗", "error", err, "record_id", id)
-		return fmt.Errorf("刪除醫療記錄失敗: %w", err)
+		return convertMongoError(err)
 	}
 
 	if result.DeletedCount == 0 {
