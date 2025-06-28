@@ -53,16 +53,6 @@ const navigation = [
     icon: BarChart3,
   },
   {
-    name: "匯出資料",
-    href: "/export",
-    icon: Upload,
-  },
-  {
-    name: "分享",
-    href: "/share",
-    icon: Share2,
-  },
-  {
     name: "設定",
     href: "/settings",
     icon: Settings,
