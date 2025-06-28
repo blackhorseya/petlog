@@ -51,7 +51,7 @@ runs:
     # 部署到 AWS Lambda
     - name: 使用 Serverless Framework 部署
       run: |
-        sls deploy --stage ${{ inputs.stage }} --region ${{ inputs.aws-region }}
+        sls deploy --stage ${{ inputs.stage }} --region ${{ inputs.aws-region }} --conceal
       env:
         SERVERLESS_ACCESS_KEY: ${{ inputs.serverless-access-key }}
       shell: bash
