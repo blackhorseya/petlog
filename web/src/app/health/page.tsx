@@ -161,8 +161,10 @@ export default function HealthPage() {
             <thead>
               <tr className="bg-muted">
                 <th className="px-4 py-2 border">日期</th>
-                <th className="px-4 py-2 border">行為</th>
-                <th className="px-4 py-2 border">備註</th>
+                <th className="px-4 py-2 border">體重 (kg)</th>
+                <th className="px-4 py-2 border">食物攝取 (g)</th>
+                <th className="px-4 py-2 border">行為備註</th>
+                <th className="px-4 py-2 border">排泄備註</th>
                 <th className="px-4 py-2 border">操作</th>
               </tr>
             </thead>
@@ -170,6 +172,12 @@ export default function HealthPage() {
               {healthLogsData.health_logs.map((log) => (
                 <tr key={log.id} className="hover:bg-accent">
                   <td className="px-4 py-2 border">{log.date.slice(0, 10)}</td>
+                  <td className="px-4 py-2 border">
+                    {log.weight_kg ? `${log.weight_kg} kg` : "-"}
+                  </td>
+                  <td className="px-4 py-2 border">
+                    {log.food_gram ? `${log.food_gram} g` : "-"}
+                  </td>
                   <td className="px-4 py-2 border">
                     {log.behaviour_notes || "-"}
                   </td>
