@@ -1,23 +1,19 @@
 "use client";
 
 import { useUser } from "@auth0/nextjs-auth0";
-import { Heart, Plus, Calendar, TrendingUp, Table } from "lucide-react";
+import { Heart, Plus, Calendar } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { usePets } from "@/hooks/use-pets";
 import { useHealthLogs } from "@/hooks/use-health-logs";
-import { HealthTrendsCharts, HealthSummaryCards } from "@/components/health-logs";
 import { useState, useEffect } from "react";
 import { deleteHealthLog } from "@/lib/api/health-log";
 import { useQueryClient } from "@tanstack/react-query";
-
-type ViewType = 'logs' | 'trends';
 
 export default function HealthPage() {
   const { user, isLoading: userLoading } = useUser();
   const { data: pets, isLoading: petsLoading } = usePets();
   const [selectedPetId, setSelectedPetId] = useState<string>("");
-  const [activeView, setActiveView] = useState<ViewType>('logs');
   const queryClient = useQueryClient();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -55,11 +51,6 @@ export default function HealthPage() {
   function handleEdit(logId: string) {
     alert(`點擊編輯：${logId}（可擴充為 modal 編輯表單）`);
   }
-
-  // 獲取選中寵物的名稱
-  const selectedPet = Array.isArray(pets) 
-    ? pets.find(pet => pet.id === selectedPetId) 
-    : null;
 
   if (userLoading || petsLoading) {
     return (
@@ -108,8 +99,53 @@ export default function HealthPage() {
     );
   }
 
-  const renderLogsView = () => (
-    <>
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">健康記錄</h1>
+          <p className="text-muted-foreground">
+            追蹤寵物的體重、飲食、行為等健康指標
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button asChild disabled={!selectedPetId}>
+            <Link href="/health/new">
+              <Plus className="mr-2 h-4 w-4" />
+              新增記錄
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {Array.isArray(pets) && pets.length > 0 && (
+        <div className="max-w-xs">
+          <label
+            htmlFor="pet-select"
+            className="block text-sm font-medium mb-1"
+          >
+            選擇寵物
+          </label>
+          <select
+            id="pet-select"
+            value={selectedPetId}
+            onChange={handlePetChange}
+            className="block w-full border border-input rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
+          >
+            {!selectedPetId && (
+              <option value="" disabled>
+                請選擇寵物
+              </option>
+            )}
+            {pets.map((pet) => (
+              <option key={pet.id} value={pet.id}>
+                {pet.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {logsLoading ? (
         <div className="flex h-32 items-center justify-center">
           <div className="h-6 w-6 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -190,96 +226,6 @@ export default function HealthPage() {
           </Button>
         </div>
       )}
-    </>
-  );
-
-  const renderTrendsView = () => (
-    <div className="space-y-6">
-      <HealthSummaryCards petName={selectedPet?.name} />
-      <HealthTrendsCharts petName={selectedPet?.name} />
-    </div>
-  );
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">健康記錄</h1>
-          <p className="text-muted-foreground">
-            追蹤寵物的體重、飲食、行為等健康指標
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button asChild disabled={!selectedPetId}>
-            <Link href="/health/new">
-              <Plus className="mr-2 h-4 w-4" />
-              新增記錄
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      {Array.isArray(pets) && pets.length > 0 && (
-        <div className="max-w-xs">
-          <label
-            htmlFor="pet-select"
-            className="block text-sm font-medium mb-1"
-          >
-            選擇寵物
-          </label>
-          <select
-            id="pet-select"
-            value={selectedPetId}
-            onChange={handlePetChange}
-            className="block w-full border border-input rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-          >
-            {!selectedPetId && (
-              <option value="" disabled>
-                請選擇寵物
-              </option>
-            )}
-            {pets.map((pet) => (
-              <option key={pet.id} value={pet.id}>
-                {pet.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {/* 視圖切換標籤 */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveView('logs')}
-            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-              activeView === 'logs'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            <Table className="h-4 w-4" />
-            健康記錄列表
-          </button>
-          <button
-            onClick={() => setActiveView('trends')}
-            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-              activeView === 'trends'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            <TrendingUp className="h-4 w-4" />
-            健康趨勢分析
-          </button>
-        </nav>
-      </div>
-
-      {/* 內容區域 */}
-      <div className="mt-6">
-        {activeView === 'logs' && renderLogsView()}
-        {activeView === 'trends' && renderTrendsView()}
-      </div>
     </div>
   );
 }
