@@ -4,47 +4,28 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MedicalRecordCard } from "./medical-record-card";
 import { MedicalRecordModal } from "./medical-record-modal";
-
-// 暫時的類型定義，等後端 API 定義完成後會替換
-export type MedicalRecordType = 
-  | "vaccination"
-  | "deworming" 
-  | "medication"
-  | "vet_visit"
-  | "other";
-
-export const MedicalRecordTypeLabels: Record<MedicalRecordType, string> = {
-  vaccination: "疫苗接種",
-  deworming: "驅蟲",
-  medication: "用藥",
-  vet_visit: "獸醫門診",
-  other: "其他",
-};
-
-export interface MedicalRecord {
-  id: string;
-  pet_id: string;
-  type: MedicalRecordType;
-  description: string;
-  date: string;
-  next_due_date?: string;
-  dosage?: string;
-}
+import { 
+  MedicalRecordTypeLabels,
+  type MedicalRecord,
+  type MedicalRecordType,
+} from "@/lib/types/medical-record";
+import { useMedicalRecordManager } from "@/hooks/use-medical-records";
 import { Plus, Filter, Calendar, FileX } from "lucide-react";
 
 interface MedicalRecordListProps {
   petId: string;
-  records: MedicalRecord[];
-  loading?: boolean;
-  onRefresh?: () => void;
 }
 
 export function MedicalRecordList({
   petId,
-  records,
-  loading = false,
-  onRefresh,
 }: MedicalRecordListProps) {
+  // 使用 API 管理 hook
+  const {
+    medicalRecords: records,
+    loading,
+    error,
+    refresh: onRefresh,
+  } = useMedicalRecordManager(petId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<MedicalRecord | null>(null);
   const [filterType, setFilterType] = useState<MedicalRecordType | "all">("all");
@@ -104,6 +85,21 @@ export function MedicalRecordList({
     handleCloseModal();
     onRefresh?.();
   };
+
+  // 錯誤處理
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-red-600 mb-4">
+          <p className="font-medium">載入醫療紀錄時發生錯誤</p>
+          <p className="text-sm">{error}</p>
+        </div>
+        <Button onClick={onRefresh} variant="outline">
+          重新載入
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

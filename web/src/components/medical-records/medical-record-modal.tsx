@@ -6,33 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-
-// 暫時的類型定義，等後端 API 定義完成後會替換
-type MedicalRecordType = 
-  | "vaccination"
-  | "deworming" 
-  | "medication"
-  | "vet_visit"
-  | "other";
-
-interface MedicalRecord {
-  id: string;
-  pet_id: string;
-  type: MedicalRecordType;
-  description: string;
-  date: string;
-  next_due_date?: string;
-  dosage?: string;
-}
-
-interface MedicalRecordFormData {
-  pet_id: string;
-  type: MedicalRecordType;
-  description: string;
-  date: string;
-  next_due_date?: string;
-  dosage?: string;
-}
+import { 
+  type MedicalRecord,
+  type MedicalRecordFormData,
+} from "@/lib/types/medical-record";
+import { 
+  useCreateMedicalRecord,
+  useUpdateMedicalRecord,
+  useDeleteMedicalRecord,
+} from "@/hooks/use-medical-records";
 
 interface MedicalRecordModalProps {
   isOpen: boolean;
@@ -50,53 +32,46 @@ export function MedicalRecordModal({
   onSuccess,
 }: MedicalRecordModalProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
+  
+  // 使用 API hooks
+  const { create, loading: createLoading } = useCreateMedicalRecord();
+  const { update, loading: updateLoading } = useUpdateMedicalRecord();
+  const { remove, loading: deleteLoading } = useDeleteMedicalRecord();
 
   const isEditing = !!editingRecord;
+  const loading = createLoading || updateLoading || deleteLoading;
 
   const handleSubmit = async (data: MedicalRecordFormData) => {
-    setLoading(true);
     try {
-      // TODO: 等後端 API 完成後，這裡會實際呼叫 API
-      console.log('醫療記錄資料:', data);
-      
-      // 模擬 API 延遲
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (isEditing) {
+      if (isEditing && editingRecord) {
+        await update(editingRecord.id, data);
         toast.success('醫療記錄更新成功！');
       } else {
+        await create(data);
         toast.success('醫療記錄建立成功！');
       }
       
       onSuccess?.();
     } catch (error) {
-      console.error('Form submission error:', error);
-      toast.error('操作失敗，請稍後重試');
-    } finally {
-      setLoading(false);
+      // 錯誤已經在 hook 中處理，這裡只需要顯示通用錯誤訊息
+      if (isEditing) {
+        toast.error('更新醫療記錄失敗，請稍後重試');
+      } else {
+        toast.error('建立醫療記錄失敗，請稍後重試');
+      }
     }
   };
 
   const handleDelete = async () => {
     if (!editingRecord) return;
     
-    setLoading(true);
     try {
-      // TODO: 等後端 API 完成後，這裡會實際呼叫刪除 API
-      console.log('刪除醫療記錄:', editingRecord.id);
-      
-      // 模擬 API 延遲
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await remove(editingRecord.id);
       toast.success('醫療記錄已成功刪除');
       setShowDeleteConfirm(false);
       onSuccess?.();
     } catch (error) {
-      console.error('Delete error:', error);
-      toast.error('刪除失敗，請稍後重試');
-    } finally {
-      setLoading(false);
+      toast.error('刪除醫療記錄失敗，請稍後重試');
     }
   };
 
