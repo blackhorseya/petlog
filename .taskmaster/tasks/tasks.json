@@ -308,7 +308,7 @@
               3
             ],
             "details": "在每個 Repository 實作中添加基於游標的分頁功能、多條件過濾（如日期範圍、類型、狀態等）和排序功能。確保這些功能適用於所有三個模型（Pet、HealthLog 和 MedicalRecord）。\n\n1. 分頁功能：\n   - 實作 `FindWithPagination` 方法，支援基於游標的分頁\n   - 支援設定每頁記錄數量\n   - 提供獲取下一頁的游標機制\n\n2. 過濾功能：\n   - 實作 `FindWithFilters` 方法，支援多條件組合查詢\n   - 支援日期範圍過濾（如建立時間、更新時間）\n   - 支援狀態、類型等欄位的精確匹配和模糊查詢\n\n3. 排序功能：\n   - 支援單欄位和多欄位排序\n   - 支援升序和降序排序\n   - 與分頁和過濾功能整合",
-            "status": "pending",
+            "status": "deferred",
             "testStrategy": "編寫整合測試，驗證進階查詢功能在實際 MongoDB 環境中的正確性。測試應包括：\n1. 分頁功能測試：驗證結果集大小、游標行為、邊界條件\n2. 過濾功能測試：測試單一條件和多條件組合、日期範圍、模糊查詢\n3. 排序功能測試：驗證單欄位和多欄位排序、升序和降序排序\n4. 組合功能測試：同時使用分頁、過濾和排序"
           },
           {
@@ -322,7 +322,7 @@
               4
             ],
             "details": "1. 錯誤處理：\n   - 確保所有 Repository 一致地使用 `internal/domain/errors.go` 中定義的標準化錯誤\n   - 實作錯誤轉換層，將 MongoDB 特定錯誤轉換為領域錯誤\n   - 提供詳細的錯誤訊息，便於除錯\n\n2. 日誌記錄：\n   - 在所有 Repository 方法中添加結構化日誌\n   - 記錄操作類型、參數、結果和執行時間\n   - 使用適當的日誌等級（Info, Warn, Error）\n\n3. 效能最佳化：\n   - 實作批次操作支援（批次插入、更新、刪除）\n   - 最佳化查詢（使用投影、限制返回欄位）\n   - 建立適當的索引以提高查詢效能\n   - 實作連線池管理和重用\n\n4. 索引管理：\n   - 為每個集合定義必要的索引\n   - 實作索引初始化和更新機制\n   - 記錄索引創建和使用情況",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "1. 效能測試：\n   - 對批次操作進行基準測試\n   - 測試大數據集下的查詢效能\n   - 比較有索引和無索引的查詢效能差異\n\n2. 錯誤處理測試：\n   - 模擬各種錯誤情境（連線失敗、超時、無效輸入等）\n   - 驗證錯誤轉換的正確性\n   - 測試錯誤恢復機制\n\n3. 負載測試：\n   - 測試高並發下的 Repository 行為\n   - 驗證連線池管理的效能\n   - 測試長時間運行下的穩定性"
           },
           {
@@ -432,7 +432,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "deferred",
         "subtasks": []
       },
       {
@@ -698,14 +698,14 @@
           5,
           6
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
         "id": 18,
         "title": "Implement API Documentation",
         "description": "Create comprehensive API documentation using OpenAPI/Swagger. [Updated: 6/23/2025]",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           4,
           5,
@@ -719,19 +719,19 @@
             "id": "18.1",
             "title": "Verify pet management API documentation",
             "description": "Review the Swagger documentation generated for pet management endpoints to ensure accuracy and completeness.",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": "18.2",
             "title": "Configure and deploy Swagger UI",
             "description": "Set up Swagger UI to provide interactive documentation for the API endpoints.",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": "18.3",
             "title": "Add Swagger annotations to remaining endpoints",
             "description": "Extend the Swagger documentation to cover all API endpoints beyond pet management.",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
@@ -997,7 +997,7 @@
         "id": 22,
         "title": "Implement Health Log API Endpoints",
         "description": "Implement backend API for the Health Log feature, including handlers in internal/usecase, internal/endpoint, and internal/transport/gin to provide a fully functional POST /api/v1/health-logs endpoint. This task also includes generating Swagger API documentation for the new endpoint.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           4,
           5,
@@ -1207,7 +1207,7 @@
         "id": 30,
         "title": "實作 Dashboard Overview Endpoint 與 Transport (後端)",
         "description": "建立 endpoint 與 Gin handler，串接 usecase，註冊 /api/v1/dashboard/overview 路由，並加上 Swagger 註解。",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           29
         ],
@@ -1314,7 +1314,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-28T02:15:46.154Z",
+      "updated": "2025-06-28T02:24:26.225Z",
       "description": "Tasks for master context"
     }
   }
