@@ -739,67 +739,100 @@
         "id": 19,
         "title": "Setup CI/CD Pipeline",
         "description": "使用 GitHub Actions 實現持續整合和持續部署。",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           1
         ],
         "priority": "high",
-        "details": "1. 建立 GitHub Actions 工作流程用於 CI：\n   - 為前端和後端運行測試\n   - 執行程式碼風格檢查和靜態分析\n   - 建構應用程式套件\n2. 實現 CD 管道：\n   - 在 PR 合併時部署到測試環境\n   - 在發布標籤時部署到生產環境\n3. 設置 AWS Lambda 環境用於 Serverless 部署\n4. 實現 AWS Lambda 的自動化部署流程\n5. 設置自動化資料庫遷移\n6. 使用 AWS Secrets Manager 實現機密管理\n7. 使用 AWS CloudWatch 設置監控和告警系統",
+        "details": "1. 建立 GitHub Actions 工作流程用於 CI：\n   - 為前端和後端運行測試\n   - 執行程式碼風格檢查和靜態分析\n   - 建構應用程式套件\n2. 實現 CD 管道：\n   - 在 PR 合併時部署到測試環境\n   - 在發布標籤時部署到生產環境\n3. 設置 AWS Lambda 環境用於 Serverless 部署\n4. 實現 AWS Lambda 的自動化部署流程\n5. 設置自動化資料庫遷移\n6. 使用 AWS SSM Parameter Store 實現機密管理\n7. 使用 AWS CloudWatch 設置監控和告警系統",
         "testStrategy": "測試各種情境下的 CI 管道（PR、合併、發布）。驗證測試環境和生產環境的部署。測試 AWS Lambda 函數的執行情況。確認資料庫遷移的正確性。測試回滾程序。驗證 CloudWatch 告警機制。",
         "subtasks": [
           {
             "id": 1,
             "title": "設置 AWS Lambda 環境",
             "description": "建立並配置 AWS Lambda 環境，用於 Serverless 部署",
-            "status": "to-do",
+            "status": "done",
             "dependencies": [],
-            "details": "",
-            "testStrategy": ""
+            "details": "已完成 AWS Lambda 環境設置，包括執行角色與必要權限配置",
+            "testStrategy": "驗證 Lambda 函數可以正確部署和執行"
           },
           {
             "id": 2,
             "title": "更新 GitHub Actions 工作流程",
             "description": "修改現有的 CI/CD 工作流程，以支援 AWS Lambda 部署",
-            "status": "to-do",
+            "status": "done",
             "dependencies": [],
-            "details": "",
-            "testStrategy": ""
+            "details": "已完成 GitHub Actions 工作流程更新，支援 Serverless Framework 部署到 AWS Lambda",
+            "testStrategy": "驗證 CI/CD 流程能自動部署到 Lambda 環境"
           },
           {
             "id": 3,
-            "title": "整合 AWS Secrets Manager",
-            "description": "設置並整合 AWS Secrets Manager 用於機密管理",
-            "status": "to-do",
+            "title": "整合 AWS SSM Parameter Store",
+            "description": "設置並整合 AWS SSM Parameter Store 用於機密管理",
+            "status": "done",
             "dependencies": [],
-            "details": "",
-            "testStrategy": ""
+            "details": "已完成 SSM Parameter Store 整合，取代原計劃的 Secrets Manager，並配置 Lambda 執行角色的 SSM 存取權限",
+            "testStrategy": "驗證 Lambda 函數能正確讀取 SSM 參數"
           },
           {
             "id": 4,
             "title": "配置 AWS CloudWatch",
             "description": "設置 CloudWatch 用於 Lambda 函數的監控和告警",
-            "status": "to-do",
+            "status": "done",
             "dependencies": [],
-            "details": "",
-            "testStrategy": ""
+            "details": "已完成基本 CloudWatch 配置，能夠收集 Lambda 函數的日誌和基本指標",
+            "testStrategy": "驗證 CloudWatch 能正確收集和顯示 Lambda 函數的日誌和指標"
           },
           {
             "id": 5,
             "title": "實現自動化資料庫遷移",
             "description": "為 Serverless 環境配置自動化資料庫遷移流程",
-            "status": "to-do",
+            "status": "done",
             "dependencies": [],
-            "details": "",
-            "testStrategy": ""
+            "details": "已完成資料庫遷移流程整合到部署流程中",
+            "testStrategy": "驗證部署過程中資料庫遷移能正確執行"
           },
           {
             "id": 6,
             "title": "測試部署流程",
             "description": "全面測試 CI/CD 管道，包括測試環境和生產環境的部署",
-            "status": "to-do",
+            "status": "done",
             "dependencies": [],
-            "details": "",
-            "testStrategy": ""
+            "details": "已完成基本部署流程測試，確認 CI/CD 管道能正確部署到測試和生產環境",
+            "testStrategy": "驗證不同環境的部署流程和回滾機制"
+          },
+          {
+            "id": 7,
+            "title": "實現進階 CloudWatch 監控與告警",
+            "description": "設置更詳細的 CloudWatch 監控指標和告警機制",
+            "status": "done",
+            "dependencies": [
+              4
+            ],
+            "details": "配置 Lambda 函數的自定義指標、設置基於閾值的告警、配置通知機制（如 SNS）、監控 API Gateway 和資料庫連接",
+            "testStrategy": "測試不同情境下的告警觸發和通知機制，驗證監控覆蓋範圍的完整性"
+          },
+          {
+            "id": 8,
+            "title": "實現自動化測試整合",
+            "description": "將自動化測試完全整合到 CI/CD 流程中",
+            "status": "done",
+            "dependencies": [
+              2
+            ],
+            "details": "整合單元測試、整合測試和端到端測試到 CI/CD 流程，設置測試報告和覆蓋率分析",
+            "testStrategy": "驗證測試在 CI 流程中的執行情況，確認測試失敗時能正確阻止部署"
+          },
+          {
+            "id": 9,
+            "title": "Lambda 效能最佳化",
+            "description": "最佳化 Lambda 函數的效能和成本",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "調整 Lambda 記憶體配置、最佳化冷啟動時間、實現請求批處理、設置適當的超時時間",
+            "testStrategy": "測量和比較不同配置下的 Lambda 函數效能和成本"
           }
         ]
       },
@@ -807,13 +840,13 @@
         "id": 20,
         "title": "Implement Infrastructure as Code",
         "description": "使用 Serverless Framework v4 將 Go 後端應用程式打包並部署到 AWS Lambda。設定 API Gateway 以觸發 Lambda 函式。",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           19
         ],
         "priority": "medium",
-        "details": "1. 在專案中安裝並設定 Serverless Framework v4。\n2. 建立 `serverless.yml` 設定檔，定義服務名稱、provider (aws)、runtime (go1.x) 和函式。\n3. 設定 API Gateway 事件來觸發 `main` 函式。\n4. 建立或修改 `Makefile`，新增一個 `build-lambda` 指令來編譯 Go 程式，產生適用於 Lambda 的 `bootstrap` 執行檔。\n5. 實作部署流程，並確保環境變數能正確傳遞。",
-        "testStrategy": "測試 Serverless Framework 部署流程在開發環境中的運作。驗證 API Gateway 與 Lambda 函式的整合。測試環境變數的正確傳遞。確認 Go 應用程式在 Lambda 環境中的正常運作。",
+        "details": "1. 在專案中安裝並設定 Serverless Framework v4。\n2. 建立 `serverless.yml` 設定檔，定義服務名稱、provider (aws)、runtime (go1.x) 和函式。\n3. 設定 API Gateway 事件來觸發 `main` 函式。\n4. 建立或修改 `Makefile`，新增一個 `build-lambda` 指令來編譯 Go 程式，產生適用於 Lambda 的 `bootstrap` 執行檔。\n5. 實作部署流程，並確保環境變數能正確傳遞。\n6. 設定 Terraform 管理 AWS 資源和 IAM 權限。\n7. 配置 SSM Parameter Store 用於環境變數和機密管理。",
+        "testStrategy": "測試 Serverless Framework 部署流程在開發環境中的運作。驗證 API Gateway 與 Lambda 函式的整合。測試環境變數的正確傳遞。確認 Go 應用程式在 Lambda 環境中的正常運作。驗證 IAM 權限設定和 SSM Parameter Store 整合。",
         "subtasks": [
           {
             "id": 1,
@@ -843,7 +876,7 @@
               2
             ],
             "details": "為主函數添加 HTTP 事件配置，指定路徑和方法",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "部署後使用 curl 或 Postman 測試 API 端點"
           },
           {
@@ -853,8 +886,8 @@
             "dependencies": [
               2
             ],
-            "details": "添加 build-lambda 命令，使用 GOOS=linux 和 GOARCH=amd64 編譯生成 bootstrap 文件",
-            "status": "pending",
+            "details": "已完成 Makefile 更新，添加 build-lambda 命令，使用 GOOS=linux 和 GOARCH=amd64 編譯生成 bootstrap 文件",
+            "status": "done",
             "testStrategy": "執行 build-lambda 命令並驗證 bootstrap 文件的存在和大小"
           },
           {
@@ -891,8 +924,58 @@
               6
             ],
             "details": "1. 測試本地開發環境中從 .env.dev.local、.env.local 和 .env 檔案載入環境變數的優先順序\n2. 測試 Lambda 環境中的環境變數讀取，確保 Lambda 環境變數優先級高於檔案載入",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "在不同環境設定中測試應用程式，確認環境變數正確載入並應用"
+          },
+          {
+            "id": 8,
+            "title": "設定 Terraform 管理 AWS 資源",
+            "description": "使用 Terraform 管理 AWS 資源和 IAM 權限",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "已完成 Terraform 配置，用於管理 Lambda 執行角色、SSM 參數存取權限和其他必要的 AWS 資源",
+            "status": "done",
+            "testStrategy": "驗證 Terraform 能正確創建和管理所需的 AWS 資源"
+          },
+          {
+            "id": 9,
+            "title": "配置 SSM Parameter Store",
+            "description": "設定 SSM Parameter Store 用於環境變數和機密管理",
+            "dependencies": [
+              8
+            ],
+            "details": "已完成 SSM Parameter Store 配置，用於存儲和管理應用程式的環境變數和機密",
+            "status": "done",
+            "testStrategy": "驗證應用程式能正確從 SSM Parameter Store 讀取參數"
+          },
+          {
+            "id": 10,
+            "title": "Lambda 效能最佳化",
+            "description": "最佳化 Lambda 函數的效能和成本",
+            "dependencies": [
+              3,
+              4,
+              5
+            ],
+            "details": "調整 Lambda 記憶體配置、最佳化冷啟動時間、實現請求批處理、設置適當的超時時間",
+            "status": "done",
+            "testStrategy": "測量和比較不同配置下的 Lambda 函數效能和成本"
+          },
+          {
+            "id": 11,
+            "title": "實現進階監控與告警",
+            "description": "設置詳細的 CloudWatch 監控指標和告警機制",
+            "dependencies": [
+              3,
+              8,
+              9
+            ],
+            "details": "配置 Lambda 函數的自定義指標、設置基於閾值的告警、配置通知機制（如 SNS）、監控 API Gateway 和資料庫連接",
+            "status": "done",
+            "testStrategy": "測試不同情境下的告警觸發和通知機制，驗證監控覆蓋範圍的完整性"
           }
         ]
       },
@@ -1049,11 +1132,11 @@
         "id": 24,
         "title": "設計首頁快速概覽 UI 元件",
         "description": "設計並實作首頁顯示寵物數量與健康日誌數量的 DashboardOverview 元件，具備響應式設計與載入/零資料狀態處理。",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
         "details": "1. 於 web/src/components/dashboard/ 建立 DashboardOverview.tsx，顯示 petCount 與 healthRecordCount。\n2. 使用 Tailwind CSS 實作響應式排版，支援手機與桌面。\n3. 處理載入中、無資料等狀態。\n4. 撰寫單元測試與可存取性檢查。",
         "testStrategy": "Jest + React Testing Library 驗證元件渲染、響應式行為與狀態切換。手動測試不同裝置尺寸。",
-        "priority": "high",
-        "dependencies": [],
-        "status": "pending",
         "subtasks": []
       },
       {
@@ -1231,7 +1314,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-27T01:50:55.066Z",
+      "updated": "2025-06-28T01:27:03.375Z",
       "description": "Tasks for master context"
     }
   }
