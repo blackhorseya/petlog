@@ -22,6 +22,43 @@ export default function MedicalRecordsPage() {
     loading: medicalRecordsLoading 
   } = useMedicalRecords({ pet_id: selectedPetId || "" });
 
+  // 計算統計資料 - 基於當前選中的寵物（必須在條件性 return 之前呼叫）
+  const stats = useMemo(() => {
+    if (!selectedPetId || !medicalRecords || medicalRecords.length === 0) {
+      return {
+        totalRecords: 0,
+        upcomingRecords: 0,
+        overdueRecords: 0,
+        recentRecords: 0,
+      };
+    }
+
+    return {
+      totalRecords: medicalRecords.length,
+      upcomingRecords: medicalRecords.filter(record => {
+        if (!record.next_due_date) return false;
+        const nextDue = new Date(record.next_due_date);
+        const now = new Date();
+        const diffDays = Math.ceil((nextDue.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        return diffDays <= 7 && diffDays >= 0;
+      }).length,
+      overdueRecords: medicalRecords.filter(record => {
+        if (!record.next_due_date) return false;
+        const nextDue = new Date(record.next_due_date);
+        const now = new Date();
+        return nextDue < now;
+      }).length,
+      recentRecords: medicalRecords.filter(record => {
+        const recordDate = new Date(record.date);
+        const now = new Date();
+        const diffDays = Math.ceil((now.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24));
+        return diffDays <= 30; // 30天內的記錄
+      }).length,
+    };
+  }, [selectedPetId, medicalRecords]);
+
+  const selectedPet = pets.find(pet => pet.id === selectedPetId);
+
   if (userLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -62,43 +99,6 @@ export default function MedicalRecordsPage() {
       </div>
     );
   }
-
-  // 計算統計資料 - 基於當前選中的寵物
-  const stats = useMemo(() => {
-    if (!selectedPetId || !medicalRecords || medicalRecords.length === 0) {
-      return {
-        totalRecords: 0,
-        upcomingRecords: 0,
-        overdueRecords: 0,
-        recentRecords: 0,
-      };
-    }
-
-    return {
-      totalRecords: medicalRecords.length,
-      upcomingRecords: medicalRecords.filter(record => {
-        if (!record.next_due_date) return false;
-        const nextDue = new Date(record.next_due_date);
-        const now = new Date();
-        const diffDays = Math.ceil((nextDue.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        return diffDays <= 7 && diffDays >= 0;
-      }).length,
-      overdueRecords: medicalRecords.filter(record => {
-        if (!record.next_due_date) return false;
-        const nextDue = new Date(record.next_due_date);
-        const now = new Date();
-        return nextDue < now;
-      }).length,
-      recentRecords: medicalRecords.filter(record => {
-        const recordDate = new Date(record.date);
-        const now = new Date();
-        const diffDays = Math.ceil((now.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24));
-        return diffDays <= 30; // 30天內的記錄
-      }).length,
-    };
-  }, [selectedPetId, medicalRecords]);
-
-  const selectedPet = pets.find(pet => pet.id === selectedPetId);
 
   return (
     <div className="space-y-6">

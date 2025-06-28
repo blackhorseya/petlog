@@ -24,6 +24,7 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 		mongodb.ProviderSet,
 		mongodb.NewPetMongoRepo,
 		mongodb.NewHealthLogRepository,
+		mongodb.NewMedicalRecordRepository,
 
 		// Pet 用例處理器
 		command.NewCreatePetHandler,
@@ -39,6 +40,13 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 		query.NewGetHealthLogByIDHandler,
 		query.NewListHealthLogsByPetHandler,
 
+		// MedicalRecord 用例處理器
+		command.NewCreateMedicalRecordHandler,
+		command.NewUpdateMedicalRecordHandler,
+		command.NewDeleteMedicalRecordHandler,
+		query.NewGetMedicalRecordByIDHandler,
+		query.NewListMedicalRecordsByPetHandler,
+
 		// Dashboard 用例處理器
 		query.NewGetDashboardOverviewHandler,
 
@@ -50,6 +58,9 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 
 		// Dashboard 端點層
 		endpoint.NewDashboardEndpoints,
+
+		// MedicalRecord 端點層
+		endpoint.MakeMedicalRecordEndpoints,
 
 		// Transport層
 		gin.NewGinEngine,

@@ -97,10 +97,17 @@ func (r *MedicalRecordRepositoryImpl) FindByPetID(c context.Context, petID strin
 
 	filter := bson.M{
 		"pet_id": petID,
-		"date": bson.M{
-			"$gte": startDate,
-			"$lte": endDate,
-		},
+	}
+
+	dateCond := bson.M{}
+	if !startDate.IsZero() {
+		dateCond["$gte"] = startDate
+	}
+	if !endDate.IsZero() {
+		dateCond["$lte"] = endDate
+	}
+	if len(dateCond) > 0 {
+		filter["date"] = dateCond
 	}
 
 	cursor, err := r.collection().Find(ctx, filter)

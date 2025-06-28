@@ -51,8 +51,19 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 	healthLogEndpoints := endpoint.ProvideHealthLogEndpoints(createHealthLogHandler, updateHealthLogHandler, deleteHealthLogHandler, getHealthLogByIDHandler, listHealthLogsByPetHandler)
 	getDashboardOverviewHandler := query.NewGetDashboardOverviewHandler(petRepository, healthLogRepository)
 	dashboardEndpoints := endpoint.NewDashboardEndpoints(getDashboardOverviewHandler)
+	medicalRecordRepository, err := mongodb.NewMedicalRecordRepository(database)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	createMedicalRecordHandler := command.NewCreateMedicalRecordHandler(medicalRecordRepository)
+	updateMedicalRecordHandler := command.NewUpdateMedicalRecordHandler(medicalRecordRepository)
+	deleteMedicalRecordHandler := command.NewDeleteMedicalRecordHandler(medicalRecordRepository)
+	getMedicalRecordByIDHandler := query.NewGetMedicalRecordByIDHandler(medicalRecordRepository)
+	listMedicalRecordsByPetHandler := query.NewListMedicalRecordsByPetHandler(medicalRecordRepository)
+	medicalRecordEndpoints := endpoint.MakeMedicalRecordEndpoints(createMedicalRecordHandler, updateMedicalRecordHandler, deleteMedicalRecordHandler, getMedicalRecordByIDHandler, listMedicalRecordsByPetHandler)
 	v := _wireValue
-	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, healthLogEndpoints, dashboardEndpoints, v)
+	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, healthLogEndpoints, dashboardEndpoints, medicalRecordEndpoints, v)
 	return handler, func() {
 		cleanup()
 	}, nil

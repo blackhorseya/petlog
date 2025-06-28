@@ -32,8 +32,11 @@ export function MedicalRecordList({
   const [sortBy, setSortBy] = useState<"date" | "type">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+  // 確保 records 有預設值，避免 undefined 錯誤
+  const safeRecords = records || [];
+
   // 過濾和排序記錄
-  const filteredAndSortedRecords = records
+  const filteredAndSortedRecords = safeRecords
     .filter((record) => filterType === "all" || record.type === filterType)
     .sort((a, b) => {
       if (sortBy === "date") {
@@ -50,7 +53,7 @@ export function MedicalRecordList({
     });
 
   // 獲取即將到期的記錄
-  const upcomingRecords = records.filter((record) => {
+  const upcomingRecords = safeRecords.filter((record) => {
     if (!record.next_due_date) return false;
     const nextDue = new Date(record.next_due_date);
     const now = new Date();
@@ -59,7 +62,7 @@ export function MedicalRecordList({
   });
 
   // 獲取已過期的記錄
-  const overdueRecords = records.filter((record) => {
+  const overdueRecords = safeRecords.filter((record) => {
     if (!record.next_due_date) return false;
     const nextDue = new Date(record.next_due_date);
     const now = new Date();
@@ -205,7 +208,7 @@ export function MedicalRecordList({
       {filteredAndSortedRecords.length > 0 && (
         <div className="text-sm text-gray-500 text-center">
           {filterType === "all" 
-            ? `共 ${records.length} 筆醫療記錄`
+            ? `共 ${safeRecords.length} 筆醫療記錄`
             : `共 ${filteredAndSortedRecords.length} 筆${MedicalRecordTypeLabels[filterType as MedicalRecordType]}記錄`
           }
         </div>
