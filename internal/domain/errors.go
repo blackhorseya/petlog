@@ -21,3 +21,30 @@ var (
 	// ErrInvalidParameter is returned when a parameter is invalid.
 	ErrInvalidParameter = errors.New("invalid parameter provided")
 )
+
+// Helper functions for error type checking
+
+// IsNotFound 檢查是否為資源不存在錯誤
+func IsNotFound(err error) bool {
+	return errors.Is(err, ErrNotFound)
+}
+
+// IsDuplicateEntry 檢查是否為重複項目錯誤
+func IsDuplicateEntry(err error) bool {
+	return errors.Is(err, ErrDuplicateEntry)
+}
+
+// IsInvalidID 檢查是否為 ID 格式錯誤
+func IsInvalidID(err error) bool {
+	return errors.Is(err, ErrInvalidID)
+}
+
+// IsUpdateConflict 檢查是否為更新衝突錯誤
+func IsUpdateConflict(err error) bool {
+	return errors.Is(err, ErrUpdateConflict)
+}
+
+// IsInvalidParameter 檢查是否為參數驗證錯誤
+func IsInvalidParameter(err error) bool {
+	return errors.Is(err, ErrInvalidParameter)
+}

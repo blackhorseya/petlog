@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -35,33 +34,29 @@ func (r *HealthLogRepositoryImpl) collection() *mongo.Collection {
 // Create inserts a new health log record into the database.
 func (r *HealthLogRepositoryImpl) Create(c context.Context, log *model.HealthLog) error {
 	ctx := contextx.WithContext(c)
-	ctx.Info("開始建立新的健康日誌", "pet_id", log.PetID, "date", log.Date)
+	ctx.Info("開始建立健康日誌", "pet_id", log.PetID)
 
-	// 將領域模型轉換為持久化模型
 	logDoc, err := healthLogMongoFromDomain(log)
 	if err != nil {
-		ctx.Error("領域模型轉換失敗", "error", err, "pet_id", log.PetID)
+		ctx.Error("領域模型轉換失敗", "error", err)
 		return err
 	}
 
-	// 設定時間戳記
 	now := time.Now()
 	logDoc.CreatedAt = now
 	logDoc.UpdatedAt = now
 
-	// 執行插入操作
 	result, err := r.collection().InsertOne(ctx, logDoc)
 	if err != nil {
-		ctx.Error("建立健康日誌失敗", "error", err, "pet_id", log.PetID)
-		return fmt.Errorf("建立健康日誌失敗: %w", err)
+		ctx.Error("建立健康日誌失敗", "error", err)
+		return convertMongoError(err)
 	}
 
-	// 將 MongoDB 生成的新 ID 回寫到傳入的 log model 中
 	if oid, ok := result.InsertedID.(bson.ObjectID); ok {
 		log.ID = oid.Hex()
 	}
 
-	ctx.Info("成功建立健康日誌", "log_id", log.ID, "pet_id", log.PetID)
+	ctx.Info("成功建立健康日誌", "log_id", log.ID)
 	return nil
 }
 
@@ -81,12 +76,8 @@ func (r *HealthLogRepositoryImpl) FindByID(c context.Context, id string) (*model
 
 	err = r.collection().FindOne(ctx, filter).Decode(&logDoc)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			ctx.Warn("找不到指定的健康日誌", "log_id", id)
-			return nil, domain.ErrNotFound
-		}
-		ctx.Error("查找健康日誌時發生錯誤", "error", err, "log_id", id)
-		return nil, fmt.Errorf("查找健康日誌失敗: %w", err)
+		ctx.Warn("查找健康日誌時發生錯誤", "error", err, "log_id", id)
+		return nil, convertMongoError(err)
 	}
 
 	log := logDoc.toDomain()
@@ -153,7 +144,7 @@ func (r *HealthLogRepositoryImpl) Update(c context.Context, log *model.HealthLog
 	result, err := r.collection().UpdateOne(ctx, filter, update)
 	if err != nil {
 		ctx.Error("更新健康日誌失敗", "error", err, "log_id", log.ID)
-		return fmt.Errorf("更新健康日誌失敗: %w", err)
+		return convertMongoError(err)
 	}
 
 	if result.MatchedCount == 0 {
@@ -181,7 +172,7 @@ func (r *HealthLogRepositoryImpl) Delete(c context.Context, id string) error {
 	result, err := r.collection().DeleteOne(ctx, filter)
 	if err != nil {
 		ctx.Error("刪除健康日誌失敗", "error", err, "log_id", id)
-		return fmt.Errorf("刪除健康日誌失敗: %w", err)
+		return convertMongoError(err)
 	}
 
 	if result.DeletedCount == 0 {

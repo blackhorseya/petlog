@@ -331,7 +331,7 @@
             "description": "建立和實作 Repository 層的標準化錯誤處理機制",
             "dependencies": [],
             "details": "1. 維護和擴展 `internal/domain/errors.go` 中的標準化錯誤類型：\n   - 確保包含 `ErrNotFound`、`ErrInvalidID` 等常見錯誤\n   - 添加 Repository 層特定的錯誤類型（如連線錯誤、衝突錯誤等）\n   - 實作錯誤檢查函式（如 `IsNotFound(err error) bool`）\n\n2. 在所有 Repository 實作中統一使用這些標準化錯誤：\n   - 建立 MongoDB 錯誤到領域錯誤的轉換函式\n   - 確保錯誤訊息清晰且包含足夠的上下文\n   - 保持錯誤處理的一致性\n\n3. 文件化錯誤處理最佳實踐：\n   - 更新開發指南，說明如何正確使用和處理這些錯誤\n   - 提供錯誤處理的程式碼範例",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "1. 單元測試：\n   - 測試錯誤轉換函式\n   - 測試錯誤檢查函式\n   - 驗證錯誤訊息的格式和內容\n\n2. 整合測試：\n   - 模擬各種錯誤情境\n   - 驗證 Repository 層正確轉換和回傳錯誤\n   - 測試上層服務如何正確處理這些錯誤"
           }
         ]
@@ -1314,7 +1314,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-28T01:59:29.531Z",
+      "updated": "2025-06-28T02:15:46.154Z",
       "description": "Tasks for master context"
     }
   }
