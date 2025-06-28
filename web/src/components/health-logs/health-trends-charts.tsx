@@ -25,6 +25,7 @@ interface HealthTrendData {
   weight: number;
   food: number;
   activity: number;
+  activityScaled: number; // 為圖表顯示而縮放的活動量
 }
 
 // 生成假資料
@@ -57,6 +58,7 @@ const generateMockData = (): HealthTrendData[] => {
       weight: parseFloat(weight.toFixed(2)),
       food: Math.round(food),
       activity: parseFloat(activity.toFixed(1)),
+      activityScaled: parseFloat((activity * 10).toFixed(1)), // 放大10倍
     });
   }
   
@@ -71,7 +73,7 @@ interface HealthTrendsChartsProps {
 
 export function HealthTrendsCharts({ petName = "您的寵物" }: HealthTrendsChartsProps) {
   const [activeChart, setActiveChart] = useState<ChartType>('overview');
-  const mockData = generateMockData();
+  const [mockData] = useState<HealthTrendData[]>(() => generateMockData());
 
   const renderWeightChart = () => (
     <div className="space-y-4">
@@ -215,15 +217,24 @@ export function HealthTrendsCharts({ petName = "您的寵物" }: HealthTrendsCha
             label={{ value: '食物 (g) / 活動量', angle: 90, position: 'insideRight' }}
           />
           <Tooltip 
-            formatter={(value: number, name: string) => {
+            formatter={(value: number, name: string, props: any) => {
               if (name === 'weight') return [`${value} kg`, '體重'];
               if (name === 'food') return [`${value} g`, '食物攝取量'];
-              if (name === 'activity') return [`${value} 分`, '活動量評分'];
+              if (name === 'activityScaled') {
+                // 活動量被放大了10倍以適應食物軸，這裡要還原顯示
+                const originalValue = (value / 10).toFixed(1);
+                return [`${originalValue} 分`, '活動量評分'];
+              }
               return [value, name];
             }}
             labelFormatter={(label) => `日期: ${label}`}
           />
-          <Legend />
+          <Legend 
+            formatter={(value) => {
+              if (value === 'activityScaled') return '活動量評分';
+              return value;
+            }}
+          />
           <Line 
             yAxisId="weight"
             type="monotone" 
@@ -245,10 +256,10 @@ export function HealthTrendsCharts({ petName = "您的寵物" }: HealthTrendsCha
           <Line 
             yAxisId="food"
             type="monotone" 
-            dataKey="activity" 
+            dataKey="activityScaled"
             stroke="#9333ea" 
             strokeWidth={2}
-            name="活動量評分"
+            name="activityScaled"
             dot={{ fill: '#9333ea', strokeWidth: 2, r: 3 }}
           />
         </LineChart>
