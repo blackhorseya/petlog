@@ -738,15 +738,70 @@
       {
         "id": 19,
         "title": "Setup CI/CD Pipeline",
-        "description": "Implement Continuous Integration and Continuous Deployment using GitHub Actions.",
-        "details": "1. Create GitHub Actions workflow for CI:\n   - Run tests for both frontend and backend\n   - Perform linting and code style checks\n   - Build Docker images\n2. Implement CD pipeline:\n   - Deploy to staging environment on PR merge\n   - Deploy to production on release tag\n3. Set up k3s cluster for deployment\n4. Implement blue-green deployment strategy\n5. Set up automated database migrations\n6. Implement secret management using GitHub Secrets\n7. Set up monitoring and alerting",
-        "testStrategy": "Test CI pipeline with various scenarios (PR, merge, release). Verify staging and production deployments. Test rollback procedures.",
-        "priority": "high",
+        "description": "使用 GitHub Actions 實現持續整合和持續部署。",
+        "status": "in-progress",
         "dependencies": [
           1
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "high",
+        "details": "1. 建立 GitHub Actions 工作流程用於 CI：\n   - 為前端和後端運行測試\n   - 執行程式碼風格檢查和靜態分析\n   - 建構應用程式套件\n2. 實現 CD 管道：\n   - 在 PR 合併時部署到測試環境\n   - 在發布標籤時部署到生產環境\n3. 設置 AWS Lambda 環境用於 Serverless 部署\n4. 實現 AWS Lambda 的自動化部署流程\n5. 設置自動化資料庫遷移\n6. 使用 AWS Secrets Manager 實現機密管理\n7. 使用 AWS CloudWatch 設置監控和告警系統",
+        "testStrategy": "測試各種情境下的 CI 管道（PR、合併、發布）。驗證測試環境和生產環境的部署。測試 AWS Lambda 函數的執行情況。確認資料庫遷移的正確性。測試回滾程序。驗證 CloudWatch 告警機制。",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "設置 AWS Lambda 環境",
+            "description": "建立並配置 AWS Lambda 環境，用於 Serverless 部署",
+            "status": "to-do",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "更新 GitHub Actions 工作流程",
+            "description": "修改現有的 CI/CD 工作流程，以支援 AWS Lambda 部署",
+            "status": "to-do",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "整合 AWS Secrets Manager",
+            "description": "設置並整合 AWS Secrets Manager 用於機密管理",
+            "status": "to-do",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "配置 AWS CloudWatch",
+            "description": "設置 CloudWatch 用於 Lambda 函數的監控和告警",
+            "status": "to-do",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "實現自動化資料庫遷移",
+            "description": "為 Serverless 環境配置自動化資料庫遷移流程",
+            "status": "to-do",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "測試部署流程",
+            "description": "全面測試 CI/CD 管道，包括測試環境和生產環境的部署",
+            "status": "to-do",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 20,
@@ -1176,7 +1231,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-26T03:08:02.349Z",
+      "updated": "2025-06-27T01:50:55.066Z",
       "description": "Tasks for master context"
     }
   }

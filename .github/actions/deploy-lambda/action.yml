@@ -1,0 +1,57 @@
+name: "Serverless Framework 部署 Lambda"
+description: "使用 Serverless Framework v4 自動部署 Go 應用到 AWS Lambda"
+inputs:
+  aws-access-key-id:
+    description: "AWS Access Key ID"
+    required: true
+  aws-secret-access-key:
+    description: "AWS Secret Access Key"
+    required: true
+  aws-region:
+    description: "AWS 區域"
+    required: true
+    default: "ap-northeast-1"
+  stage:
+    description: "部署階段（如 int, prod）"
+    required: false
+    default: "int"
+  serverless-access-key:
+    description: "Serverless Dashboard Access Key (可選)"
+    required: false
+runs:
+  using: "composite"
+  steps:
+    # 安裝 Node.js 並啟用 pnpm 快取，加速依賴安裝
+    - name: 安裝 Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: 安裝 pnpm
+      run: npm install -g pnpm
+      shell: bash
+
+    - name: 安裝 Serverless Framework v4
+      run: npm install -g serverless@4
+      shell: bash
+
+    # 安裝 依賴
+    - name: 安裝 依賴
+      run: pnpm install
+      shell: bash
+
+    # 設定 AWS 認證
+    - name: 設定 AWS 認證
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+
+    # 部署到 AWS Lambda
+    - name: 使用 Serverless Framework 部署
+      run: |
+        sls deploy --stage ${{ inputs.stage }} --region ${{ inputs.aws-region }} --conceal 2>&1 | grep -v 'endpoint'
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ inputs.serverless-access-key }}
+      shell: bash
