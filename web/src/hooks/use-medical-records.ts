@@ -19,7 +19,7 @@ import type {
 // 列出醫療紀錄的 hook
 export function useMedicalRecords(params: ListMedicalRecordsParams) {
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!params.pet_id); // 只有當有 pet_id 時才初始為 loading
   const [error, setError] = useState<string | null>(null);
 
   const fetchMedicalRecords = async () => {
@@ -38,6 +38,11 @@ export function useMedicalRecords(params: ListMedicalRecordsParams) {
   useEffect(() => {
     if (params.pet_id) {
       fetchMedicalRecords();
+    } else {
+      // 如果沒有 pet_id，重置狀態
+      setMedicalRecords([]);
+      setLoading(false);
+      setError(null);
     }
   }, [params.pet_id, params.start_date, params.end_date]);
 
@@ -195,7 +200,7 @@ export function useDeleteMedicalRecord() {
 
 // 綜合管理 hook
 export function useMedicalRecordManager(petId: string) {
-  const { medicalRecords, loading: listLoading, error: listError, refresh } = useMedicalRecords({ pet_id: petId });
+  const { medicalRecords, loading: listLoading, error: listError, refresh } = useMedicalRecords({ pet_id: petId || "" });
   const { create, loading: createLoading, error: createError } = useCreateMedicalRecord();
   const { update, loading: updateLoading, error: updateError } = useUpdateMedicalRecord();
   const { remove, loading: deleteLoading, error: deleteError } = useDeleteMedicalRecord();

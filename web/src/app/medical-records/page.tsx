@@ -16,11 +16,11 @@ export default function MedicalRecordsPage() {
   // 獲取寵物列表
   const { data: pets = [], isLoading: petsLoading } = usePets();
   
-  // 獲取所選寵物的醫療記錄
+  // 獲取所選寵物的醫療記錄 - 確保 hooks 順序一致
   const { 
     medicalRecords, 
     loading: medicalRecordsLoading 
-  } = useMedicalRecords(selectedPetId ? { pet_id: selectedPetId } : { pet_id: "" });
+  } = useMedicalRecords({ pet_id: selectedPetId || "" });
 
   if (userLoading) {
     return (
@@ -65,7 +65,7 @@ export default function MedicalRecordsPage() {
 
   // 計算統計資料 - 基於當前選中的寵物
   const stats = useMemo(() => {
-    if (!selectedPetId || medicalRecords.length === 0) {
+    if (!selectedPetId || !medicalRecords || medicalRecords.length === 0) {
       return {
         totalRecords: 0,
         upcomingRecords: 0,

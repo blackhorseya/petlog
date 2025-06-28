@@ -19,13 +19,13 @@ interface MedicalRecordListProps {
 export function MedicalRecordList({
   petId,
 }: MedicalRecordListProps) {
-  // 使用 API 管理 hook
+  // 使用 API 管理 hook - 確保總是呼叫，避免 hooks 順序問題
   const {
     medicalRecords: records,
     loading,
     error,
     refresh: onRefresh,
-  } = useMedicalRecordManager(petId);
+  } = useMedicalRecordManager(petId || "");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<MedicalRecord | null>(null);
   const [filterType, setFilterType] = useState<MedicalRecordType | "all">("all");

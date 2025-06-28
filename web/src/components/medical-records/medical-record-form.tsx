@@ -47,9 +47,15 @@ export function MedicalRecordForm({
 
   const handleFormSubmit = (data: MedicalRecordFormData) => {
     // 確保必要欄位存在
+    const finalPetId = petId || data.pet_id;
+    if (!finalPetId) {
+      console.error("Pet ID is required for medical record");
+      return;
+    }
+
     const formattedData: MedicalRecordFormData = {
       ...data,
-      pet_id: petId || data.pet_id,
+      pet_id: finalPetId,
       // 將日期轉換為 RFC3339 格式
       date: new Date(data.date).toISOString(),
       next_due_date: data.next_due_date 
