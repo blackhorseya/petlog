@@ -27,19 +27,12 @@ runs:
       with:
         node-version: "20"
 
-    - name: 安裝 Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: "1.22"
-        cache: true # 內建 module + build 快取
-
-    - name: 下載 Go modules
-      run: go mod download
-      shell: bash
-
-    # 安裝 pnpm
     - name: 安裝 pnpm
       run: npm install -g pnpm
+      shell: bash
+
+    - name: 安裝 Serverless Framework v4
+      run: npm install -g serverless@4
       shell: bash
 
     # 安裝 依賴
@@ -57,8 +50,8 @@ runs:
 
     # 部署到 AWS Lambda
     - name: 使用 Serverless Framework 部署
-      uses: serverless/github-action@v4
-      with:
-        args: deploy --stage ${{ inputs.stage }} --region ${{ inputs.aws-region }}
+      run: |
+        sls deploy --stage ${{ inputs.stage }} --region ${{ inputs.aws-region }}
       env:
         SERVERLESS_ACCESS_KEY: ${{ inputs.serverless-access-key }}
+      shell: bash
