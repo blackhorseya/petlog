@@ -381,9 +381,6 @@ export function PetProfile({ pet, onBack, onEdit }: PetProfileProps) {
       {activeTab === "medical" && (
         <MedicalRecordList
           petId={pet.id}
-          records={medicalRecords}
-          loading={medicalRecordsLoading}
-          onRefresh={refetchMedicalRecords}
         />
       )}
     </div>
