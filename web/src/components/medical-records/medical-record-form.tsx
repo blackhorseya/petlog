@@ -6,31 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-
-// 暫時的類型定義，等後端 API 定義完成後會替換
-type MedicalRecordType = 
-  | "vaccination"
-  | "deworming" 
-  | "medication"
-  | "vet_visit"
-  | "other";
-
-const MedicalRecordTypeLabels: Record<MedicalRecordType, string> = {
-  vaccination: "疫苗接種",
-  deworming: "驅蟲",
-  medication: "用藥",
-  vet_visit: "獸醫門診",
-  other: "其他",
-};
-
-interface MedicalRecordFormData {
-  pet_id: string;
-  type: MedicalRecordType;
-  description: string;
-  date: string;
-  next_due_date?: string;
-  dosage?: string;
-}
+import { 
+  MedicalRecordTypeLabels,
+  type MedicalRecordFormData,
+  type MedicalRecordType,
+} from "@/lib/types/medical-record";
 
 interface MedicalRecordFormProps {
   initialData?: Partial<MedicalRecordFormData>;
@@ -67,9 +47,15 @@ export function MedicalRecordForm({
 
   const handleFormSubmit = (data: MedicalRecordFormData) => {
     // 確保必要欄位存在
+    const finalPetId = petId || data.pet_id;
+    if (!finalPetId) {
+      console.error("Pet ID is required for medical record");
+      return;
+    }
+
     const formattedData: MedicalRecordFormData = {
       ...data,
-      pet_id: petId || data.pet_id,
+      pet_id: finalPetId,
       // 將日期轉換為 RFC3339 格式
       date: new Date(data.date).toISOString(),
       next_due_date: data.next_due_date 

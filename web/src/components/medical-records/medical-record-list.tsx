@@ -4,55 +4,39 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MedicalRecordCard } from "./medical-record-card";
 import { MedicalRecordModal } from "./medical-record-modal";
-
-// 暫時的類型定義，等後端 API 定義完成後會替換
-export type MedicalRecordType = 
-  | "vaccination"
-  | "deworming" 
-  | "medication"
-  | "vet_visit"
-  | "other";
-
-export const MedicalRecordTypeLabels: Record<MedicalRecordType, string> = {
-  vaccination: "疫苗接種",
-  deworming: "驅蟲",
-  medication: "用藥",
-  vet_visit: "獸醫門診",
-  other: "其他",
-};
-
-export interface MedicalRecord {
-  id: string;
-  pet_id: string;
-  type: MedicalRecordType;
-  description: string;
-  date: string;
-  next_due_date?: string;
-  dosage?: string;
-}
+import { 
+  MedicalRecordTypeLabels,
+  type MedicalRecord,
+  type MedicalRecordType,
+} from "@/lib/types/medical-record";
+import { useMedicalRecordManager } from "@/hooks/use-medical-records";
 import { Plus, Filter, Calendar, FileX } from "lucide-react";
 
 interface MedicalRecordListProps {
   petId: string;
-  records: MedicalRecord[];
-  loading?: boolean;
-  onRefresh?: () => void;
 }
 
 export function MedicalRecordList({
   petId,
-  records,
-  loading = false,
-  onRefresh,
 }: MedicalRecordListProps) {
+  // 使用 API 管理 hook - 確保總是呼叫，避免 hooks 順序問題
+  const {
+    medicalRecords: records,
+    loading,
+    error,
+    refresh: onRefresh,
+  } = useMedicalRecordManager(petId || "");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<MedicalRecord | null>(null);
   const [filterType, setFilterType] = useState<MedicalRecordType | "all">("all");
   const [sortBy, setSortBy] = useState<"date" | "type">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+  // 確保 records 有預設值，避免 undefined 錯誤
+  const safeRecords = records || [];
+
   // 過濾和排序記錄
-  const filteredAndSortedRecords = records
+  const filteredAndSortedRecords = safeRecords
     .filter((record) => filterType === "all" || record.type === filterType)
     .sort((a, b) => {
       if (sortBy === "date") {
@@ -69,7 +53,7 @@ export function MedicalRecordList({
     });
 
   // 獲取即將到期的記錄
-  const upcomingRecords = records.filter((record) => {
+  const upcomingRecords = safeRecords.filter((record) => {
     if (!record.next_due_date) return false;
     const nextDue = new Date(record.next_due_date);
     const now = new Date();
@@ -78,7 +62,7 @@ export function MedicalRecordList({
   });
 
   // 獲取已過期的記錄
-  const overdueRecords = records.filter((record) => {
+  const overdueRecords = safeRecords.filter((record) => {
     if (!record.next_due_date) return false;
     const nextDue = new Date(record.next_due_date);
     const now = new Date();
@@ -104,6 +88,21 @@ export function MedicalRecordList({
     handleCloseModal();
     onRefresh?.();
   };
+
+  // 錯誤處理
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-red-600 mb-4">
+          <p className="font-medium">載入醫療紀錄時發生錯誤</p>
+          <p className="text-sm">{error}</p>
+        </div>
+        <Button onClick={onRefresh} variant="outline">
+          重新載入
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -209,7 +208,7 @@ export function MedicalRecordList({
       {filteredAndSortedRecords.length > 0 && (
         <div className="text-sm text-gray-500 text-center">
           {filterType === "all" 
-            ? `共 ${records.length} 筆醫療記錄`
+            ? `共 ${safeRecords.length} 筆醫療記錄`
             : `共 ${filteredAndSortedRecords.length} 筆${MedicalRecordTypeLabels[filterType as MedicalRecordType]}記錄`
           }
         </div>
