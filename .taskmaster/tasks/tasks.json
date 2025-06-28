@@ -664,7 +664,7 @@
           5,
           6
         ],
-        "status": "deferred",
+        "status": "cancelled",
         "subtasks": []
       },
       {
@@ -1132,7 +1132,7 @@
         "id": 24,
         "title": "設計首頁快速概覽 UI 元件",
         "description": "設計並實作首頁顯示寵物數量與健康日誌數量的 DashboardOverview 元件，具備響應式設計與載入/零資料狀態處理。",
-        "status": "pending",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "details": "1. 於 web/src/components/dashboard/ 建立 DashboardOverview.tsx，顯示 petCount 與 healthRecordCount。\n2. 使用 Tailwind CSS 實作響應式排版，支援手機與桌面。\n3. 處理載入中、無資料等狀態。\n4. 撰寫單元測試與可存取性檢查。",
@@ -1314,7 +1314,7 @@
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-28T01:27:03.375Z",
+      "updated": "2025-06-28T01:59:29.531Z",
       "description": "Tasks for master context"
     }
   }
