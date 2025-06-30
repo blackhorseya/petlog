@@ -50,8 +50,17 @@ export default function Home() {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
-          <p className="text-destructive">載入時發生錯誤</p>
-          <p className="text-sm text-muted-foreground">{error.message}</p>
+          {error.message === 'Unauthorized' || error.message === 'UNAUTHORIZED' ? (
+            <>
+              <p className="text-destructive">請先登入</p>
+              <p className="text-sm text-muted-foreground">您必須登入才能瀏覽此頁面</p>
+            </>
+          ) : (
+            <>
+              <p className="text-destructive">載入時發生錯誤</p>
+              <p className="text-sm text-muted-foreground">{error.message}</p>
+            </>
+          )}
         </div>
       </div>
     );
