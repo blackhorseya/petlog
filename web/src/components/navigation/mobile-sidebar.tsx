@@ -139,20 +139,17 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   (item.href !== "/" && pathname.startsWith(item.href))
                 
                 return (
-                  <Button
+                  <Link
                     key={item.name}
-                    variant={isActive ? "secondary" : "ghost"}
+                    href={item.href}
                     className={cn(
-                      "w-full justify-start",
-                      isActive && "bg-muted font-medium text-foreground"
+                      "w-full flex items-center px-4 py-2 rounded-md transition-colors font-medium gap-2",
+                      isActive ? "bg-muted text-foreground" : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
                     )}
-                    asChild
                   >
-                    <Link href={item.href}>
-                      <item.icon className="mr-3 h-4 w-4" />
-                      {item.name}
-                    </Link>
-                  </Button>
+                    <item.icon className="h-5 w-5" />
+                    <span className="flex-1 text-left">{item.name}</span>
+                  </Link>
                 )
               })}
             </div>
