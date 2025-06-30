@@ -1310,11 +1310,24 @@
         ],
         "status": "done",
         "subtasks": []
+      },
+      {
+        "id": 32,
+        "title": "前端 API 層重構：導入 OpenAPI 型別生成與型別安全的 API 呼叫",
+        "description": "重構前端 API 層，導入 openapi-typescript 與 openapi-fetch，實現自動型別生成與型別安全的 API 呼叫，確保前後端 API 合約同步。",
+        "details": "本任務將重構前端 API 層，引入基於 OpenAPI 的型別生成與型別安全 API 呼叫機制：\n\n1. 安裝必要的依賴套件：\n   - 執行 `pnpm add openapi-fetch` 安裝執行時依賴\n   - 執行 `pnpm add -D openapi-typescript` 安裝開發時依賴\n\n2. 在 package.json 的 scripts 區段新增自動生成 API 型別的指令：\n   ```json\n   \"scripts\": {\n     \"gen:api-types\": \"openapi-typescript ../api/swagger.yaml -o src/lib/api/v1.d.ts\"\n   }\n   ```\n\n3. 執行 `pnpm gen:api-types` 命令，從後端 Swagger 定義檔生成 TypeScript 型別定義檔案。\n\n4. 建立 API 客戶端工具：\n   - 在 `src/lib/api/client.ts` 中實作基於 openapi-fetch 的客戶端\n   - 整合 Auth0 身份驗證，自動在請求中加入 token\n   ```typescript\n   import createClient from 'openapi-fetch';\n   import type { paths } from './v1';\n   import { getAuth0Token } from '../auth';\n\n   export const apiClient = createClient<paths>({\n     baseUrl: import.meta.env.VITE_API_BASE_URL || '/api',\n     headers: async () => {\n       const token = await getAuth0Token();\n       return {\n         Authorization: token ? `Bearer ${token}` : '',\n         'Content-Type': 'application/json',\n       };\n     },\n   });\n   ```\n\n5. 以 pet.ts 為例重構 API 呼叫：\n   - 移除舊有的 `types/pet.ts` 型別定義\n   - 使用生成的型別與 apiClient 重構 API 呼叫\n   ```typescript\n   // src/api/pet.ts\n   import { apiClient } from '../lib/api/client';\n\n   export const getPets = async () => {\n     const { data, error } = await apiClient.GET('/api/v1/pets');\n     if (error) throw new Error(error.message);\n     return data;\n   };\n\n   export const getPet = async (id: string) => {\n     const { data, error } = await apiClient.GET('/api/v1/pets/{id}', {\n       params: { path: { id } }\n     });\n     if (error) throw new Error(error.message);\n     return data;\n   };\n   ```\n\n6. 依照相同模式重構其他 API 檔案，包括但不限於：\n   - health_log.ts\n   - dashboard.ts\n   - user.ts\n   等所有與後端 API 互動的模組\n\n7. 更新相關的單元測試，確保 API 呼叫正確使用新的型別安全機制。\n\n8. 更新開發文件，說明 API 型別生成與使用流程，確保團隊成員了解如何在前後端 API 合約變更時更新型別定義。",
+        "testStrategy": "測試策略將確保 API 層重構後的型別安全與功能正確性：\n\n1. 單元測試：\n   - 為每個重構的 API 函數編寫單元測試，使用 Jest 和 MSW (Mock Service Worker) 模擬 API 響應\n   - 測試正常情境與錯誤處理情境\n   - 驗證型別推導是否正確工作（使用 TypeScript 編譯器 API 進行靜態分析）\n\n2. 整合測試：\n   - 在隔離環境中測試前端與模擬後端的整合\n   - 驗證所有 API 呼叫是否正確傳遞參數並處理響應\n   - 測試 Auth0 token 是否正確注入到請求中\n\n3. 端對端測試：\n   - 使用 Playwright 或 Cypress 編寫端對端測試\n   - 測試實際 API 呼叫流程，確保資料正確顯示在 UI 上\n   - 測試不同用戶權限下的 API 行為\n\n4. 型別安全驗證：\n   - 執行 `tsc --noEmit` 確保沒有型別錯誤\n   - 驗證 IDE 中的型別提示是否正確\n   - 測試 API 參數變更時是否會產生編譯錯誤（確保型別安全）\n\n5. 回歸測試：\n   - 執行現有的應用程式功能測試，確保重構不影響現有功能\n   - 特別關注 Dashboard Overview 等最近開發的功能\n\n6. 文檔驗證：\n   - 確認生成的型別定義與 Swagger 文檔一致\n   - 驗證型別生成指令在 CI/CD 流程中正確執行\n\n7. 手動測試：\n   - 在開發環境中手動測試所有 API 互動功能\n   - 驗證錯誤處理與邊界情況",
+        "status": "pending",
+        "dependencies": [
+          31
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-19T23:35:36.274Z",
-      "updated": "2025-06-28T02:24:26.225Z",
+      "updated": "2025-06-30T01:38:52.541Z",
       "description": "Tasks for master context"
     }
   }
