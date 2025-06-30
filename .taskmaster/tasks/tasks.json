@@ -19,7 +19,7 @@
         "id": 2,
         "title": "【後端】實作費用紀錄 Domain Model 與 Repository",
         "description": "建立費用紀錄的領域模型與資料存取層，實現基本的 CRUD 操作",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           12
         ],
@@ -168,7 +168,7 @@
         "id": 12,
         "title": "【全端】設計費用紀錄 Swagger API 規格",
         "description": "依據產品需求文件與前端需求，設計所有費用紀錄相關 API（CRUD、查詢、分類等）的 Swagger/OpenAPI 規格，作為前後端開發的共同依據",
-        "status": "pending",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "details": "1. 分析需求與規劃 API 架構：\n- 仔細研讀產品需求文件，確認所有費用紀錄相關功能\n- 與前端團隊討論 API 需求，包括資料格式、查詢參數等\n- 規劃 RESTful API 路由結構，遵循最佳實踐\n- 確定 API 版本控制策略\n\n2. 設計基本 CRUD API：\n- POST /api/expenses - 新增費用紀錄\n- GET /api/expenses/{id} - 獲取單一費用紀錄\n- PUT /api/expenses/{id} - 更新費用紀錄\n- DELETE /api/expenses/{id} - 刪除費用紀錄\n- GET /api/expenses - 獲取費用紀錄列表（含分頁、排序）\n\n3. 設計進階查詢 API：\n- GET /api/expenses/search - 支援多條件搜尋（日期範圍、金額範圍、關鍵字等）\n- GET /api/expenses/statistics - 費用統計資料（總額、平均值等）\n- GET /api/expenses/categories - 依分類統計費用\n\n4. 設計多寵物相關 API：\n- 確保所有 API 支援寵物 ID 參數\n- 設計寵物與費用關聯的資料結構\n\n5. 設計分類相關 API：\n- GET /api/categories - 獲取所有分類\n- POST /api/categories - 新增自訂分類\n- PUT /api/categories/{id} - 更新分類\n- DELETE /api/categories/{id} - 刪除分類\n\n6. 使用 golang swag 工具產生文檔：\n- 在 Go 代碼中添加符合 swag 格式的註釋\n- 設置適當的 API 標籤、分組和描述\n- 使用 swag init 命令生成 swagger.json 和 swagger.yaml\n- 配置 Swagger UI 以便於瀏覽和測試 API\n\n7. 詳細定義每個 API 的：\n- 請求參數（路徑參數、查詢參數、請求體）\n- 回應格式與狀態碼\n- 錯誤訊息格式與代碼\n- 權限要求\n- 速率限制（如適用）\n\n8. 文檔化與溝通：\n- 整理 Swagger 文檔，確保清晰易懂\n- 與前端團隊進行 API 規格評審\n- 根據反饋調整 API 設計\n- 最終確認並發布 API 規格文檔",
@@ -178,7 +178,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T03:21:22.226Z",
-      "updated": "2025-06-30T03:21:48.783Z",
+      "updated": "2025-06-30T03:53:55.238Z",
       "description": "費用紀錄功能專用 tag，修正標籤狀態以利後續任務管理。",
       "copiedFrom": {
         "tag": "master",
