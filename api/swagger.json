@@ -51,6 +51,375 @@
                 }
             }
         },
+        "/api/v1/expenses": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "依條件查詢費用紀錄",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expenses"
+                ],
+                "summary": "查詢費用紀錄",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "寵物ID",
+                        "name": "pet_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "分類",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "起始日期 (RFC3339)",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "結束日期 (RFC3339)",
+                        "name": "end_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ListExpensesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ListExpensesResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ListExpensesResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ListExpensesResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "建立一筆新的費用紀錄",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expenses"
+                ],
+                "summary": "新增費用紀錄",
+                "parameters": [
+                    {
+                        "description": "費用資料",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreateExpenseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreateExpenseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreateExpenseResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreateExpenseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.CreateExpenseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/expenses/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "查詢本月總支出、分類統計等摘要",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expenses"
+                ],
+                "summary": "查詢費用摘要",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "寵物ID",
+                        "name": "pet_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetExpenseSummaryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetExpenseSummaryResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetExpenseSummaryResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetExpenseSummaryResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/expenses/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "取得指定 ID 的費用紀錄",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expenses"
+                ],
+                "summary": "取得單筆費用紀錄",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "費用ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetExpenseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetExpenseResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetExpenseResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetExpenseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetExpenseResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "編輯指定 ID 的費用紀錄",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expenses"
+                ],
+                "summary": "編輯費用紀錄",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "費用ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "費用資料",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateExpenseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateExpenseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateExpenseResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateExpenseResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateExpenseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.UpdateExpenseResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "刪除指定 ID 的費用紀錄",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expenses"
+                ],
+                "summary": "刪除費用紀錄",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "費用ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.DeleteExpenseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.DeleteExpenseResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.DeleteExpenseResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.DeleteExpenseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.DeleteExpenseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/health-logs": {
             "get": {
                 "security": [
@@ -946,6 +1315,42 @@
         }
     },
     "definitions": {
+        "endpoint.CreateExpenseRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "category",
+                "date",
+                "pet_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "category": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "pet_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "endpoint.CreateExpenseResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "expense": {
+                    "$ref": "#/definitions/model.Expense"
+                }
+            }
+        },
         "endpoint.CreateHealthLogRequest": {
             "type": "object",
             "properties": {
@@ -1045,6 +1450,12 @@
                 }
             }
         },
+        "endpoint.DeleteExpenseResponse": {
+            "type": "object",
+            "properties": {
+                "error": {}
+            }
+        },
         "endpoint.DeleteHealthLogResponse": {
             "type": "object",
             "properties": {
@@ -1080,6 +1491,36 @@
                 }
             }
         },
+        "endpoint.GetExpenseResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "expense": {
+                    "$ref": "#/definitions/model.Expense"
+                }
+            }
+        },
+        "endpoint.GetExpenseSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "category_stats": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "error": {},
+                "recent": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Expense"
+                    }
+                },
+                "total_amount": {
+                    "type": "integer"
+                }
+            }
+        },
         "endpoint.GetHealthLogByIDResponse": {
             "type": "object",
             "properties": {
@@ -1104,6 +1545,18 @@
                 "error": {},
                 "pet": {
                     "$ref": "#/definitions/model.Pet"
+                }
+            }
+        },
+        "endpoint.ListExpensesResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "expenses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Expense"
+                    }
                 }
             }
         },
@@ -1140,6 +1593,45 @@
                     "items": {
                         "$ref": "#/definitions/model.Pet"
                     }
+                }
+            }
+        },
+        "endpoint.UpdateExpenseRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "category",
+                "date",
+                "pet_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "category": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pet_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "endpoint.UpdateExpenseResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "expense": {
+                    "$ref": "#/definitions/model.Expense"
                 }
             }
         },
@@ -1246,6 +1738,35 @@
             "type": "object",
             "properties": {
                 "error": {}
+            }
+        },
+        "model.Expense": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pet_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
             }
         },
         "model.HealthLog": {

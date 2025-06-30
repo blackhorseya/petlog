@@ -1,187 +1,189 @@
 {
-  "tasks": [
-    {
-      "id": 1,
-      "title": "【後端】建立費用紀錄資料庫結構",
-      "description": "設計並實作費用紀錄功能所需的資料庫結構，包含所有必要欄位",
-      "status": "pending",
-      "dependencies": [
-        2,
-        12
-      ],
-      "priority": "high",
-      "details": "建立 Expense 資料表，包含以下欄位：\n- id (主鍵)\n- pet_id (外鍵，關聯到寵物表)\n- category (分類，字串型態)\n- amount (金額，正整數)\n- description (描述，可為空)\n- date (日期)\n- created_at (建立時間)\n- updated_at (更新時間)\n\n同時需要建立 Category 資料表，用於儲存預設與自訂分類：\n- id (主鍵)\n- name (分類名稱)\n- user_id (若為自訂分類則關聯到使用者)\n- is_default (布林值，標示是否為預設分類)\n\n預設分類包含：醫療、飼料、保健品、日用品、其他\n\n資料庫遷移腳本需包含初始預設分類資料",
-      "testStrategy": "1. 撰寫單元測試確保資料表結構符合需求\n2. 測試外鍵約束是否正常運作\n3. 測試預設分類是否正確建立\n4. 驗證欄位類型與限制條件是否符合需求",
-      "subtasks": []
-    },
-    {
-      "id": 2,
-      "title": "【後端】實作費用紀錄 Domain Model 與 Repository",
-      "description": "建立費用紀錄的領域模型與資料存取層，實現基本的 CRUD 操作",
-      "status": "pending",
-      "dependencies": [
-        12
-      ],
-      "priority": "high",
-      "details": "1. 建立 Expense domain model，包含所有必要欄位與驗證邏輯：\n```\ntype Expense struct {\n  ID          uint\n  PetID       uint\n  Category    string\n  Amount      int\n  Description string\n  Date        time.Time\n  CreatedAt   time.Time\n  UpdatedAt   time.Time\n  Pet         *Pet\n}\n```\n\n2. 實作 ExpenseRepository 介面與實現：\n```\ntype ExpenseRepository interface {\n  Create(expense *Expense) error\n  FindByID(id uint) (*Expense, error)\n  Update(expense *Expense) error\n  Delete(id uint) error\n  FindAll(filters map[string]interface{}) ([]*Expense, error)\n}\n```\n\n3. 實作 CategoryRepository 介面與實現，用於管理預設與自訂分類",
-      "testStrategy": "1. 撰寫單元測試確保 Repository 的 CRUD 操作正常運作\n2. 測試各種查詢條件組合\n3. 測試邊界情況，如無效 ID、不存在的記錄等\n4. 測試資料驗證邏輯",
-      "subtasks": []
-    },
-    {
-      "id": 3,
-      "title": "【後端】實作費用紀錄 Usecase 層",
-      "description": "建立費用紀錄的業務邏輯層，處理複雜查詢、驗證與業務規則",
-      "status": "pending",
-      "dependencies": [
-        2,
-        12
-      ],
-      "priority": "high",
-      "details": "1. 建立 ExpenseUsecase 介面與實現：\n```\ntype ExpenseUsecase interface {\n  CreateExpense(expense *Expense) error\n  GetExpenseByID(id uint) (*Expense, error)\n  UpdateExpense(expense *Expense) error\n  DeleteExpense(id uint) error\n  ListExpenses(filters map[string]interface{}) ([]*Expense, error)\n  GetExpensesByPetID(petID uint) ([]*Expense, error)\n  GetExpensesByDateRange(start, end time.Time) ([]*Expense, error)\n  GetExpensesByCategory(category string) ([]*Expense, error)\n  SearchExpenses(keyword string) ([]*Expense, error)\n}\n```\n\n2. 實作 CategoryUsecase 介面與實現，用於管理分類：\n```\ntype CategoryUsecase interface {\n  GetAllCategories() ([]*Category, error)\n  GetDefaultCategories() ([]*Category, error)\n  GetUserCategories(userID uint) ([]*Category, error)\n  CreateCategory(category *Category) error\n  UpdateCategory(category *Category) error\n  DeleteCategory(id uint) error\n}\n```\n\n3. 實作業務邏輯，包含：\n- 欄位驗證（必填、金額為正整數等）\n- 多條件組合查詢\n- 快速輸入邏輯（記住上次輸入）",
-      "testStrategy": "1. 撰寫單元測試確保業務邏輯正確\n2. 測試各種查詢條件組合\n3. 測試驗證邏輯，包含必填欄位、金額格式等\n4. 測試快速輸入功能\n5. 模擬各種使用情境進行整合測試",
-      "subtasks": []
-    },
-    {
-      "id": 4,
-      "title": "【後端】實作費用紀錄 API Endpoints",
-      "description": "建立費用紀錄相關的 RESTful API 端點，支援 CRUD 與查詢操作",
-      "status": "pending",
-      "dependencies": [
-        3,
-        12
-      ],
-      "priority": "high",
-      "details": "1. 實作以下 API 端點：\n- POST /api/v1/expenses - 新增費用紀錄\n- GET /api/v1/expenses/:id - 取得單筆費用紀錄\n- PUT /api/v1/expenses/:id - 更新費用紀錄\n- DELETE /api/v1/expenses/:id - 刪除費用紀錄\n- GET /api/v1/expenses - 查詢費用紀錄（支援多條件篩選）\n  - 查詢參數：pet_id, category, start_date, end_date, keyword\n\n2. 實作分類相關 API：\n- GET /api/categories - 取得所有分類\n- POST /api/categories - 新增自訂分類\n- PUT /api/categories/:id - 更新分類\n- DELETE /api/categories/:id - 刪除分類\n\n3. 實作請求與回應的資料結構：\n```\ntype CreateExpenseRequest struct {\n  PetID       uint      `json:\"pet_id\" binding:\"required\"`\n  Category    string    `json:\"category\" binding:\"required\"`\n  Amount      int       `json:\"amount\" binding:\"required,min=1\"`\n  Description string    `json:\"description\"`\n  Date        time.Time `json:\"date\" binding:\"required\"`\n}\n\ntype ExpenseResponse struct {\n  ID          uint      `json:\"id\"`\n  PetID       uint      `json:\"pet_id\"`\n  PetName     string    `json:\"pet_name\"`\n  Category    string    `json:\"category\"`\n  Amount      int       `json:\"amount\"`\n  Description string    `json:\"description\"`\n  Date        time.Time `json:\"date\"`\n  CreatedAt   time.Time `json:\"created_at\"`\n  UpdatedAt   time.Time `json:\"updated_at\"`\n}\n```",
-      "testStrategy": "1. 撰寫 API 測試確保所有端點正常運作\n2. 測試各種查詢參數組合\n3. 測試權限驗證\n4. 測試錯誤處理與回應\n5. 測試資料驗證邏輯\n6. 使用 Postman 或類似工具建立 API 測試集合",
-      "subtasks": []
-    },
-    {
-      "id": 5,
-      "title": "【前端】實作費用列表頁面",
-      "description": "建立費用列表頁面，顯示所有費用紀錄並支援篩選、排序功能",
-      "status": "pending",
-      "dependencies": [
-        4,
-        11,
-        12
-      ],
-      "priority": "medium",
-      "details": "1. 建立費用列表頁面，包含以下元素：\n- 費用紀錄列表（依日期倒序排列）\n- 每筆紀錄顯示：日期、分類、金額、描述\n- 篩選區域：寵物選擇器、分類選擇器、日期範圍選擇器、關鍵字搜尋\n- 新增費用按鈕\n- 編輯/刪除操作按鈕\n\n2. 實作列表功能：\n- 分頁顯示\n- 依日期倒序排列\n- 支援多條件篩選\n- 即時更新篩選結果\n\n3. 實作多寵物切換功能：\n- 寵物選擇器（下拉選單）\n- 切換寵物時自動更新列表\n\n4. 實作 UI 元件：\n- 費用卡片元件\n- 篩選表單元件\n- 空狀態提示\n- 載入中狀態",
-      "testStrategy": "1. 撰寫單元測試確保元件正確渲染\n2. 測試篩選功能是否正常運作\n3. 測試多寵物切換功能\n4. 測試分頁功能\n5. 測試 UI 在不同裝置尺寸下的響應式設計\n6. 使用者測試確保操作流暢度",
-      "subtasks": []
-    },
-    {
-      "id": 6,
-      "title": "【前端】實作費用表單頁面",
-      "description": "建立新增與編輯費用的表單頁面，支援所有必要欄位與驗證",
-      "status": "pending",
-      "dependencies": [
-        4,
-        11,
-        12
-      ],
-      "priority": "medium",
-      "details": "1. 建立費用表單頁面，包含以下欄位：\n- 寵物選擇器（下拉選單，必填）\n- 分類選擇器（下拉選單，包含預設與自訂分類，必填）\n- 金額輸入框（數字輸入，必填，僅允許正整數）\n- 描述輸入框（文字輸入，選填）\n- 日期選擇器（日期選擇，必填，預設今日）\n- 送出按鈕\n- 取消按鈕\n\n2. 實作表單驗證：\n- 必填欄位檢查\n- 金額格式驗證（正整數）\n- 日期合理性檢查\n\n3. 實作快速輸入模式：\n- 記住上次選擇的分類\n- 記住上次輸入的金額\n- 提供快速填入按鈕\n\n4. 實作分類管理：\n- 新增自訂分類功能\n- 編輯分類功能\n- 刪除分類功能",
-      "testStrategy": "1. 撰寫單元測試確保表單元件正確渲染\n2. 測試表單驗證邏輯\n3. 測試快速輸入功能\n4. 測試分類管理功能\n5. 測試表單提交與取消操作\n6. 使用者測試確保操作流暢度",
-      "subtasks": []
-    },
-    {
-      "id": 7,
-      "title": "【後端】實作分類管理功能（後端部分）",
-      "description": "建立分類管理功能，支援預設分類與自訂分類的管理",
-      "status": "pending",
-      "dependencies": [
-        2,
-        4,
-        12
-      ],
-      "priority": "medium",
-      "details": "1. 建立分類管理頁面或模態框，包含以下功能：\n- 顯示所有分類（預設與自訂）\n- 新增自訂分類\n- 編輯自訂分類\n- 刪除自訂分類\n\n2. 實作預設分類：\n- 初始化預設分類：醫療、飼料、保健品、日用品、其他\n- 預設分類不可刪除或編輯\n\n3. 實作自訂分類：\n- 使用者可新增自訂分類\n- 使用者可編輯自己的自訂分類\n- 使用者可刪除自己的自訂分類\n\n4. 實作分類選擇器元件：\n- 在費用表單中使用\n- 顯示所有可用分類\n- 支援快速新增分類",
-      "testStrategy": "1. 撰寫單元測試確保分類管理功能正常運作\n2. 測試預設分類的保護機制\n3. 測試自訂分類的 CRUD 操作\n4. 測試分類選擇器元件\n5. 測試分類在費用表單中的使用\n6. 使用者測試確保操作流暢度",
-      "subtasks": []
-    },
-    {
-      "id": 8,
-      "title": "【前端】實作多寵物切換功能",
-      "description": "建立多寵物切換功能，支援依寵物篩選費用紀錄",
-      "status": "pending",
-      "dependencies": [
-        5,
-        6,
-        11,
-        12
-      ],
-      "priority": "medium",
-      "details": "1. 建立寵物選擇器元件：\n- 顯示使用者所有寵物\n- 支援單選模式（選擇單一寵物）\n- 支援多選模式（選擇多個寵物）\n- 支援「全部」選項\n\n2. 整合寵物選擇器到費用列表頁面：\n- 切換寵物時自動更新列表\n- 記住上次選擇的寵物\n\n3. 整合寵物選擇器到費用表單：\n- 新增費用時預設選擇上次使用的寵物\n- 編輯費用時顯示原本的寵物\n\n4. 實作寵物相關資料獲取：\n- 獲取使用者所有寵物列表\n- 獲取寵物詳細資訊\n- 關聯寵物與費用紀錄",
-      "testStrategy": "1. 撰寫單元測試確保寵物選擇器元件正確渲染\n2. 測試寵物切換功能\n3. 測試寵物選擇記憶功能\n4. 測試寵物與費用紀錄的關聯\n5. 使用者測試確保操作流暢度",
-      "subtasks": []
-    },
-    {
-      "id": 9,
-      "title": "【全端】實作權限驗證與錯誤處理",
-      "description": "實作權限驗證機制，確保只有登入用戶可操作，並優化錯誤處理與提示",
-      "status": "pending",
-      "dependencies": [
-        4,
-        12
-      ],
-      "priority": "high",
-      "details": "1. 實作權限驗證中間件：\n- 確保所有費用相關 API 需要登入才能訪問\n- 確保使用者只能操作自己的費用紀錄\n- 實作 JWT 或 Session 驗證\n\n2. 實作錯誤處理：\n- 統一錯誤回應格式\n- 友善的錯誤訊息\n- 適當的 HTTP 狀態碼\n\n3. 實作前端錯誤處理：\n- 表單驗證錯誤提示\n- API 錯誤提示\n- 載入失敗處理\n- 操作失敗處理\n\n4. 實作錯誤日誌：\n- 記錄後端錯誤\n- 記錄前端錯誤\n- 錯誤分析與監控",
-      "testStrategy": "1. 撰寫單元測試確保權限驗證正常運作\n2. 測試未登入用戶的訪問限制\n3. 測試使用者只能操作自己資料的限制\n4. 測試各種錯誤情境的處理\n5. 測試錯誤提示的友善度\n6. 安全性測試確保無權限漏洞",
-      "subtasks": []
-    },
-    {
-      "id": 10,
-      "title": "【前端】實作手機操作優化與 UI/UX 改進",
-      "description": "優化手機操作體驗，改進 UI/UX 設計，確保在各種裝置上都有良好的使用體驗",
-      "status": "pending",
-      "dependencies": [
-        5,
-        6,
-        8,
-        11,
-        12
-      ],
-      "priority": "medium",
-      "details": "1. 實作響應式設計：\n- 確保所有頁面在手機、平板、桌面都有良好顯示\n- 針對小螢幕優化表單與列表顯示\n- 使用 CSS Grid 或 Flexbox 實現彈性布局\n\n2. 實作手機操作優化：\n- 觸控友善的按鈕與控制項\n- 適當的字體大小與間距\n- 簡化手機版表單\n- 優化手機版篩選功能\n\n3. 實作 UI/UX 改進：\n- 統一設計語言\n- 清晰的視覺層級\n- 適當的動畫與過渡效果\n- 即時反饋\n\n4. 實作快速輸入優化：\n- 一鍵填入常用資料\n- 智能預設值\n- 記住使用者偏好",
-      "testStrategy": "1. 在各種裝置與螢幕尺寸上測試\n2. 使用者測試確保操作流暢度\n3. 測試觸控操作的便利性\n4. 測試響應式設計的斷點\n5. 測試快速輸入功能\n6. 可用性測試確保良好的使用者體驗",
-      "subtasks": []
-    },
-    {
-      "id": 11,
-      "title": "【前端】費用紀錄視覺設計與元件規劃",
-      "description": "根據產品需求文件，設計費用紀錄的視覺元素與元件結構，包含卡片式列表、色彩區分、重點摘要和圖表等，並產出設計文件供前端實作",
-      "status": "pending",
-      "dependencies": [
-        6,
-        8,
-        10,
-        12
-      ],
-      "priority": "high",
-      "details": "1. 設計卡片式列表與視覺元素：\n- 設計費用卡片 (ExpenseCard) 元件，包含金額、日期、分類、描述等資訊的視覺呈現\n- 設計摘要面板 (SummaryPanel) 元件，顯示總支出、分類統計等\n- 設計分類標籤 (CategoryBadge) 元件，使用色彩區分不同分類\n- 設計圖表元件，包括支出趨勢圖、分類佔比圓餅圖等\n- 確保所有元件在桌面和移動設備上都有良好的顯示效果\n\n2. 規劃元件結構與層級：\n- 定義元件層級與組合關係\n- 規劃元件的 props 與事件\n- 設計元件狀態管理方式\n- 考慮元件的可重用性與擴展性\n\n3. 訂定設計規範：\n- 定義主色調與輔助色彩系統，確保分類標籤有明確區分\n- 選擇適合的字型與字級大小，確保可讀性\n- 規範間距系統，確保一致的視覺節奏\n- 定義陰影、圓角等視覺細節\n- 設計互動狀態（hover、active、focus）的視覺效果\n\n4. 產出設計文件：\n- 製作高保真 mockup 或 wireframe\n- 編寫元件設計說明文件，包含元件結構、props、事件等\n- 製作設計系統文件，包含色彩、字型、間距等規範\n- 提供元件使用範例與最佳實踐建議\n\n5. 與開發團隊協作：\n- 與前端工程師討論實作可行性\n- 根據技術限制調整設計\n- 提供必要的設計資源（圖標、圖片等）",
-      "testStrategy": "1. 設計審核：\n- 與產品經理確認設計是否符合 PRD 需求\n- 與利害關係人進行設計評審，確保符合品牌形象\n- 檢查設計是否符合無障礙設計原則\n\n2. 使用者測試：\n- 使用原型工具（如 Figma、InVision）製作可點擊原型\n- 進行小規模使用者測試，收集對視覺設計的反饋\n- 評估使用者對色彩區分、視覺層級的理解程度\n\n3. 技術可行性測試：\n- 與前端工程師確認設計元素是否可實現\n- 檢查設計在不同螢幕尺寸下的適應性\n- 評估設計對性能的潛在影響\n\n4. 設計一致性檢查：\n- 確保所有元件遵循統一的設計語言\n- 檢查色彩、字型、間距等是否一致\n- 確保視覺元素與現有系統風格協調\n\n5. 文檔完整性檢查：\n- 確認設計文件包含所有必要元件的規格\n- 確認設計規範文件詳細且易於理解\n- 確認提供了足夠的實作指引",
-      "subtasks": []
-    },
-    {
-      "id": 12,
-      "title": "【全端】設計費用紀錄 Swagger API 規格",
-      "description": "依據產品需求文件與前端需求，設計所有費用紀錄相關 API（CRUD、查詢、分類等）的 Swagger/OpenAPI 規格，作為前後端開發的共同依據",
-      "status": "pending",
-      "dependencies": [],
-      "priority": "high",
-      "details": "1. 分析需求與規劃 API 架構：\n- 仔細研讀產品需求文件，確認所有費用紀錄相關功能\n- 與前端團隊討論 API 需求，包括資料格式、查詢參數等\n- 規劃 RESTful API 路由結構，遵循最佳實踐\n- 確定 API 版本控制策略\n\n2. 設計基本 CRUD API：\n- POST /api/expenses - 新增費用紀錄\n- GET /api/expenses/{id} - 獲取單一費用紀錄\n- PUT /api/expenses/{id} - 更新費用紀錄\n- DELETE /api/expenses/{id} - 刪除費用紀錄\n- GET /api/expenses - 獲取費用紀錄列表（含分頁、排序）\n\n3. 設計進階查詢 API：\n- GET /api/expenses/search - 支援多條件搜尋（日期範圍、金額範圍、關鍵字等）\n- GET /api/expenses/statistics - 費用統計資料（總額、平均值等）\n- GET /api/expenses/categories - 依分類統計費用\n\n4. 設計多寵物相關 API：\n- 確保所有 API 支援寵物 ID 參數\n- 設計寵物與費用關聯的資料結構\n\n5. 設計分類相關 API：\n- GET /api/categories - 獲取所有分類\n- POST /api/categories - 新增自訂分類\n- PUT /api/categories/{id} - 更新分類\n- DELETE /api/categories/{id} - 刪除分類\n\n6. 使用 golang swag 工具產生文檔：\n- 在 Go 代碼中添加符合 swag 格式的註釋\n- 設置適當的 API 標籤、分組和描述\n- 使用 swag init 命令生成 swagger.json 和 swagger.yaml\n- 配置 Swagger UI 以便於瀏覽和測試 API\n\n7. 詳細定義每個 API 的：\n- 請求參數（路徑參數、查詢參數、請求體）\n- 回應格式與狀態碼\n- 錯誤訊息格式與代碼\n- 權限要求\n- 速率限制（如適用）\n\n8. 文檔化與溝通：\n- 整理 Swagger 文檔，確保清晰易懂\n- 與前端團隊進行 API 規格評審\n- 根據反饋調整 API 設計\n- 最終確認並發布 API 規格文檔",
-      "testStrategy": "1. 文檔完整性檢查：\n- 確認所有 API 端點都有完整的描述\n- 確認所有請求參數都有類型和描述\n- 確認所有回應格式都有明確定義\n- 確認所有錯誤狀態都有說明\n\n2. 技術評審：\n- 與後端團隊進行技術評審，確認 API 設計的可行性\n- 檢查 API 命名是否符合 RESTful 最佳實踐\n- 檢查資料結構是否合理\n- 確認權限控制設計是否完善\n\n3. 前端需求覆蓋檢查：\n- 與前端團隊確認 API 是否滿足所有前端需求\n- 檢查查詢參數是否支援所有前端篩選需求\n- 確認回應格式是否包含前端所需的所有資料\n\n4. Swagger 文檔驗證：\n- 使用 Swagger 驗證工具檢查文檔格式是否正確\n- 確認生成的 swagger.json 或 swagger.yaml 符合 OpenAPI 規範\n- 在 Swagger UI 中測試文檔的可讀性和易用性\n\n5. 模擬測試：\n- 使用 Swagger UI 或 Postman 模擬 API 請求\n- 確認請求和回應格式的一致性\n- 測試各種參數組合的效果\n\n6. 最終確認：\n- 與產品經理確認 API 設計是否符合產品需求\n- 與前後端團隊最終確認 API 規格\n- 記錄任何未解決的問題或後續優化建議",
-      "subtasks": []
-    }
-  ],
-  "metadata": {
-    "created": "2025-06-30T03:21:22.226Z",
-    "updated": "2025-06-30T03:21:48.783Z",
-    "description": "費用紀錄功能專用 tag，修正標籤狀態以利後續任務管理。",
-    "copiedFrom": {
-      "tag": "master",
-      "date": "2025-06-30T03:21:22.226Z"
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "【後端】建立費用紀錄資料庫結構",
+        "description": "設計並實作費用紀錄功能所需的資料庫結構，包含所有必要欄位",
+        "status": "pending",
+        "dependencies": [
+          2,
+          12
+        ],
+        "priority": "high",
+        "details": "建立 Expense 資料表，包含以下欄位：\n- id (主鍵)\n- pet_id (外鍵，關聯到寵物表)\n- category (分類，字串型態)\n- amount (金額，正整數)\n- description (描述，可為空)\n- date (日期)\n- created_at (建立時間)\n- updated_at (更新時間)\n\n同時需要建立 Category 資料表，用於儲存預設與自訂分類：\n- id (主鍵)\n- name (分類名稱)\n- user_id (若為自訂分類則關聯到使用者)\n- is_default (布林值，標示是否為預設分類)\n\n預設分類包含：醫療、飼料、保健品、日用品、其他\n\n資料庫遷移腳本需包含初始預設分類資料",
+        "testStrategy": "1. 撰寫單元測試確保資料表結構符合需求\n2. 測試外鍵約束是否正常運作\n3. 測試預設分類是否正確建立\n4. 驗證欄位類型與限制條件是否符合需求",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "【後端】實作費用紀錄 Domain Model 與 Repository",
+        "description": "建立費用紀錄的領域模型與資料存取層，實現基本的 CRUD 操作",
+        "status": "pending",
+        "dependencies": [
+          12
+        ],
+        "priority": "high",
+        "details": "1. 建立 Expense domain model，包含所有必要欄位與驗證邏輯：\n```\ntype Expense struct {\n  ID          uint\n  PetID       uint\n  Category    string\n  Amount      int\n  Description string\n  Date        time.Time\n  CreatedAt   time.Time\n  UpdatedAt   time.Time\n  Pet         *Pet\n}\n```\n\n2. 實作 ExpenseRepository 介面與實現：\n```\ntype ExpenseRepository interface {\n  Create(expense *Expense) error\n  FindByID(id uint) (*Expense, error)\n  Update(expense *Expense) error\n  Delete(id uint) error\n  FindAll(filters map[string]interface{}) ([]*Expense, error)\n}\n```\n\n3. 實作 CategoryRepository 介面與實現，用於管理預設與自訂分類",
+        "testStrategy": "1. 撰寫單元測試確保 Repository 的 CRUD 操作正常運作\n2. 測試各種查詢條件組合\n3. 測試邊界情況，如無效 ID、不存在的記錄等\n4. 測試資料驗證邏輯",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "【後端】實作費用紀錄 Usecase 層",
+        "description": "建立費用紀錄的業務邏輯層，處理複雜查詢、驗證與業務規則",
+        "status": "pending",
+        "dependencies": [
+          2,
+          12
+        ],
+        "priority": "high",
+        "details": "1. 建立 ExpenseUsecase 介面與實現：\n```\ntype ExpenseUsecase interface {\n  CreateExpense(expense *Expense) error\n  GetExpenseByID(id uint) (*Expense, error)\n  UpdateExpense(expense *Expense) error\n  DeleteExpense(id uint) error\n  ListExpenses(filters map[string]interface{}) ([]*Expense, error)\n  GetExpensesByPetID(petID uint) ([]*Expense, error)\n  GetExpensesByDateRange(start, end time.Time) ([]*Expense, error)\n  GetExpensesByCategory(category string) ([]*Expense, error)\n  SearchExpenses(keyword string) ([]*Expense, error)\n}\n```\n\n2. 實作 CategoryUsecase 介面與實現，用於管理分類：\n```\ntype CategoryUsecase interface {\n  GetAllCategories() ([]*Category, error)\n  GetDefaultCategories() ([]*Category, error)\n  GetUserCategories(userID uint) ([]*Category, error)\n  CreateCategory(category *Category) error\n  UpdateCategory(category *Category) error\n  DeleteCategory(id uint) error\n}\n```\n\n3. 實作業務邏輯，包含：\n- 欄位驗證（必填、金額為正整數等）\n- 多條件組合查詢\n- 快速輸入邏輯（記住上次輸入）",
+        "testStrategy": "1. 撰寫單元測試確保業務邏輯正確\n2. 測試各種查詢條件組合\n3. 測試驗證邏輯，包含必填欄位、金額格式等\n4. 測試快速輸入功能\n5. 模擬各種使用情境進行整合測試",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "【後端】實作費用紀錄 API Endpoints",
+        "description": "建立費用紀錄相關的 RESTful API 端點，支援 CRUD 與查詢操作",
+        "status": "pending",
+        "dependencies": [
+          3,
+          12
+        ],
+        "priority": "high",
+        "details": "1. 實作以下 API 端點：\n- POST /api/v1/expenses - 新增費用紀錄\n- GET /api/v1/expenses/:id - 取得單筆費用紀錄\n- PUT /api/v1/expenses/:id - 更新費用紀錄\n- DELETE /api/v1/expenses/:id - 刪除費用紀錄\n- GET /api/v1/expenses - 查詢費用紀錄（支援多條件篩選）\n  - 查詢參數：pet_id, category, start_date, end_date, keyword\n\n2. 實作分類相關 API：\n- GET /api/categories - 取得所有分類\n- POST /api/categories - 新增自訂分類\n- PUT /api/categories/:id - 更新分類\n- DELETE /api/categories/:id - 刪除分類\n\n3. 實作請求與回應的資料結構：\n```\ntype CreateExpenseRequest struct {\n  PetID       uint      `json:\"pet_id\" binding:\"required\"`\n  Category    string    `json:\"category\" binding:\"required\"`\n  Amount      int       `json:\"amount\" binding:\"required,min=1\"`\n  Description string    `json:\"description\"`\n  Date        time.Time `json:\"date\" binding:\"required\"`\n}\n\ntype ExpenseResponse struct {\n  ID          uint      `json:\"id\"`\n  PetID       uint      `json:\"pet_id\"`\n  PetName     string    `json:\"pet_name\"`\n  Category    string    `json:\"category\"`\n  Amount      int       `json:\"amount\"`\n  Description string    `json:\"description\"`\n  Date        time.Time `json:\"date\"`\n  CreatedAt   time.Time `json:\"created_at\"`\n  UpdatedAt   time.Time `json:\"updated_at\"`\n}\n```",
+        "testStrategy": "1. 撰寫 API 測試確保所有端點正常運作\n2. 測試各種查詢參數組合\n3. 測試權限驗證\n4. 測試錯誤處理與回應\n5. 測試資料驗證邏輯\n6. 使用 Postman 或類似工具建立 API 測試集合",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "【前端】實作費用列表頁面",
+        "description": "建立費用列表頁面，顯示所有費用紀錄並支援篩選、排序功能",
+        "status": "pending",
+        "dependencies": [
+          4,
+          11,
+          12
+        ],
+        "priority": "medium",
+        "details": "1. 建立費用列表頁面，包含以下元素：\n- 費用紀錄列表（依日期倒序排列）\n- 每筆紀錄顯示：日期、分類、金額、描述\n- 篩選區域：寵物選擇器、分類選擇器、日期範圍選擇器、關鍵字搜尋\n- 新增費用按鈕\n- 編輯/刪除操作按鈕\n\n2. 實作列表功能：\n- 分頁顯示\n- 依日期倒序排列\n- 支援多條件篩選\n- 即時更新篩選結果\n\n3. 實作多寵物切換功能：\n- 寵物選擇器（下拉選單）\n- 切換寵物時自動更新列表\n\n4. 實作 UI 元件：\n- 費用卡片元件\n- 篩選表單元件\n- 空狀態提示\n- 載入中狀態",
+        "testStrategy": "1. 撰寫單元測試確保元件正確渲染\n2. 測試篩選功能是否正常運作\n3. 測試多寵物切換功能\n4. 測試分頁功能\n5. 測試 UI 在不同裝置尺寸下的響應式設計\n6. 使用者測試確保操作流暢度",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "【前端】實作費用表單頁面",
+        "description": "建立新增與編輯費用的表單頁面，支援所有必要欄位與驗證",
+        "status": "pending",
+        "dependencies": [
+          4,
+          11,
+          12
+        ],
+        "priority": "medium",
+        "details": "1. 建立費用表單頁面，包含以下欄位：\n- 寵物選擇器（下拉選單，必填）\n- 分類選擇器（下拉選單，包含預設與自訂分類，必填）\n- 金額輸入框（數字輸入，必填，僅允許正整數）\n- 描述輸入框（文字輸入，選填）\n- 日期選擇器（日期選擇，必填，預設今日）\n- 送出按鈕\n- 取消按鈕\n\n2. 實作表單驗證：\n- 必填欄位檢查\n- 金額格式驗證（正整數）\n- 日期合理性檢查\n\n3. 實作快速輸入模式：\n- 記住上次選擇的分類\n- 記住上次輸入的金額\n- 提供快速填入按鈕\n\n4. 實作分類管理：\n- 新增自訂分類功能\n- 編輯分類功能\n- 刪除分類功能",
+        "testStrategy": "1. 撰寫單元測試確保表單元件正確渲染\n2. 測試表單驗證邏輯\n3. 測試快速輸入功能\n4. 測試分類管理功能\n5. 測試表單提交與取消操作\n6. 使用者測試確保操作流暢度",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "【後端】實作分類管理功能（後端部分）",
+        "description": "建立分類管理功能，支援預設分類與自訂分類的管理",
+        "status": "pending",
+        "dependencies": [
+          2,
+          4,
+          12
+        ],
+        "priority": "medium",
+        "details": "1. 建立分類管理頁面或模態框，包含以下功能：\n- 顯示所有分類（預設與自訂）\n- 新增自訂分類\n- 編輯自訂分類\n- 刪除自訂分類\n\n2. 實作預設分類：\n- 初始化預設分類：醫療、飼料、保健品、日用品、其他\n- 預設分類不可刪除或編輯\n\n3. 實作自訂分類：\n- 使用者可新增自訂分類\n- 使用者可編輯自己的自訂分類\n- 使用者可刪除自己的自訂分類\n\n4. 實作分類選擇器元件：\n- 在費用表單中使用\n- 顯示所有可用分類\n- 支援快速新增分類",
+        "testStrategy": "1. 撰寫單元測試確保分類管理功能正常運作\n2. 測試預設分類的保護機制\n3. 測試自訂分類的 CRUD 操作\n4. 測試分類選擇器元件\n5. 測試分類在費用表單中的使用\n6. 使用者測試確保操作流暢度",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "【前端】實作多寵物切換功能",
+        "description": "建立多寵物切換功能，支援依寵物篩選費用紀錄",
+        "status": "pending",
+        "dependencies": [
+          5,
+          6,
+          11,
+          12
+        ],
+        "priority": "medium",
+        "details": "1. 建立寵物選擇器元件：\n- 顯示使用者所有寵物\n- 支援單選模式（選擇單一寵物）\n- 支援多選模式（選擇多個寵物）\n- 支援「全部」選項\n\n2. 整合寵物選擇器到費用列表頁面：\n- 切換寵物時自動更新列表\n- 記住上次選擇的寵物\n\n3. 整合寵物選擇器到費用表單：\n- 新增費用時預設選擇上次使用的寵物\n- 編輯費用時顯示原本的寵物\n\n4. 實作寵物相關資料獲取：\n- 獲取使用者所有寵物列表\n- 獲取寵物詳細資訊\n- 關聯寵物與費用紀錄",
+        "testStrategy": "1. 撰寫單元測試確保寵物選擇器元件正確渲染\n2. 測試寵物切換功能\n3. 測試寵物選擇記憶功能\n4. 測試寵物與費用紀錄的關聯\n5. 使用者測試確保操作流暢度",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "【全端】實作權限驗證與錯誤處理",
+        "description": "實作權限驗證機制，確保只有登入用戶可操作，並優化錯誤處理與提示",
+        "status": "pending",
+        "dependencies": [
+          4,
+          12
+        ],
+        "priority": "high",
+        "details": "1. 實作權限驗證中間件：\n- 確保所有費用相關 API 需要登入才能訪問\n- 確保使用者只能操作自己的費用紀錄\n- 實作 JWT 或 Session 驗證\n\n2. 實作錯誤處理：\n- 統一錯誤回應格式\n- 友善的錯誤訊息\n- 適當的 HTTP 狀態碼\n\n3. 實作前端錯誤處理：\n- 表單驗證錯誤提示\n- API 錯誤提示\n- 載入失敗處理\n- 操作失敗處理\n\n4. 實作錯誤日誌：\n- 記錄後端錯誤\n- 記錄前端錯誤\n- 錯誤分析與監控",
+        "testStrategy": "1. 撰寫單元測試確保權限驗證正常運作\n2. 測試未登入用戶的訪問限制\n3. 測試使用者只能操作自己資料的限制\n4. 測試各種錯誤情境的處理\n5. 測試錯誤提示的友善度\n6. 安全性測試確保無權限漏洞",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "【前端】實作手機操作優化與 UI/UX 改進",
+        "description": "優化手機操作體驗，改進 UI/UX 設計，確保在各種裝置上都有良好的使用體驗",
+        "status": "pending",
+        "dependencies": [
+          5,
+          6,
+          8,
+          11,
+          12
+        ],
+        "priority": "medium",
+        "details": "1. 實作響應式設計：\n- 確保所有頁面在手機、平板、桌面都有良好顯示\n- 針對小螢幕優化表單與列表顯示\n- 使用 CSS Grid 或 Flexbox 實現彈性布局\n\n2. 實作手機操作優化：\n- 觸控友善的按鈕與控制項\n- 適當的字體大小與間距\n- 簡化手機版表單\n- 優化手機版篩選功能\n\n3. 實作 UI/UX 改進：\n- 統一設計語言\n- 清晰的視覺層級\n- 適當的動畫與過渡效果\n- 即時反饋\n\n4. 實作快速輸入優化：\n- 一鍵填入常用資料\n- 智能預設值\n- 記住使用者偏好",
+        "testStrategy": "1. 在各種裝置與螢幕尺寸上測試\n2. 使用者測試確保操作流暢度\n3. 測試觸控操作的便利性\n4. 測試響應式設計的斷點\n5. 測試快速輸入功能\n6. 可用性測試確保良好的使用者體驗",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "【前端】費用紀錄視覺設計與元件規劃",
+        "description": "根據產品需求文件，設計費用紀錄的視覺元素與元件結構，包含卡片式列表、色彩區分、重點摘要和圖表等，並產出設計文件供前端實作",
+        "status": "pending",
+        "dependencies": [
+          6,
+          8,
+          10,
+          12
+        ],
+        "priority": "high",
+        "details": "1. 設計卡片式列表與視覺元素：\n- 設計費用卡片 (ExpenseCard) 元件，包含金額、日期、分類、描述等資訊的視覺呈現\n- 設計摘要面板 (SummaryPanel) 元件，顯示總支出、分類統計等\n- 設計分類標籤 (CategoryBadge) 元件，使用色彩區分不同分類\n- 設計圖表元件，包括支出趨勢圖、分類佔比圓餅圖等\n- 確保所有元件在桌面和移動設備上都有良好的顯示效果\n\n2. 規劃元件結構與層級：\n- 定義元件層級與組合關係\n- 規劃元件的 props 與事件\n- 設計元件狀態管理方式\n- 考慮元件的可重用性與擴展性\n\n3. 訂定設計規範：\n- 定義主色調與輔助色彩系統，確保分類標籤有明確區分\n- 選擇適合的字型與字級大小，確保可讀性\n- 規範間距系統，確保一致的視覺節奏\n- 定義陰影、圓角等視覺細節\n- 設計互動狀態（hover、active、focus）的視覺效果\n\n4. 產出設計文件：\n- 製作高保真 mockup 或 wireframe\n- 編寫元件設計說明文件，包含元件結構、props、事件等\n- 製作設計系統文件，包含色彩、字型、間距等規範\n- 提供元件使用範例與最佳實踐建議\n\n5. 與開發團隊協作：\n- 與前端工程師討論實作可行性\n- 根據技術限制調整設計\n- 提供必要的設計資源（圖標、圖片等）",
+        "testStrategy": "1. 設計審核：\n- 與產品經理確認設計是否符合 PRD 需求\n- 與利害關係人進行設計評審，確保符合品牌形象\n- 檢查設計是否符合無障礙設計原則\n\n2. 使用者測試：\n- 使用原型工具（如 Figma、InVision）製作可點擊原型\n- 進行小規模使用者測試，收集對視覺設計的反饋\n- 評估使用者對色彩區分、視覺層級的理解程度\n\n3. 技術可行性測試：\n- 與前端工程師確認設計元素是否可實現\n- 檢查設計在不同螢幕尺寸下的適應性\n- 評估設計對性能的潛在影響\n\n4. 設計一致性檢查：\n- 確保所有元件遵循統一的設計語言\n- 檢查色彩、字型、間距等是否一致\n- 確保視覺元素與現有系統風格協調\n\n5. 文檔完整性檢查：\n- 確認設計文件包含所有必要元件的規格\n- 確認設計規範文件詳細且易於理解\n- 確認提供了足夠的實作指引",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "【全端】設計費用紀錄 Swagger API 規格",
+        "description": "依據產品需求文件與前端需求，設計所有費用紀錄相關 API（CRUD、查詢、分類等）的 Swagger/OpenAPI 規格，作為前後端開發的共同依據",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "details": "1. 分析需求與規劃 API 架構：\n- 仔細研讀產品需求文件，確認所有費用紀錄相關功能\n- 與前端團隊討論 API 需求，包括資料格式、查詢參數等\n- 規劃 RESTful API 路由結構，遵循最佳實踐\n- 確定 API 版本控制策略\n\n2. 設計基本 CRUD API：\n- POST /api/expenses - 新增費用紀錄\n- GET /api/expenses/{id} - 獲取單一費用紀錄\n- PUT /api/expenses/{id} - 更新費用紀錄\n- DELETE /api/expenses/{id} - 刪除費用紀錄\n- GET /api/expenses - 獲取費用紀錄列表（含分頁、排序）\n\n3. 設計進階查詢 API：\n- GET /api/expenses/search - 支援多條件搜尋（日期範圍、金額範圍、關鍵字等）\n- GET /api/expenses/statistics - 費用統計資料（總額、平均值等）\n- GET /api/expenses/categories - 依分類統計費用\n\n4. 設計多寵物相關 API：\n- 確保所有 API 支援寵物 ID 參數\n- 設計寵物與費用關聯的資料結構\n\n5. 設計分類相關 API：\n- GET /api/categories - 獲取所有分類\n- POST /api/categories - 新增自訂分類\n- PUT /api/categories/{id} - 更新分類\n- DELETE /api/categories/{id} - 刪除分類\n\n6. 使用 golang swag 工具產生文檔：\n- 在 Go 代碼中添加符合 swag 格式的註釋\n- 設置適當的 API 標籤、分組和描述\n- 使用 swag init 命令生成 swagger.json 和 swagger.yaml\n- 配置 Swagger UI 以便於瀏覽和測試 API\n\n7. 詳細定義每個 API 的：\n- 請求參數（路徑參數、查詢參數、請求體）\n- 回應格式與狀態碼\n- 錯誤訊息格式與代碼\n- 權限要求\n- 速率限制（如適用）\n\n8. 文檔化與溝通：\n- 整理 Swagger 文檔，確保清晰易懂\n- 與前端團隊進行 API 規格評審\n- 根據反饋調整 API 設計\n- 最終確認並發布 API 規格文檔",
+        "testStrategy": "1. 文檔完整性檢查：\n- 確認所有 API 端點都有完整的描述\n- 確認所有請求參數都有類型和描述\n- 確認所有回應格式都有明確定義\n- 確認所有錯誤狀態都有說明\n\n2. 技術評審：\n- 與後端團隊進行技術評審，確認 API 設計的可行性\n- 檢查 API 命名是否符合 RESTful 最佳實踐\n- 檢查資料結構是否合理\n- 確認權限控制設計是否完善\n\n3. 前端需求覆蓋檢查：\n- 與前端團隊確認 API 是否滿足所有前端需求\n- 檢查查詢參數是否支援所有前端篩選需求\n- 確認回應格式是否包含前端所需的所有資料\n\n4. Swagger 文檔驗證：\n- 使用 Swagger 驗證工具檢查文檔格式是否正確\n- 確認生成的 swagger.json 或 swagger.yaml 符合 OpenAPI 規範\n- 在 Swagger UI 中測試文檔的可讀性和易用性\n\n5. 模擬測試：\n- 使用 Swagger UI 或 Postman 模擬 API 請求\n- 確認請求和回應格式的一致性\n- 測試各種參數組合的效果\n\n6. 最終確認：\n- 與產品經理確認 API 設計是否符合產品需求\n- 與前後端團隊最終確認 API 規格\n- 記錄任何未解決的問題或後續優化建議",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-06-30T03:21:22.226Z",
+      "updated": "2025-06-30T03:21:48.783Z",
+      "description": "費用紀錄功能專用 tag，修正標籤狀態以利後續任務管理。",
+      "copiedFrom": {
+        "tag": "master",
+        "date": "2025-06-30T03:21:22.226Z"
+      }
     }
   }
 }
