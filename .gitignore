@@ -568,3 +568,4 @@ node_modules/
 
 ## Custom ##
 bin/
+.serena/cache
