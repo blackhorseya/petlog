@@ -7,7 +7,7 @@ import type {
   UpdateExpenseRequest,
   ExpenseFilters,
   ExpenseCategory,
-  ExpenseSummaryResponse,
+  ExpenseStatistics,
 } from '@/lib/types/expense';
 
 // Query Keys
@@ -44,7 +44,7 @@ export function useExpense(id: string) {
   });
 }
 
-export function useExpenseSummary(filters?: { pet_id?: string }) {
+export function useExpenseStatistics(filters?: { pet_id?: string }) {
   return useQuery({
     queryKey: expenseKeys.statistics(filters),
     queryFn: () => expenseAPI.getSummary(filters),
@@ -55,7 +55,7 @@ export function useExpenseSummary(filters?: { pet_id?: string }) {
 // 搜尋費用紀錄
 export function useExpenseSearch(keyword: string, filters?: Omit<ExpenseFilters, 'keyword'>) {
   return useQuery({
-    queryKey: expenseKeys.list({ ...filters, keyword }),
+    queryKey: [...expenseKeys.list(filters), { keyword }],
     queryFn: () => expenseAPI.search(keyword, filters),
     enabled: keyword.trim().length > 0,
     staleTime: 1000 * 60 * 2, // 2 分鐘

@@ -9,7 +9,7 @@ import type {
   CreateExpenseResponse,
   UpdateExpenseResponse,
   DeleteExpenseResponse,
-  ExpenseSummaryResponse,
+  ExpenseStatistics,
   ExpenseCategory,
 } from '@/lib/types/expense';
 import {
@@ -284,55 +284,34 @@ export const expenseAPI = {
     return this.list(categoryFilters);
   },
 
-  // 取得費用摘要（基於 API 的 /expenses/summary 端點）
-  async getSummary(filters?: { pet_id?: string }): Promise<ExpenseSummaryResponse> {
+  // 取得費用摘要統計
+  async getSummary(filters?: { pet_id?: string }): Promise<ExpenseStatistics> {
     if (USE_MOCK_DATA) {
       await delay(400);
-      
-      if (shouldSimulateError()) {
-        throw new Error('模擬網路錯誤');
-      }
-
-      // 模擬摘要資料
-      const mockExpenses = getMockExpenses();
-      const filteredExpenses = filters?.pet_id 
-        ? mockExpenses.filter(e => e.pet_id === filters.pet_id)
-        : mockExpenses;
-        
-      const totalAmount = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-      
-      // 計算分類統計
-      const categoryStats = filteredExpenses.reduce((acc, expense) => {
-        acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
-        return acc;
-      }, {} as Record<string, number>);
-      
-      // 最近的費用（最多 5 筆）
-      const recent = filteredExpenses
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .slice(0, 5);
-
       return {
-        total_amount: totalAmount,
-        category_stats: categoryStats,
-        recent,
+        total_amount: 16650,
+        total_count: 15,
+        average_amount: 1110,
+        categories: [
+          { category: '醫療', amount: 9000, count: 4 },
+          { category: '飼料', amount: 2330, count: 3 },
+          { category: '美容', amount: 1150, count: 2 },
+        ],
+        monthly_summary: [
+          { month: '2024-01', amount: 5570, count: 7 },
+          { month: '2023-12', amount: 11080, count: 8 },
+        ],
       };
     }
 
-    // 真實 API 調用
-    const params = new URLSearchParams();
-    if (filters?.pet_id) {
-      params.append('pet_id', filters.pet_id);
-    }
-
-    const url = params.toString() 
-      ? `${API_BASE}/expenses/summary?${params.toString()}`
+    const url = filters?.pet_id
+      ? `${API_BASE}/expenses/summary?pet_id=${filters.pet_id}`
       : `${API_BASE}/expenses/summary`;
 
-    const response = await apiRequest<ExpenseSummaryResponse>(url);
+    const response = await apiRequest<ExpenseStatistics>(url);
     
     if (response.error) {
-      throw new Error(response.error);
+      throw new Error(JSON.stringify(response.error));
     }
     
     return response;

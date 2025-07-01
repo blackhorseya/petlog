@@ -4,6 +4,7 @@
 export interface Expense {
   id: string;
   pet_id: string;
+  pet_name: string;
   category: string;
   amount: number;
   description?: string;
@@ -42,6 +43,10 @@ export interface ExpenseFilters {
 // API Response 格式（對應 endpoint.ListExpensesResponse）
 export interface ListExpensesResponse {
   expenses: Expense[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
   error?: any;
 }
 
@@ -69,10 +74,12 @@ export interface DeleteExpenseResponse {
 }
 
 // 費用摘要回應（對應 endpoint.GetExpenseSummaryResponse）
-export interface ExpenseSummaryResponse {
+export interface ExpenseStatistics {
   total_amount: number;
-  category_stats: Record<string, number>;
-  recent: Expense[];
+  total_count: number;
+  average_amount: number;
+  categories: { category: string; amount: number; count: number }[];
+  monthly_summary: { month: string; amount: number; count: number }[];
   error?: any;
 }
 

@@ -1,9 +1,10 @@
 import type {
   Expense,
   ExpenseCategory,
-  ExpenseListResponse,
+  ListExpensesResponse,
   ExpenseStatistics,
 } from '@/lib/types/expense';
+import { Pet } from '@/lib/types/pet';
 
 // 簡單的寵物類型定義（用於費用篩選）
 export interface MockPet {
@@ -18,7 +19,7 @@ export const mockPets: MockPet[] = [
   {
     id: 'pet1',
     name: '小白',
-    breed: '黃金獵犬',
+    breed: '黃金犬',
     dob: '2020-03-15',
   },
   {
@@ -289,7 +290,7 @@ export function paginateExpenses(
   expenses: Expense[], 
   page: number = 1, 
   pageSize: number = 20
-): ExpenseListResponse {
+): ListExpensesResponse {
   const startIndex = (page - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedExpenses = expenses.slice(startIndex, endIndex);
