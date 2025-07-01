@@ -9,11 +9,39 @@ import {
   DeletePetResponse,
 } from "../types/pet";
 import { apiRequest } from "./request";
+import { mockPets } from "./expense-mock";
+
+// 是否使用 mock data（開發環境下預設為 true）
+const USE_MOCK_DATA = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
+
+// 模擬 API 延遲
+const delay = (ms: number = 200) => 
+  new Promise(resolve => setTimeout(resolve, ms));
+
+// 轉換 mock 寵物資料為正式格式
+function convertMockPetToPet(mockPet: typeof mockPets[0]): Pet {
+  return {
+    id: mockPet.id,
+    name: mockPet.name,
+    owner_id: 'user1',
+    avatar_url: '', // 簡化處理
+    dob: mockPet.dob || '',
+    breed: mockPet.breed || '',
+    microchip_id: '',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+  };
+}
 
 // 寵物 API 服務
 export const petApi = {
   // 獲取所有寵物 - GET /api/v1/pets
   async listPets(): Promise<Pet[]> {
+    if (USE_MOCK_DATA) {
+      await delay(200);
+      return mockPets.map(convertMockPetToPet);
+    }
+
     const response = await apiRequest<ListPetsResponse>("/api/v1/pets");
     return response.pets;
   },
