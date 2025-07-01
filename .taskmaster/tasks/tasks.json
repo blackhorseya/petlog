@@ -5,7 +5,7 @@
         "id": 1,
         "title": "【後端】建立費用紀錄資料庫結構",
         "description": "設計並實作費用紀錄功能所需的資料庫結構，包含所有必要欄位",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           2,
           12
@@ -178,7 +178,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T03:21:22.226Z",
-      "updated": "2025-06-30T03:53:55.238Z",
+      "updated": "2025-07-01T02:26:10.347Z",
       "description": "費用紀錄功能專用 tag，修正標籤狀態以利後續任務管理。",
       "copiedFrom": {
         "tag": "master",

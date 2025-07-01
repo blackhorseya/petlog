@@ -14,7 +14,7 @@ tasks:
   test:
     desc: 執行 Go 測試
     cmds:
-      - go test -v ./...
+      - go test -v -race ./...
 
   clean:
     desc: 清理 ./bin 內所有編譯檔
