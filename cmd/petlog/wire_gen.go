@@ -62,8 +62,16 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 	getMedicalRecordByIDHandler := query.NewGetMedicalRecordByIDHandler(medicalRecordRepository)
 	listMedicalRecordsByPetHandler := query.NewListMedicalRecordsByPetHandler(medicalRecordRepository)
 	medicalRecordEndpoints := endpoint.MakeMedicalRecordEndpoints(createMedicalRecordHandler, updateMedicalRecordHandler, deleteMedicalRecordHandler, getMedicalRecordByIDHandler, listMedicalRecordsByPetHandler)
+	expenseRepository := mongodb.NewExpenseRepository()
+	createExpenseHandler := command.NewCreateExpenseHandler(expenseRepository)
+	updateExpenseHandler := command.NewUpdateExpenseHandler(expenseRepository)
+	deleteExpenseHandler := command.NewDeleteExpenseHandler(expenseRepository)
+	getExpenseByIDHandler := query.NewGetExpenseByIDHandler(expenseRepository)
+	listExpensesByPetHandler := query.NewListExpensesByPetHandler(expenseRepository)
+	getExpenseSummaryHandler := query.NewGetExpenseSummaryHandler(expenseRepository)
+	expenseEndpoints := endpoint.MakeExpenseEndpoints(createExpenseHandler, updateExpenseHandler, deleteExpenseHandler, getExpenseByIDHandler, listExpensesByPetHandler, getExpenseSummaryHandler)
 	v := _wireValue
-	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, healthLogEndpoints, dashboardEndpoints, medicalRecordEndpoints, v)
+	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, healthLogEndpoints, dashboardEndpoints, medicalRecordEndpoints, expenseEndpoints, v)
 	return handler, func() {
 		cleanup()
 	}, nil

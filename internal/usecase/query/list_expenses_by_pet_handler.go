@@ -15,7 +15,7 @@ type ListExpensesByPetQuery struct {
 	Options []repository.ExpenseQueryOption `json:"-"`
 }
 
-// ListExpensesByPetHandler 處理根據寵物 ID 查詢費用列表的業務邏輯
+// ListExpensesByPetHandler 處理查詢費用列表的業務邏輯
 type ListExpensesByPetHandler struct {
 	expenseRepo repository.ExpenseRepository
 }
