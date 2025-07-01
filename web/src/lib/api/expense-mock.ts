@@ -242,9 +242,9 @@ export const delay = (ms: number = 300) =>
 // 模擬錯誤（10% 機率）
 export const shouldSimulateError = () => Math.random() < 0.1;
 
-// 模擬篩選邏輯
-export function filterExpenses(
-  expenses: Expense[], 
+// 模擬篩選邏輯（支援 ExpenseWithPetName）
+export function filterExpenses<T extends Expense>(
+  expenses: T[], 
   filters: {
     pet_id?: string;
     category?: string;
@@ -252,7 +252,7 @@ export function filterExpenses(
     end_date?: string;
     keyword?: string;
   }
-): Expense[] {
+): T[] {
   return expenses.filter(expense => {
     // 寵物篩選
     if (filters.pet_id && expense.pet_id !== filters.pet_id) {

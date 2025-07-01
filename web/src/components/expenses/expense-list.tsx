@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ExpenseCard, ExpenseFilters, ExpensePagination } from '@/components/expenses';
 import { useExpenses, useExpenseManagement } from '@/hooks/use-expenses';
-import type { ExpenseFilters as ExpenseFiltersType, Expense } from '@/lib/types/expense';
+import type { ExpenseFilters as ExpenseFiltersType } from '@/lib/types/expense';
+import type { ExpenseWithPetName } from '@/lib/api/expense';
 
 interface ExpenseListProps {
   onAddExpense?: () => void;
-  onEditExpense?: (expense: Expense) => void;
+  onEditExpense?: (expense: ExpenseWithPetName) => void;
 }
 
 export function ExpenseList({
@@ -18,18 +19,21 @@ export function ExpenseList({
   onEditExpense,
 }: ExpenseListProps) {
   // 篩選狀態
-  const [filters, setFilters] = useState<ExpenseFiltersType>({
+  const [filters, setFilters] = useState<ExpenseFiltersType>({});
+  
+  // 分頁狀態（分離管理）
+  const [pagination, setPagination] = useState({
     page: 1,
     page_size: 20,
   });
 
-  // 獲取費用資料
+  // 獲取費用資料（合併篩選和分頁參數）
   const {
     data: expenseData,
     isLoading,
     error,
     refetch,
-  } = useExpenses(filters);
+  } = useExpenses({ ...filters, ...pagination });
 
   // 費用管理操作
   const { delete: deleteExpense, isDeleting } = useExpenseManagement();
@@ -37,28 +41,27 @@ export function ExpenseList({
   // 處理篩選變更
   const handleFiltersChange = useCallback((newFilters: ExpenseFiltersType) => {
     setFilters(newFilters);
+    // 篩選變更時重置到第一頁
+    setPagination(prev => ({ ...prev, page: 1 }));
   }, []);
 
   // 重置篩選
   const handleResetFilters = useCallback(() => {
-    setFilters({
-      page: 1,
-      page_size: filters.page_size,
-    });
-  }, [filters.page_size]);
+    setFilters({});
+    setPagination({ page: 1, page_size: pagination.page_size });
+  }, [pagination.page_size]);
 
   // 處理分頁變更
   const handlePageChange = useCallback((page: number) => {
-    setFilters(prev => ({ ...prev, page }));
+    setPagination(prev => ({ ...prev, page }));
   }, []);
 
   // 處理每頁尺寸變更
   const handlePageSizeChange = useCallback((pageSize: number) => {
-    setFilters(prev => ({ 
-      ...prev, 
+    setPagination({ 
       page_size: pageSize, 
       page: 1 // 重置到第一頁
-    }));
+    });
   }, []);
 
   // 處理刪除費用
@@ -67,8 +70,8 @@ export function ExpenseList({
       try {
         await deleteExpense(expenseId);
                  // 如果當前頁面沒有資料了，回到上一頁
-         if (expenseData && expenseData.expenses.length === 1 && (filters.page || 1) > 1) {
-           handlePageChange((filters.page || 1) - 1);
+         if (expenseData && expenseData.expenses.length === 1 && pagination.page > 1) {
+           handlePageChange(pagination.page - 1);
          } else {
            refetch();
          }
@@ -76,7 +79,7 @@ export function ExpenseList({
         console.error('刪除費用紀錄失敗:', error);
       }
     }
-  }, [deleteExpense, expenseData, filters.page, handlePageChange, refetch]);
+  }, [deleteExpense, expenseData, pagination.page, handlePageChange, refetch]);
 
   // 檢查是否有篩選條件
   const hasFilters = useMemo(() => {
@@ -84,8 +87,7 @@ export function ExpenseList({
       filters.pet_id || 
       filters.category || 
       filters.start_date || 
-      filters.end_date || 
-      filters.keyword
+      filters.end_date
     );
   }, [filters]);
 
@@ -225,10 +227,10 @@ export function ExpenseList({
       {/* 分頁組件 */}
       {expenses.length > 0 && (
         <ExpensePagination
-          currentPage={filters.page || 1}
+          currentPage={pagination.page}
           totalPages={totalPages}
           totalItems={total}
-          pageSize={filters.page_size || 20}
+          pageSize={pagination.page_size}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           isLoading={isLoading}

@@ -4,9 +4,13 @@ import type {
   CreateExpenseRequest,
   UpdateExpenseRequest,
   ExpenseFilters,
-  ExpenseListResponse,
+  ListExpensesResponse,
+  GetExpenseResponse,
+  CreateExpenseResponse,
+  UpdateExpenseResponse,
+  DeleteExpenseResponse,
+  ExpenseSummaryResponse,
   ExpenseCategory,
-  ExpenseStatistics,
 } from '@/lib/types/expense';
 import {
   getMockExpenses,
@@ -17,17 +21,63 @@ import {
   addMockCategory,
   updateMockCategory,
   deleteMockCategory,
-  mockStatistics,
   delay,
   shouldSimulateError,
   filterExpenses,
-  paginateExpenses,
 } from './expense-mock';
 
 const API_BASE = '/api/v1';
 
 // 是否使用 mock data（開發環境下預設為 true）
 const USE_MOCK_DATA = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
+
+// 擴展 Expense 類型來包含 pet_name（前端顯示用）
+export interface ExpenseWithPetName extends Expense {
+  pet_name: string;
+}
+
+// 模擬的分頁回應（用於兼容現有前端組件）
+export interface MockExpenseListResponse {
+  expenses: ExpenseWithPetName[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+// 轉換函數：從 API 回應到前端使用的格式
+function enhanceExpenseWithPetName(expense: Expense): ExpenseWithPetName {
+  // 簡化映射（實際應該從寵物 API 獲取）
+  const petNameMap: Record<string, string> = {
+    'pet1': '小白',
+    'pet2': '黑豆', 
+    'pet3': '咪咪',
+  };
+  
+  return {
+    ...expense,
+    pet_name: petNameMap[expense.pet_id] || '未知寵物',
+  };
+}
+
+// 創建模擬分頁回應
+function createMockPaginationResponse(
+  expenses: ExpenseWithPetName[], 
+  page: number = 1, 
+  pageSize: number = 20
+): MockExpenseListResponse {
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedExpenses = expenses.slice(startIndex, endIndex);
+  
+  return {
+    expenses: paginatedExpenses,
+    total: expenses.length,
+    page,
+    page_size: pageSize,
+    total_pages: Math.ceil(expenses.length / pageSize),
+  };
+}
 
 // 費用紀錄 CRUD 操作
 export const expenseAPI = {
@@ -129,8 +179,8 @@ export const expenseAPI = {
     });
   },
 
-  // 查詢費用紀錄列表
-  async list(filters?: ExpenseFilters): Promise<ExpenseListResponse> {
+  // 查詢費用紀錄列表（兼容分頁格式）
+  async list(filters?: ExpenseFilters & { page?: number; page_size?: number }): Promise<MockExpenseListResponse> {
     if (USE_MOCK_DATA) {
       // 模擬 API 延遲
       await delay(300);
@@ -141,7 +191,8 @@ export const expenseAPI = {
       }
 
       // 篩選資料
-      const filteredExpenses = filterExpenses(getMockExpenses(), filters || {});
+      const mockExpenses = getMockExpenses().map(enhanceExpenseWithPetName);
+      const filteredExpenses = filterExpenses(mockExpenses, filters || {});
       
       // 依日期倒序排列
       const sortedExpenses = filteredExpenses.sort((a, b) => 
@@ -149,17 +200,26 @@ export const expenseAPI = {
       );
       
       // 分頁處理
-      return paginateExpenses(
+      return createMockPaginationResponse(
         sortedExpenses, 
         filters?.page || 1, 
         filters?.page_size || 20
       );
     }
 
+    // 真實 API 調用
     const params = new URLSearchParams();
     
     if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
+      // 只傳遞 API 支援的參數
+      const apiFilters = {
+        pet_id: filters.pet_id,
+        category: filters.category,
+        start_date: filters.start_date,
+        end_date: filters.end_date,
+      };
+      
+      Object.entries(apiFilters).forEach(([key, value]) => {
         if (value !== undefined && value !== '') {
           params.append(key, String(value));
         }
@@ -170,18 +230,37 @@ export const expenseAPI = {
       ? `${API_BASE}/expenses?${params.toString()}`
       : `${API_BASE}/expenses`;
 
-    return apiRequest<ExpenseListResponse>(url);
+    const response = await apiRequest<ListExpensesResponse>(url);
+    
+    // 處理 API 錯誤
+    if (response.error) {
+      throw new Error(response.error);
+    }
+    
+    // 轉換為前端期望的格式（含分頁模擬）
+    const enhancedExpenses = response.expenses.map(enhanceExpenseWithPetName);
+    return createMockPaginationResponse(
+      enhancedExpenses,
+      filters?.page || 1,
+      filters?.page_size || 20
+    );
   },
 
-  // 搜尋費用紀錄
-  async search(keyword: string, filters?: Omit<ExpenseFilters, 'keyword'>): Promise<ExpenseListResponse> {
-    const searchFilters: ExpenseFilters = { ...filters, keyword };
-    return this.list(searchFilters);
+  // 搜尋費用紀錄（已棄用，因為 API 不支援 keyword 搜尋）
+  async search(keyword: string, filters?: Omit<ExpenseFilters, 'keyword'>): Promise<MockExpenseListResponse> {
+    // 在 mock 模式下模擬搜尋，實際 API 不支援
+    if (USE_MOCK_DATA) {
+      const searchFilters = { ...filters, keyword };
+      return this.list(searchFilters);
+    } else {
+      // 真實 API 不支援 keyword 搜尋，回退到普通列表
+      return this.list(filters);
+    }
   },
 
   // 依寵物 ID 查詢費用紀錄
-  async getByPetId(petId: string, filters?: Omit<ExpenseFilters, 'pet_id'>): Promise<ExpenseListResponse> {
-    const petFilters: ExpenseFilters = { ...filters, pet_id: petId };
+  async getByPetId(petId: string, filters?: Omit<ExpenseFilters, 'pet_id'>): Promise<MockExpenseListResponse> {
+    const petFilters = { ...filters, pet_id: petId };
     return this.list(petFilters);
   },
 
@@ -190,8 +269,8 @@ export const expenseAPI = {
     startDate: string, 
     endDate: string, 
     filters?: Omit<ExpenseFilters, 'start_date' | 'end_date'>
-  ): Promise<ExpenseListResponse> {
-    const dateFilters: ExpenseFilters = { 
+  ): Promise<MockExpenseListResponse> {
+    const dateFilters = { 
       ...filters, 
       start_date: startDate, 
       end_date: endDate 
@@ -200,13 +279,13 @@ export const expenseAPI = {
   },
 
   // 依分類查詢費用紀錄
-  async getByCategory(category: string, filters?: Omit<ExpenseFilters, 'category'>): Promise<ExpenseListResponse> {
-    const categoryFilters: ExpenseFilters = { ...filters, category };
+  async getByCategory(category: string, filters?: Omit<ExpenseFilters, 'category'>): Promise<MockExpenseListResponse> {
+    const categoryFilters = { ...filters, category };
     return this.list(categoryFilters);
   },
 
-  // 取得費用統計資料
-  async getStatistics(filters?: Omit<ExpenseFilters, 'page' | 'page_size'>): Promise<ExpenseStatistics> {
+  // 取得費用摘要（基於 API 的 /expenses/summary 端點）
+  async getSummary(filters?: { pet_id?: string }): Promise<ExpenseSummaryResponse> {
     if (USE_MOCK_DATA) {
       await delay(400);
       
@@ -214,57 +293,49 @@ export const expenseAPI = {
         throw new Error('模擬網路錯誤');
       }
 
-      // 如果有篩選條件，重新計算統計資料
-      if (filters && Object.keys(filters).length > 0) {
-        const filteredExpenses = filterExpenses(getMockExpenses(), filters);
+      // 模擬摘要資料
+      const mockExpenses = getMockExpenses();
+      const filteredExpenses = filters?.pet_id 
+        ? mockExpenses.filter(e => e.pet_id === filters.pet_id)
+        : mockExpenses;
         
-        const totalAmount = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-        const totalCount = filteredExpenses.length;
-        const averageAmount = totalCount > 0 ? Math.round(totalAmount / totalCount) : 0;
-        
-        // 重新計算分類統計
-        const categoryStats = filteredExpenses.reduce((acc, expense) => {
-          const existing = acc.find(cat => cat.category === expense.category);
-          if (existing) {
-            existing.amount += expense.amount;
-            existing.count += 1;
-          } else {
-            acc.push({
-              category: expense.category,
-              amount: expense.amount,
-              count: 1,
-            });
-          }
-          return acc;
-        }, [] as { category: string; amount: number; count: number; }[]);
-        
-        return {
-          total_amount: totalAmount,
-          total_count: totalCount,
-          average_amount: averageAmount,
-          categories: categoryStats,
-          monthly_summary: mockStatistics.monthly_summary, // 簡化處理
-        };
-      }
+      const totalAmount = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+      
+      // 計算分類統計
+      const categoryStats = filteredExpenses.reduce((acc, expense) => {
+        acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      // 最近的費用（最多 5 筆）
+      const recent = filteredExpenses
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 5);
 
-      return mockStatistics;
+      return {
+        total_amount: totalAmount,
+        category_stats: categoryStats,
+        recent,
+      };
     }
 
+    // 真實 API 調用
     const params = new URLSearchParams();
-    
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== '') {
-          params.append(key, String(value));
-        }
-      });
+    if (filters?.pet_id) {
+      params.append('pet_id', filters.pet_id);
     }
 
     const url = params.toString() 
-      ? `${API_BASE}/expenses/statistics?${params.toString()}`
-      : `${API_BASE}/expenses/statistics`;
+      ? `${API_BASE}/expenses/summary?${params.toString()}`
+      : `${API_BASE}/expenses/summary`;
 
-    return apiRequest<ExpenseStatistics>(url);
+    const response = await apiRequest<ExpenseSummaryResponse>(url);
+    
+    if (response.error) {
+      throw new Error(response.error);
+    }
+    
+    return response;
   },
 };
 

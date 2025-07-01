@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { expenseAPI, categoryAPI } from '@/lib/api/expense';
+import type { MockExpenseListResponse, ExpenseWithPetName } from '@/lib/api/expense';
 import type {
   Expense,
   CreateExpenseRequest,
   UpdateExpenseRequest,
   ExpenseFilters,
-  ExpenseListResponse,
   ExpenseCategory,
-  ExpenseStatistics,
+  ExpenseSummaryResponse,
 } from '@/lib/types/expense';
 
 // Query Keys
@@ -44,10 +44,10 @@ export function useExpense(id: string) {
   });
 }
 
-export function useExpenseStatistics(filters?: Omit<ExpenseFilters, 'page' | 'page_size'>) {
+export function useExpenseSummary(filters?: { pet_id?: string }) {
   return useQuery({
     queryKey: expenseKeys.statistics(filters),
-    queryFn: () => expenseAPI.getStatistics(filters),
+    queryFn: () => expenseAPI.getSummary(filters),
     staleTime: 1000 * 60 * 10, // 10 分鐘
   });
 }
@@ -81,8 +81,8 @@ export function useUpdateExpense() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateExpenseRequest }) => 
-      expenseAPI.update(id, data),
+    mutationFn: (data: UpdateExpenseRequest) => 
+      expenseAPI.update(data.id, data),
     onSuccess: (updatedExpense) => {
       // 更新特定項目快取
       queryClient.setQueryData(

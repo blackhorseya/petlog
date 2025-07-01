@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Search, Filter, X, ChevronDown } from 'lucide-react';
+import { Calendar, Filter, X, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,7 +43,6 @@ export function ExpenseFilters({
     onFiltersChange({
       ...filters,
       [key]: value,
-      page: 1, // 重置頁碼
     });
   }, [filters, onFiltersChange]);
 
@@ -52,8 +51,7 @@ export function ExpenseFilters({
     filters.pet_id || 
     filters.category || 
     filters.start_date || 
-    filters.end_date || 
-    filters.keyword
+    filters.end_date
   );
 
   return (
@@ -95,19 +93,7 @@ export function ExpenseFilters({
       </CardHeader>
 
       <CardContent className={`space-y-4 ${!isExpanded ? 'hidden md:block' : ''}`}>
-        {/* 第一行：關鍵字搜尋 */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="搜尋費用描述..."
-            value={filters.keyword || ''}
-            onChange={(e) => updateFilter('keyword', e.target.value || undefined)}
-            className="pl-10"
-            disabled={isLoading}
-          />
-        </div>
-
-        {/* 第二行：寵物和分類選擇 */}
+        {/* 寵物和分類選擇 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 寵物選擇器 */}
           <div>
@@ -230,7 +216,6 @@ export function ExpenseFilters({
                 ...filters,
                 start_date: today,
                 end_date: today,
-                page: 1,
               });
             }}
             disabled={isLoading}
@@ -249,7 +234,6 @@ export function ExpenseFilters({
                 ...filters,
                 start_date: lastWeek.toISOString().split('T')[0],
                 end_date: today.toISOString().split('T')[0],
-                page: 1,
               });
             }}
             disabled={isLoading}
@@ -268,7 +252,6 @@ export function ExpenseFilters({
                 ...filters,
                 start_date: lastMonth.toISOString().split('T')[0],
                 end_date: today.toISOString().split('T')[0],
-                page: 1,
               });
             }}
             disabled={isLoading}
