@@ -20,44 +20,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-
-const navigation = [
-  {
-    name: "首頁",
-    href: "/",
-    icon: Home,
-  },
-  {
-    name: "我的寵物",
-    href: "/pets",
-    icon: PawPrint,
-  },
-  {
-    name: "健康記錄",
-    href: "/health",
-    icon: Heart,
-  },
-  {
-    name: "日曆檢視",
-    href: "/calendar",
-    icon: Calendar,
-  },
-  {
-    name: "醫療記錄",
-    href: "/medical-records",
-    icon: FileText,
-  },
-  {
-    name: "數據分析",
-    href: "/analytics",
-    icon: BarChart3,
-  },
-  {
-    name: "設定",
-    href: "/settings",
-    icon: Settings,
-  },
-]
+import { navigation } from "@/components/navigation/navigation"
 
 interface MobileSidebarProps {
   isOpen: boolean
