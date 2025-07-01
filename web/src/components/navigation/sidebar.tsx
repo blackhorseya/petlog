@@ -12,7 +12,8 @@ import {
   Home,
   BarChart3,
   Upload,
-  Share2
+  Share2,
+  DollarSign
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -33,6 +34,11 @@ const navigation = [
     name: "健康記錄",
     href: "/health",
     icon: Heart,
+  },
+  {
+    name: "費用紀錄",
+    href: "/expenses",
+    icon: DollarSign,
   },
   {
     name: "日曆檢視",
