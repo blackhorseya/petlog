@@ -1,5 +1,30 @@
 basePath: /
 definitions:
+  endpoint.CreateExpenseRequest:
+    properties:
+      amount:
+        minimum: 1
+        type: integer
+      category:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      pet_id:
+        type: string
+    required:
+    - amount
+    - category
+    - date
+    - pet_id
+    type: object
+  endpoint.CreateExpenseResponse:
+    properties:
+      error: {}
+      expense:
+        $ref: '#/definitions/model.Expense'
+    type: object
   endpoint.CreateHealthLogRequest:
     properties:
       behaviour_notes:
@@ -66,6 +91,10 @@ definitions:
       pet:
         $ref: '#/definitions/model.Pet'
     type: object
+  endpoint.DeleteExpenseResponse:
+    properties:
+      error: {}
+    type: object
   endpoint.DeleteHealthLogResponse:
     properties:
       error: {}
@@ -94,6 +123,26 @@ definitions:
           example: 2
         type: integer
     type: object
+  endpoint.GetExpenseResponse:
+    properties:
+      error: {}
+      expense:
+        $ref: '#/definitions/model.Expense'
+    type: object
+  endpoint.GetExpenseSummaryResponse:
+    properties:
+      category_stats:
+        additionalProperties:
+          type: integer
+        type: object
+      error: {}
+      recent:
+        items:
+          $ref: '#/definitions/model.Expense'
+        type: array
+      total_amount:
+        type: integer
+    type: object
   endpoint.GetHealthLogByIDResponse:
     properties:
       error: {}
@@ -111,6 +160,14 @@ definitions:
       error: {}
       pet:
         $ref: '#/definitions/model.Pet'
+    type: object
+  endpoint.ListExpensesResponse:
+    properties:
+      error: {}
+      expenses:
+        items:
+          $ref: '#/definitions/model.Expense'
+        type: array
     type: object
   endpoint.ListHealthLogsByPetResponse:
     properties:
@@ -135,6 +192,33 @@ definitions:
         items:
           $ref: '#/definitions/model.Pet'
         type: array
+    type: object
+  endpoint.UpdateExpenseRequest:
+    properties:
+      amount:
+        minimum: 1
+        type: integer
+      category:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      pet_id:
+        type: string
+    required:
+    - amount
+    - category
+    - date
+    - pet_id
+    type: object
+  endpoint.UpdateExpenseResponse:
+    properties:
+      error: {}
+      expense:
+        $ref: '#/definitions/model.Expense'
     type: object
   endpoint.UpdateHealthLogRequest:
     properties:
@@ -205,6 +289,25 @@ definitions:
   endpoint.UpdatePetResponse:
     properties:
       error: {}
+    type: object
+  model.Expense:
+    properties:
+      amount:
+        type: integer
+      category:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      pet_id:
+        type: string
+      updated_at:
+        type: string
     type: object
   model.HealthLog:
     properties:
@@ -309,6 +412,242 @@ paths:
       summary: 首頁快速概覽
       tags:
       - dashboard
+  /api/v1/expenses:
+    get:
+      consumes:
+      - application/json
+      description: 依條件查詢費用紀錄
+      parameters:
+      - description: 寵物ID
+        in: query
+        name: pet_id
+        type: string
+      - description: 分類
+        in: query
+        name: category
+        type: string
+      - description: 起始日期 (RFC3339)
+        in: query
+        name: start_date
+        type: string
+      - description: 結束日期 (RFC3339)
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.ListExpensesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/endpoint.ListExpensesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/endpoint.ListExpensesResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/endpoint.ListExpensesResponse'
+      security:
+      - BearerAuth: []
+      summary: 查詢費用紀錄
+      tags:
+      - expenses
+    post:
+      consumes:
+      - application/json
+      description: 建立一筆新的費用紀錄
+      parameters:
+      - description: 費用資料
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/endpoint.CreateExpenseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/endpoint.CreateExpenseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/endpoint.CreateExpenseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/endpoint.CreateExpenseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/endpoint.CreateExpenseResponse'
+      security:
+      - BearerAuth: []
+      summary: 新增費用紀錄
+      tags:
+      - expenses
+  /api/v1/expenses/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 刪除指定 ID 的費用紀錄
+      parameters:
+      - description: 費用ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/endpoint.DeleteExpenseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/endpoint.DeleteExpenseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/endpoint.DeleteExpenseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/endpoint.DeleteExpenseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/endpoint.DeleteExpenseResponse'
+      security:
+      - BearerAuth: []
+      summary: 刪除費用紀錄
+      tags:
+      - expenses
+    get:
+      consumes:
+      - application/json
+      description: 取得指定 ID 的費用紀錄
+      parameters:
+      - description: 費用ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.GetExpenseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/endpoint.GetExpenseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/endpoint.GetExpenseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/endpoint.GetExpenseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/endpoint.GetExpenseResponse'
+      security:
+      - BearerAuth: []
+      summary: 取得單筆費用紀錄
+      tags:
+      - expenses
+    put:
+      consumes:
+      - application/json
+      description: 編輯指定 ID 的費用紀錄
+      parameters:
+      - description: 費用ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 費用資料
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/endpoint.UpdateExpenseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.UpdateExpenseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/endpoint.UpdateExpenseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/endpoint.UpdateExpenseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/endpoint.UpdateExpenseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/endpoint.UpdateExpenseResponse'
+      security:
+      - BearerAuth: []
+      summary: 編輯費用紀錄
+      tags:
+      - expenses
+  /api/v1/expenses/summary:
+    get:
+      consumes:
+      - application/json
+      description: 查詢本月總支出、分類統計等摘要
+      parameters:
+      - description: 寵物ID
+        in: query
+        name: pet_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.GetExpenseSummaryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/endpoint.GetExpenseSummaryResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/endpoint.GetExpenseSummaryResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/endpoint.GetExpenseSummaryResponse'
+      security:
+      - BearerAuth: []
+      summary: 查詢費用摘要
+      tags:
+      - expenses
   /api/v1/health-logs:
     get:
       consumes:
