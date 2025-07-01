@@ -42,6 +42,7 @@ func NewHTTPHandler(
 	healthLogEndpoints endpoint.HealthLogEndpoints,
 	dashboardEndpoints endpoint.DashboardEndpoints,
 	medicalRecordEndpoints endpoint.MedicalRecordEndpoints,
+	expenseEndpoints endpoint.ExpenseEndpoints,
 	options []httptransport.ServerOption,
 ) http.Handler {
 	// Register routes for the "pet" module.
@@ -55,6 +56,9 @@ func NewHTTPHandler(
 
 	// Register routes for the "medical-record" module.
 	RegisterMedicalRecordRoutes(r, cfg, medicalRecordEndpoints, options...)
+
+	// Register routes for the "expense" module.
+	RegisterExpenseRoutes(r, cfg, expenseEndpoints, options...)
 
 	return r
 }

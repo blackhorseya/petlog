@@ -23,3 +23,7 @@ type Expense struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+
+var DefaultExpenseCategories = []string{
+	"醫療", "飼料", "保健品", "日用品", "其他",
+}
