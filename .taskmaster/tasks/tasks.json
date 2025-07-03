@@ -83,63 +83,17 @@
       {
         "id": 5,
         "title": "【前端】實作費用明細查詢與管理頁面",
-        "description": "建立費用明細查詢與管理頁面，顯示所有費用紀錄，支援多條件篩選、分頁、排序與 CRUD 功能，屬於次要查詢與管理介面。",
-        "status": "in-progress",
+        "description": "此功能已整合至任務 #4.5 的費用總覽儀表板中，不再作為獨立頁面存在。原有的列表、篩選、分頁功能已由儀表板中的 `ExpenseList` 元件處理。",
+        "status": "done",
         "dependencies": [
           4,
           11,
           12
         ],
         "priority": "medium",
-        "details": "1. 建立費用明細查詢頁面，包含：\n- 費用紀錄列表（依日期倒序排列）\n- 每筆紀錄顯示：日期、分類、金額、描述、寵物\n- 篩選區域：寵物選擇器、分類選擇器、日期範圍、關鍵字搜尋\n- 新增、編輯、刪除操作按鈕\n2. 支援多條件篩選、分頁、即時更新\n3. UI/UX 與 Dashboard 風格一致，支援響應式設計\n4. 點擊列表可進入編輯/詳細頁面",
-        "testStrategy": "1. 撰寫單元測試確保元件正確渲染\n2. 測試篩選、分頁、CRUD 功能\n3. 測試多寵物切換功能\n4. 測試 UI 響應式設計\n5. 使用者測試確保查詢與管理流暢",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "建立頁面基本骨架",
-            "description": "在 `web/src/app/expenses/list/page.tsx` 建立頁面基本骨架，放置 `<ExpenseList />` 元件，並加入新增按鈕。",
-            "status": "done",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "實作多條件篩選功能",
-            "description": "在費用明細頁面實作多條件篩選功能，包含：\n- 寵物選擇器篩選\n- 分類選擇器篩選\n- 日期範圍篩選\n- 關鍵字搜尋功能",
-            "status": "pending",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "實作列表分頁功能",
-            "description": "為費用明細列表實作分頁功能，確保大量資料時的效能與使用體驗。",
-            "status": "pending",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "實作列表排序功能",
-            "description": "實作費用明細列表的排序功能，允許使用者依不同欄位（如日期、金額、分類等）進行排序。",
-            "status": "pending",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "完成 CRUD 操作功能",
-            "description": "完成費用明細的完整 CRUD 操作：\n- 實作新增/編輯表單\n- 實作刪除功能與確認對話框\n- 確保操作後列表即時更新",
-            "status": "done",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          }
-        ]
+        "details": "1. 費用明細查詢與管理功能已整合至費用總覽儀表板中\n2. 原計劃的功能已透過儀表板中的 `ExpenseList` 元件實現：\n   - 費用紀錄列表（依日期倒序排列）\n   - 每筆紀錄顯示：日期、分類、金額、描述、寵物\n   - 篩選區域：寵物選擇器、分類選擇器、日期範圍、關鍵字搜尋\n   - 新增、編輯、刪除操作按鈕\n3. 多條件篩選、分頁、即時更新功能已在儀表板中實現\n4. UI/UX 與 Dashboard 風格保持一致，支援響應式設計",
+        "testStrategy": "1. 確認所有功能已正確整合至費用總覽儀表板\n2. 驗證儀表板中的 `ExpenseList` 元件包含原計劃的所有功能\n3. 測試整合後的篩選、分頁、CRUD 功能\n4. 測試多寵物切換功能\n5. 測試 UI 響應式設計\n6. 使用者測試確保查詢與管理流暢",
+        "subtasks": []
       },
       {
         "id": 5.5,
@@ -321,7 +275,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T03:21:22.226Z",
-      "updated": "2025-07-03T03:38:23.776Z",
+      "updated": "2025-07-03T23:25:04.259Z",
       "description": "費用紀錄功能專用 tag，修正標籤狀態以利後續任務管理。",
       "copiedFrom": {
         "tag": "master",
