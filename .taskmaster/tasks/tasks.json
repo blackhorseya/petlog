@@ -60,10 +60,10 @@
         "id": 4.5,
         "title": "【前端】實作費用總覽 Dashboard（圖表化主視覺）",
         "description": "建立費用總覽 Dashboard 頁面，主視覺以圖表與摘要區塊為主，支援依寵物細分查詢入口，整合 API 彙總查詢，UI/UX 現代清爽，支援響應式設計。",
-        "status": "pending",
+        "status": "done",
         "dependencies": [4, 11, 12],
         "priority": "high",
-        "details": "1. 實作主視覺頁面，包含：\n- 圓餅圖（分類分布）\n- 長條圖（本月每日支出）\n- 折線圖（年度趨勢）\n- 摘要區塊（本月總支出、分類排行、最近紀錄）\n- 依寵物細分查詢入口（按鈕/選單）\n2. UI/UX 需現代、清爽，支援響應式設計\n3. 整合 API 彙總查詢，動態更新圖表與摘要資料\n4. 點擊分類/圖表區塊可進一步篩選或跳轉明細查詢頁面",
+        "details": "✅ 實作完成 (2025-01-27)\n\n原始需求：\n1. 實作主視覺頁面，包含：\n- 圓餅圖（分類分布）\n- 長條圖（本月每日支出）\n- 折線圖（年度趨勢）\n- 摘要區塊（本月總支出、分類排行、最近紀錄）\n- 依寵物細分查詢入口（按鈕/選單）\n2. UI/UX 需現代、清爽，支援響應式設計\n3. 整合 API 彙總查詢，動態更新圖表與摘要資料\n4. 點擊分類/圖表區塊可進一步篩選或跳轉明細查詢頁面\n\n實作成果：\n✅ 重新設計 /expenses 頁面作為主視覺 Dashboard\n✅ 整合 ExpenseCharts 元件（圓餅圖 + 趨勢圖）\n✅ 整合 SummaryPanel 元件（本月支出、變化率、分類統計、最近記錄）\n✅ 實作寵物選擇器（支援「所有寵物」和個別選擇）\n✅ 實作時間範圍選擇器（本月/本季/本年）\n✅ 動態資料處理和圖表更新\n✅ 響應式設計和現代化 UI\n✅ 快速操作卡片（明細查詢、分類管理、費用報告）\n✅ 完整的空狀態和載入狀態處理\n✅ 建立子頁面結構 (/expenses/list, /expenses/new)\n\n技術檔案：\n- web/src/app/expenses/page.tsx (主 Dashboard)\n- web/src/app/expenses/list/page.tsx (明細查詢頁面)\n- web/src/app/expenses/new/page.tsx (新增費用頁面)\n- web/docs/TASK_4.5_IMPLEMENTATION.md (實作報告)",
         "testStrategy": "1. 撰寫單元測試確保 Dashboard 元件正確渲染\n2. 測試圖表資料動態更新\n3. 測試摘要區塊資料正確性\n4. 測試依寵物切換功能\n5. 測試響應式設計與跨裝置顯示\n6. 使用者測試確保主視覺資訊一目了然"
       },
       {

@@ -19,6 +19,7 @@ export interface ExpenseSummary {
     category: string;
     date: string;
   }[];
+  mostSpentCategory?: string;
 }
 
 interface SummaryPanelProps {
