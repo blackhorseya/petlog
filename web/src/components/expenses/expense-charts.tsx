@@ -2,6 +2,18 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CategoryBadge } from "./category-badge";
+import {
+  ResponsiveContainer,
+  BarChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from 'recharts';
 
 export interface ChartData {
   trendData: {
@@ -19,9 +31,10 @@ export interface ChartData {
 interface ExpenseChartsProps {
   data: ChartData;
   loading?: boolean;
+  chartType: 'trend' | 'category' | 'all';
 }
 
-export function ExpenseCharts({ data, loading = false }: ExpenseChartsProps) {
+export function ExpenseCharts({ data, loading = false, chartType = 'all' }: ExpenseChartsProps) {
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('zh-TW', {
       style: 'currency',
@@ -53,9 +66,84 @@ export function ExpenseCharts({ data, loading = false }: ExpenseChartsProps) {
     );
   }
 
-  // 簡化版趨勢圖（使用CSS實現基本效果）
-  const maxAmount = Math.max(...data.trendData.map(d => d.amount));
-  
+  let TrendChart = null;
+
+  if (chartType === 'all' || chartType === 'trend') {
+    TrendChart = (
+      <div className="h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data.trendData}>
+            <XAxis 
+              dataKey="date" 
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => new Date(value).toLocaleDateString('zh-TW', { month: 'short' })}
+            />
+            <YAxis 
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `$${value}`}
+            />
+            <Tooltip 
+              formatter={(value: number) => [formatAmount(value), "支出"]}
+              labelFormatter={(label) => new Date(label).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' })}
+              contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
+              cursor={{ fill: 'rgba(206, 206, 206, 0.2)' }}
+            />
+            <Bar dataKey="amount" fill="#8884d8" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+
+  const CategoryChart = (
+    <ResponsiveContainer width="100%" height={300}>
+      <PieChart>
+        <Pie
+          data={data.categoryData}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          outerRadius={80}
+          fill="#8884d8"
+          dataKey="amount"
+          nameKey="category"
+          label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+            if (percent === undefined || percent === 0) return null;
+            const RADIAN = Math.PI / 180;
+            const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+            const x  = cx + radius * Math.cos(-(midAngle || 0) * RADIAN);
+            const y = cy  + radius * Math.sin(-(midAngle || 0) * RADIAN);
+            return (
+              <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+                {`${((percent || 0) * 100).toFixed(0)}%`}
+              </text>
+            );
+          }}
+        >
+          {data.categoryData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={entry.color} />
+          ))}
+        </Pie>
+        <Tooltip formatter={(value: number, name: string) => [formatAmount(value), name]}/>
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
+  );
+
+  if (chartType === 'trend') {
+    return TrendChart;
+  }
+
+  if (chartType === 'category') {
+    return CategoryChart;
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {/* 支出趨勢圖 */}
@@ -64,36 +152,7 @@ export function ExpenseCharts({ data, loading = false }: ExpenseChartsProps) {
           <CardTitle className="text-lg font-semibold">支出趨勢</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {/* 簡化的趨勢顯示 */}
-            <div className="space-y-2">
-              {data.trendData.slice(-7).map((item, index) => (
-                <div key={item.date} className="flex items-center space-x-3">
-                  <div className="text-xs text-muted-foreground w-16">
-                    {new Date(item.date).toLocaleDateString('zh-TW', {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </div>
-                  <div className="flex-1 flex items-center space-x-2">
-                    <div 
-                      className="h-2 bg-primary rounded-full"
-                      style={{ 
-                        width: `${(item.amount / maxAmount) * 100}%`,
-                        minWidth: '4px'
-                      }}
-                    />
-                    <div className="text-sm font-medium">
-                      {formatAmount(item.amount)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              過去 7 日支出趨勢
-            </div>
-          </div>
+          {TrendChart}
         </CardContent>
       </Card>
 
@@ -103,51 +162,7 @@ export function ExpenseCharts({ data, loading = false }: ExpenseChartsProps) {
           <CardTitle className="text-lg font-semibold">分類佔比</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {/* 簡化的圓餅圖效果 */}
-            <div className="relative w-48 h-48 mx-auto">
-              <div className="w-full h-full rounded-full border-8 border-muted relative overflow-hidden">
-                {data.categoryData.map((item, index) => {
-                  const previousPercentage = data.categoryData
-                    .slice(0, index)
-                    .reduce((sum, cat) => sum + cat.percentage, 0);
-                  
-                  return (
-                    <div
-                      key={item.category}
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background: `conic-gradient(from ${previousPercentage * 3.6}deg, ${item.color} ${previousPercentage * 3.6}deg ${(previousPercentage + item.percentage) * 3.6}deg, transparent ${(previousPercentage + item.percentage) * 3.6}deg)`,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 圖例 */}
-            <div className="space-y-2">
-              {data.categoryData.map((item) => (
-                <div key={item.category} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div 
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <CategoryBadge category={item.category} />
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">
-                      {formatAmount(item.amount)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {item.percentage.toFixed(1)}%
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {CategoryChart}
         </CardContent>
       </Card>
     </div>
