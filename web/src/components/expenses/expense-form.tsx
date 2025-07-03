@@ -259,7 +259,7 @@ export function ExpenseForm({
               </SelectTrigger>
               <SelectContent>
                 {petsLoading ? (
-                  <SelectItem value="" disabled>載入中...</SelectItem>
+                  <div className="p-2 text-sm text-center text-gray-500">載入中...</div>
                 ) : pets?.length ? (
                   pets.map((pet) => (
                     <SelectItem key={pet.id} value={pet.id}>
@@ -267,7 +267,7 @@ export function ExpenseForm({
                     </SelectItem>
                   ))
                 ) : (
-                  <SelectItem value="" disabled>沒有可用的寵物</SelectItem>
+                  <div className="p-2 text-sm text-center text-gray-500">沒有可用的寵物</div>
                 )}
               </SelectContent>
             </Select>
@@ -289,7 +289,7 @@ export function ExpenseForm({
                 </SelectTrigger>
                 <SelectContent>
                   {categoriesLoading ? (
-                    <SelectItem value="" disabled>載入中...</SelectItem>
+                    <div className="p-2 text-sm text-center text-gray-500">載入中...</div>
                   ) : categories?.length ? (
                     categories.map((category) => (
                       <SelectItem key={category.id} value={category.name}>
@@ -302,7 +302,7 @@ export function ExpenseForm({
                       </SelectItem>
                     ))
                   ) : (
-                    <SelectItem value="" disabled>沒有可用的分類</SelectItem>
+                    <div className="p-2 text-sm text-center text-gray-500">沒有可用的分類</div>
                   )}
                 </SelectContent>
               </Select>
