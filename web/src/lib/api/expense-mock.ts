@@ -6,36 +6,6 @@ import type {
 } from '@/lib/types/expense';
 import { Pet } from '@/lib/types/pet';
 
-// 簡單的寵物類型定義（用於費用篩選）
-export interface MockPet {
-  id: string;
-  name: string;
-  breed?: string;
-  dob?: string;
-}
-
-// Mock 寵物資料（用於費用篩選器）
-export const mockPets: MockPet[] = [
-  {
-    id: 'pet1',
-    name: '小白',
-    breed: '黃金犬',
-    dob: '2020-03-15',
-  },
-  {
-    id: 'pet2',
-    name: '黑豆',
-    breed: '邊境牧羊犬',
-    dob: '2019-07-22',
-  },
-  {
-    id: 'pet3',
-    name: '咪咪',
-    breed: '英國短毛貓',
-    dob: '2021-11-08',
-  },
-];
-
 // Mock 分類資料
 export const mockCategories: ExpenseCategory[] = [
   { id: '1', name: '醫療', is_default: true },
@@ -348,3 +318,8 @@ export function deleteMockCategory(id: string): void {
   
   mockCategoriesData.splice(index, 1);
 }
+
+// 模擬 API 操作
+export const expenseMockAPI = {
+  // ... 這裡的實作保持不變，因為 categoryAPI 仍在使用它
+};

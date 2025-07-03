@@ -1,13 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { expenseAPI, categoryAPI } from '@/lib/api/expense';
-import type { MockExpenseListResponse, ExpenseWithPetName } from '@/lib/api/expense';
 import type {
   Expense,
   CreateExpenseRequest,
   UpdateExpenseRequest,
   ExpenseFilters,
   ExpenseCategory,
-  ExpenseStatistics,
+  ExpenseSummary,
 } from '@/lib/types/expense';
 
 // Query Keys
@@ -17,8 +16,8 @@ export const expenseKeys = {
   list: (filters?: ExpenseFilters) => [...expenseKeys.lists(), filters] as const,
   details: () => [...expenseKeys.all, 'detail'] as const,
   detail: (id: string) => [...expenseKeys.details(), id] as const,
-  statistics: (filters?: Omit<ExpenseFilters, 'page' | 'page_size'>) => 
-    [...expenseKeys.all, 'statistics', filters] as const,
+  summary: (filters?: { pet_id?: string }) => 
+    [...expenseKeys.all, 'summary', filters] as const,
 };
 
 export const categoryKeys = {
@@ -28,10 +27,20 @@ export const categoryKeys = {
 };
 
 // 費用紀錄 Hooks
-export function useExpenses(filters?: ExpenseFilters) {
+export function useExpenses(filters: ExpenseFilters = {}) {
+  const { page = 1, limit = 10, ...apiFilters } = filters;
+
   return useQuery({
-    queryKey: expenseKeys.list(filters),
-    queryFn: () => expenseAPI.list(filters),
+    queryKey: expenseKeys.list(apiFilters),
+    queryFn: () => expenseAPI.list(apiFilters),
+    select: (data) => {
+      const allExpenses = data.expenses || [];
+
+      return {
+        expenses: allExpenses,
+        total: allExpenses.length,
+      };
+    },
     staleTime: 1000 * 60 * 5, // 5 分鐘
   });
 }
@@ -41,24 +50,15 @@ export function useExpense(id: string) {
     queryKey: expenseKeys.detail(id),
     queryFn: () => expenseAPI.getById(id),
     enabled: !!id,
+    select: (data) => data.expense,
   });
 }
 
-export function useExpenseStatistics(filters?: { pet_id?: string }) {
+export function useExpenseSummary(filters?: { pet_id?: string }) {
   return useQuery({
-    queryKey: expenseKeys.statistics(filters),
-    queryFn: () => expenseAPI.getSummary(filters),
+    queryKey: expenseKeys.summary(filters),
+    queryFn: () => expenseAPI.summary(filters),
     staleTime: 1000 * 60 * 10, // 10 分鐘
-  });
-}
-
-// 搜尋費用紀錄
-export function useExpenseSearch(keyword: string, filters?: Omit<ExpenseFilters, 'keyword'>) {
-  return useQuery({
-    queryKey: [...expenseKeys.list(filters), { keyword }],
-    queryFn: () => expenseAPI.search(keyword, filters),
-    enabled: keyword.trim().length > 0,
-    staleTime: 1000 * 60 * 2, // 2 分鐘
   });
 }
 
@@ -83,7 +83,8 @@ export function useUpdateExpense() {
   return useMutation({
     mutationFn: (data: UpdateExpenseRequest) => 
       expenseAPI.update(data.id, data),
-    onSuccess: (updatedExpense) => {
+    onSuccess: (response) => {
+      const updatedExpense = response.expense;
       // 更新特定項目快取
       queryClient.setQueryData(
         expenseKeys.detail(updatedExpense.id),
@@ -91,7 +92,6 @@ export function useUpdateExpense() {
       );
       // 清除列表快取
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: expenseKeys.all });
     },
   });
 }
