@@ -4,7 +4,8 @@
 export interface Expense {
   id: string;
   pet_id: string;
-  pet_name: string;
+  // pet_name 是客戶端額外加入的，非來自後端 model
+  pet_name?: string;
   category: string;
   amount: number;
   description?: string;
@@ -38,15 +39,14 @@ export interface ExpenseFilters {
   category?: string;
   start_date?: string; // RFC3339 格式
   end_date?: string; // RFC3339 格式
+  // 分頁參數，由前端實作
+  page?: number;
+  limit?: number;
 }
 
 // API Response 格式（對應 endpoint.ListExpensesResponse）
 export interface ListExpensesResponse {
   expenses: Expense[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
   error?: any;
 }
 
@@ -74,16 +74,14 @@ export interface DeleteExpenseResponse {
 }
 
 // 費用摘要回應（對應 endpoint.GetExpenseSummaryResponse）
-export interface ExpenseStatistics {
+export interface ExpenseSummary {
   total_amount: number;
-  total_count: number;
-  average_amount: number;
-  categories: { category: string; amount: number; count: number }[];
-  monthly_summary: { month: string; amount: number; count: number }[];
+  category_stats: Record<string, number>;
+  recent: Expense[];
   error?: any;
 }
 
-// 分類相關類型（用於 mock data，因為 API 暫無分類管理）
+// 分類相關類型（用於 UI 顯示）
 export interface ExpenseCategory {
   id: string;
   name: string;

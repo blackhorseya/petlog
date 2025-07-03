@@ -2,7 +2,7 @@ import type {
   Expense,
   ExpenseCategory,
   ListExpensesResponse,
-  ExpenseStatistics,
+  ExpenseSummary,
 } from '@/lib/types/expense';
 import { Pet } from '@/lib/types/pet';
 
@@ -43,8 +43,6 @@ export const mockCategories: ExpenseCategory[] = [
   { id: '3', name: '保健品', is_default: true },
   { id: '4', name: '日用品', is_default: true },
   { id: '5', name: '其他', is_default: true },
-  { id: '6', name: '美容', is_default: false, user_id: 'user1' },
-  { id: '7', name: '訓練', is_default: false, user_id: 'user1' },
 ];
 
 // Mock 費用資料（可變的，支援 CRUD 操作）
@@ -70,17 +68,6 @@ let mockExpensesData: Expense[] = [
     date: '2024-01-12',
     created_at: '2024-01-12T14:20:00Z',
     updated_at: '2024-01-12T14:20:00Z',
-  },
-  {
-    id: '3',
-    pet_id: 'pet2',
-    pet_name: '黑豆',
-    category: '美容',
-    amount: 600,
-    description: '洗澡和剪毛',
-    date: '2024-01-10',
-    created_at: '2024-01-10T16:45:00Z',
-    updated_at: '2024-01-10T16:45:00Z',
   },
   {
     id: '4',
@@ -125,17 +112,6 @@ let mockExpensesData: Expense[] = [
     date: '2024-01-01',
     created_at: '2024-01-01T08:00:00Z',
     updated_at: '2024-01-01T08:00:00Z',
-  },
-  {
-    id: '8',
-    pet_id: 'pet2',
-    pet_name: '黑豆',
-    category: '訓練',
-    amount: 1000,
-    description: '基礎服從訓練課程',
-    date: '2023-12-28',
-    created_at: '2023-12-28T15:00:00Z',
-    updated_at: '2023-12-28T15:00:00Z',
   },
   {
     id: '9',
@@ -193,17 +169,6 @@ let mockExpensesData: Expense[] = [
     updated_at: '2023-12-12T09:30:00Z',
   },
   {
-    id: '14',
-    pet_id: 'pet1',
-    pet_name: '小白',
-    category: '美容',
-    amount: 550,
-    description: '專業美容護理',
-    date: '2023-12-10',
-    created_at: '2023-12-10T16:00:00Z',
-    updated_at: '2023-12-10T16:00:00Z',
-  },
-  {
     id: '15',
     pet_id: 'pet2',
     pet_name: '黑豆',
@@ -217,23 +182,16 @@ let mockExpensesData: Expense[] = [
 ];
 
 // Mock 統計資料
-export const mockStatistics: ExpenseStatistics = {
-  total_amount: 16650,
-  total_count: 15,
-  average_amount: 1110,
-  categories: [
-    { category: '醫療', amount: 9000, count: 4 },
-    { category: '飼料', amount: 2330, count: 3 },
-    { category: '美容', amount: 1150, count: 2 },
-    { category: '保健品', amount: 1170, count: 2 },
-    { category: '日用品', amount: 600, count: 2 },
-    { category: '訓練', amount: 1000, count: 1 },
-    { category: '其他', amount: 1200, count: 1 },
-  ],
-  monthly_summary: [
-    { month: '2024-01', amount: 5570, count: 7 },
-    { month: '2023-12', amount: 11080, count: 8 },
-  ],
+export const mockStatistics: ExpenseSummary = {
+  total_amount: 12500, // 重新計算
+  category_stats: {
+    '醫療': 7500,
+    '飼料': 1650,
+    '保健品': 1170,
+    '日用品': 600,
+    '其他': 1200,
+  },
+  recent: [], // 暫時留空
 };
 
 // 模擬 API 延遲
@@ -255,32 +213,21 @@ export function filterExpenses<T extends Expense>(
   }
 ): T[] {
   return expenses.filter(expense => {
-    // 寵物篩選
-    if (filters.pet_id && expense.pet_id !== filters.pet_id) {
-      return false;
-    }
-
-    // 分類篩選
-    if (filters.category && expense.category !== filters.category) {
-      return false;
-    }
-
-    // 日期範圍篩選
-    if (filters.start_date && expense.date < filters.start_date) {
-      return false;
-    }
-    if (filters.end_date && expense.date > filters.end_date) {
-      return false;
-    }
-
-    // 關鍵字搜尋
+    if (filters.pet_id && expense.pet_id !== filters.pet_id) return false;
+    if (filters.category && expense.category !== filters.category) return false;
+    if (filters.start_date && new Date(expense.date) < new Date(filters.start_date)) return false;
+    if (filters.end_date && new Date(expense.date) > new Date(filters.end_date)) return false;
     if (filters.keyword) {
       const keyword = filters.keyword.toLowerCase();
-      return expense.description?.toLowerCase().includes(keyword) ||
-             expense.category.toLowerCase().includes(keyword) ||
-             expense.pet_name.toLowerCase().includes(keyword);
+      const petName = expense.pet_name || ''; // 提供 fallback
+      if (
+        !expense.category.toLowerCase().includes(keyword) &&
+        !(expense.description && expense.description.toLowerCase().includes(keyword)) &&
+        !petName.toLowerCase().includes(keyword)
+      ) {
+        return false;
+      }
     }
-
     return true;
   });
 }
@@ -297,10 +244,6 @@ export function paginateExpenses(
   
   return {
     expenses: paginatedExpenses,
-    total: expenses.length,
-    page,
-    page_size: pageSize,
-    total_pages: Math.ceil(expenses.length / pageSize),
   };
 }
 
