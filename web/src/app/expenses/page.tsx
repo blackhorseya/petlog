@@ -239,11 +239,19 @@ export default function ExpensesDashboardPage() {
   return (
     <div className="space-y-8">
       {/* 頁面標題和控制項 */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-wide">費用總覽儀表板</h1>
-        <p className="text-muted-foreground text-lg mt-1">
-          以圖表視覺化方式，快速掌握所有寵物的支出狀況
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-wide">費用總覽儀表板</h1>
+          <p className="text-muted-foreground text-lg mt-1">
+            以圖表視覺化方式，快速掌握所有寵物的支出狀況
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/expenses/new" className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            新增費用
+          </Link>
+        </Button>
       </div>
 
       {/* 圖表區 */}
