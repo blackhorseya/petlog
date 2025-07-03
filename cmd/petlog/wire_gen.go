@@ -62,7 +62,7 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 	getMedicalRecordByIDHandler := query.NewGetMedicalRecordByIDHandler(medicalRecordRepository)
 	listMedicalRecordsByPetHandler := query.NewListMedicalRecordsByPetHandler(medicalRecordRepository)
 	medicalRecordEndpoints := endpoint.MakeMedicalRecordEndpoints(createMedicalRecordHandler, updateMedicalRecordHandler, deleteMedicalRecordHandler, getMedicalRecordByIDHandler, listMedicalRecordsByPetHandler)
-	expenseRepository := mongodb.NewExpenseRepository()
+	expenseRepository := mongodb.NewExpenseRepository(database)
 	createExpenseHandler := command.NewCreateExpenseHandler(expenseRepository, petRepository)
 	updateExpenseHandler := command.NewUpdateExpenseHandler(expenseRepository)
 	deleteExpenseHandler := command.NewDeleteExpenseHandler(expenseRepository)
