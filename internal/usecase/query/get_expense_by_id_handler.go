@@ -32,9 +32,13 @@ func (h *GetExpenseByIDHandler) Handle(c context.Context, query GetExpenseByIDQu
 
 	ctx.Info("開始根據 ID 查詢費用", "expense_id", query.ID)
 
-	// TODO: 驗證 ID 格式
+	// 驗證 ID 格式
+	if query.ID == "" {
+		ctx.Warn("費用 ID 為必填欄位", "expense_id", query.ID)
+		return nil, fmt.Errorf("費用 ID 為必填欄位")
+	}
 
-	expense, err := h.expenseRepo.FindByID(c, query.ID)
+	expense, err := h.expenseRepo.FindByID(ctx, query.ID)
 	if err != nil {
 		ctx.Error("查詢費用失敗", "expense_id", query.ID, "error", err)
 		return nil, fmt.Errorf("根據 ID 查詢費用失敗: %w", err)

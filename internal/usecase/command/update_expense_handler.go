@@ -7,6 +7,7 @@ import (
 
 	"github.com/blackhorseya/petlog/internal/domain/model"
 	"github.com/blackhorseya/petlog/internal/domain/repository"
+	"github.com/blackhorseya/petlog/internal/usecase/behavior"
 	"github.com/blackhorseya/petlog/pkg/contextx"
 )
 
@@ -36,7 +37,19 @@ func NewUpdateExpenseHandler(expenseRepo repository.ExpenseRepository) *UpdateEx
 func (h *UpdateExpenseHandler) Handle(c context.Context, cmd UpdateExpenseCommand) (*model.Expense, error) {
 	ctx := contextx.WithContext(c)
 
-	// TODO: 欄位驗證（如金額 > 0、必填欄位等）
+	// 欄位驗證
+	exp := &model.Expense{
+		ID:          cmd.ID,
+		PetID:       cmd.PetID,
+		Amount:      cmd.Amount,
+		Description: cmd.Description,
+		Date:        cmd.Date,
+	}
+	validator := behavior.NewExpenseValidator()
+	if err := validator.ValidateUpdateExpense(exp); err != nil {
+		ctx.Warn("費用驗證失敗", "error", err, "expense_id", exp.ID)
+		return nil, fmt.Errorf("費用驗證失敗: %w", err)
+	}
 
 	// 取得原始資料，僅允許更新部分欄位，category 不可變更
 	existing, err := h.expenseRepo.FindByID(ctx, cmd.ID)

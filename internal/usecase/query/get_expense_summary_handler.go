@@ -2,10 +2,10 @@ package query
 
 import (
 	"context"
-	"errors"
 
 	"github.com/blackhorseya/petlog/internal/domain/model"
 	"github.com/blackhorseya/petlog/internal/domain/repository"
+	"github.com/blackhorseya/petlog/pkg/contextx"
 )
 
 // GetExpenseSummaryQuery 封裝查詢費用摘要的請求參數
@@ -35,41 +35,42 @@ func NewGetExpenseSummaryHandler(expenseRepo repository.ExpenseRepository) *GetE
 
 // Handle 執行查詢費用摘要的流程
 func (h *GetExpenseSummaryHandler) Handle(c context.Context, query GetExpenseSummaryQuery) (*ExpenseSummary, error) {
-	// ctx := contextx.WithContext(c)
+	ctx := contextx.WithContext(c)
 
 	// 查詢所有費用紀錄（如果有指定 PetID 則篩選）
-	// TODO: 實作查詢費用摘要的業務邏輯
-	// var opts []repository.ExpenseQueryOption
-	// if query.PetID != "" {
-	// 	opts = append(opts, repository.WithPetID(query.PetID))
-	// }
+	var opts []repository.ExpenseQueryOption
+	if query.PetID != "" {
+		opts = append(opts, repository.WithPetID(query.PetID))
+	}
 
-	// expenses, _, err := h.expenseRepo.FindAll(ctx, opts...)
-	// if err != nil {
-	// 	ctx.Error("failed to get expenses for summary", "error", err)
-	// 	return nil, err
-	// }
+	expenses, _, err := h.expenseRepo.FindAll(ctx, opts...)
+	if err != nil {
+		ctx.Error("查詢費用紀錄失敗", "error", err)
+		return nil, err
+	}
 
-	// // 計算統計資料
-	// summary := &ExpenseSummary{
-	// 	TotalAmount:   0,
-	// 	CategoryStats: make(map[string]int),
-	// 	Recent:        make([]*model.Expense, 0),
-	// }
+	// 計算統計資料
+	summary := &ExpenseSummary{
+		TotalAmount:   0,
+		CategoryStats: make(map[string]int),
+		Recent:        make([]*model.Expense, 0),
+	}
 
-	// // 計算總金額和分類統計
-	// for _, expense := range expenses {
-	// 	summary.TotalAmount += expense.Amount
-	// 	summary.CategoryStats[expense.Category] += expense.Amount
-	// }
+	// 計算總金額和分類統計
+	for _, expense := range expenses {
+		summary.TotalAmount += expense.Amount
+		summary.CategoryStats[expense.Category] += expense.Amount
+	}
 
-	// // 取最近 5 筆紀錄
-	// recentCount := 5
-	// if len(expenses) < recentCount {
-	// 	recentCount = len(expenses)
-	// }
-	// summary.Recent = expenses[:recentCount]
+	// 取最近 5 筆紀錄
+	recentCount := 5
+	if len(expenses) < recentCount {
+		recentCount = len(expenses)
+	}
+	if recentCount > 0 {
+		summary.Recent = expenses[:recentCount]
+	}
 
-	// ctx.Info("expense summary retrieved successfully", "total_amount", summary.TotalAmount, "categories", len(summary.CategoryStats))
-	return nil, errors.New("not implemented")
+	ctx.Info("成功取得費用摘要", "total_amount", summary.TotalAmount, "categories", len(summary.CategoryStats))
+	return summary, nil
 }

@@ -33,12 +33,10 @@ func (h *ListExpensesByPetHandler) Handle(c context.Context, query ListExpensesB
 
 	ctx.Info("開始根據寵物 ID 查詢費用列表", "pet_id", query.PetID)
 
-	// TODO: 驗證 PetID 格式
-
 	// 組合查詢選項，加上 PetID 篩選
 	opts := append(query.Options, repository.WithPetID(query.PetID))
 
-	expenses, total, err := h.expenseRepo.FindAll(c, opts...)
+	expenses, total, err := h.expenseRepo.FindAll(ctx, opts...)
 	if err != nil {
 		ctx.Error("查詢費用列表失敗", "pet_id", query.PetID, "error", err)
 		return nil, 0, fmt.Errorf("根據寵物 ID 查詢費用列表失敗: %w", err)

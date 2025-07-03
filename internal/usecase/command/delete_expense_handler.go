@@ -31,17 +31,21 @@ func (h *DeleteExpenseHandler) Handle(c context.Context, cmd DeleteExpenseComman
 
 	ctx.Info("開始刪除費用", "expense_id", cmd.ID)
 
-	// TODO: 驗證 ID 格式
+	// 驗證 ID 格式
+	if cmd.ID == "" {
+		ctx.Warn("費用 ID 為必填欄位", "expense_id", cmd.ID)
+		return fmt.Errorf("費用 ID 為必填欄位")
+	}
 
 	// 先檢查費用是否存在
-	_, err := h.expenseRepo.FindByID(c, cmd.ID)
+	_, err := h.expenseRepo.FindByID(ctx, cmd.ID)
 	if err != nil {
 		ctx.Error("查詢費用失敗", "expense_id", cmd.ID, "error", err)
 		return fmt.Errorf("查詢費用失敗: %w", err)
 	}
 
 	// 執行刪除
-	err = h.expenseRepo.Delete(c, cmd.ID)
+	err = h.expenseRepo.Delete(ctx, cmd.ID)
 	if err != nil {
 		ctx.Error("刪除費用失敗", "expense_id", cmd.ID, "error", err)
 		return fmt.Errorf("刪除費用失敗: %w", err)
