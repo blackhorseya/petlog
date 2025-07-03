@@ -2,12 +2,15 @@
 
 import { useUser } from "@auth0/nextjs-auth0";
 import { ArrowLeft, DollarSign } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ExpenseForm } from "@/components/expenses";
+import type { CreateExpenseRequest } from "@/lib/types/expense";
 import Link from 'next/link';
 
 export default function NewExpensePage() {
   const { user, isLoading: userLoading } = useUser();
+  const router = useRouter();
 
   if (userLoading) {
     return (
@@ -25,6 +28,16 @@ export default function NewExpensePage() {
       </div>
     );
   }
+
+  const handleFormSubmit = (data: CreateExpenseRequest) => {
+    // ExpenseForm 組件已經處理 API 調用和成功/錯誤處理
+    // 成功後可以選擇導航回總覽頁面
+    console.log('費用新增提交:', data);
+  };
+
+  const handleCancel = () => {
+    router.push('/expenses');
+  };
 
   return (
     <div className="space-y-6">
@@ -47,26 +60,11 @@ export default function NewExpensePage() {
         </div>
       </div>
 
-      {/* 佔位符內容 */}
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>費用表單</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-              <DollarSign className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">功能開發中</h3>
-            <p className="text-muted-foreground mb-4">
-              費用表單功能將在 Task 6 中實作
-            </p>
-            <Button variant="outline" asChild>
-              <Link href="/expenses">返回費用總覽</Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* 費用表單 */}
+      <ExpenseForm 
+        onSubmit={handleFormSubmit}
+        onCancel={handleCancel}
+      />
     </div>
   );
 }

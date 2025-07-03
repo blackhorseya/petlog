@@ -6,6 +6,7 @@ export { ExpenseCharts, getCategoryColor } from "./expense-charts";
 export { ExpenseFilters } from "./expense-filters";
 export { ExpensePagination } from "./expense-pagination";
 export { ExpenseList } from "./expense-list";
+export { ExpenseForm } from './expense-form';
 
 // 類型定義匯出
 export type { Expense } from "./expense-card";
