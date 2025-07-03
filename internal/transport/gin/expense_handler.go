@@ -54,7 +54,7 @@ func CreateExpense(e endpoint.ExpenseEndpoints, options ...httptransport.ServerO
 	return gin.WrapH(httptransport.NewServer(
 		e.CreateExpenseEndpoint,
 		decodeCreateExpenseRequest,
-		encodeCreateExpenseResponse,
+		encodeResponse,
 		options...,
 	))
 }
@@ -124,7 +124,7 @@ func DeleteExpense(e endpoint.ExpenseEndpoints, options ...httptransport.ServerO
 	return gin.WrapH(httptransport.NewServer(
 		e.DeleteExpenseEndpoint,
 		decodeDeleteExpenseRequest,
-		encodeDeleteExpenseResponse,
+		encodeResponse,
 		options...,
 	))
 }
@@ -199,33 +199,6 @@ func decodeListExpensesRequest(c context.Context, r *http.Request) (request inte
 		StartDate: startDate,
 		EndDate:   endDate,
 	}, nil
-}
-
-// Custom encoders for different status codes
-func encodeCreateExpenseResponse(c context.Context, w http.ResponseWriter, response interface{}) error {
-	ginctx, _ := c.Value(ginContextKey).(*gin.Context)
-	resp := response.(endpoint.CreateExpenseResponse)
-
-	if resp.Failed() != nil {
-		ginctx.JSON(http.StatusInternalServerError, resp)
-		return nil
-	}
-
-	ginctx.JSON(http.StatusCreated, resp)
-	return nil
-}
-
-func encodeDeleteExpenseResponse(c context.Context, w http.ResponseWriter, response interface{}) error {
-	ginctx, _ := c.Value(ginContextKey).(*gin.Context)
-	resp := response.(endpoint.DeleteExpenseResponse)
-
-	if resp.Failed() != nil {
-		ginctx.JSON(http.StatusInternalServerError, resp)
-		return nil
-	}
-
-	ginctx.JSON(http.StatusNoContent, resp)
-	return nil
 }
 
 // GetExpenseSummary godoc
