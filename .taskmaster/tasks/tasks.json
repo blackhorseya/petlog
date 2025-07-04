@@ -54,14 +54,28 @@
         "priority": "high",
         "details": "1. 實作以下 API 端點：\n- POST /api/v1/expenses - 新增費用紀錄\n- GET /api/v1/expenses/:id - 取得單筆費用紀錄\n- PUT /api/v1/expenses/:id - 更新費用紀錄\n- DELETE /api/v1/expenses/:id - 刪除費用紀錄\n- GET /api/v1/expenses - 查詢費用紀錄（支援多條件篩選）\n  - 查詢參數：pet_id, category, start_date, end_date, keyword\n\n2. 實作分類相關 API：\n- GET /api/categories - 取得所有分類\n- POST /api/categories - 新增自訂分類\n- PUT /api/categories/:id - 更新分類\n- DELETE /api/categories/:id - 刪除分類\n\n3. 實作請求與回應的資料結構：\n```\ntype CreateExpenseRequest struct {\n  PetID       uint      `json:\"pet_id\" binding:\"required\"`\n  Category    string    `json:\"category\" binding:\"required\"`\n  Amount      int       `json:\"amount\" binding:\"required,min=1\"`\n  Description string    `json:\"description\"`\n  Date        time.Time `json:\"date\" binding:\"required\"`\n}\n\ntype ExpenseResponse struct {\n  ID          uint      `json:\"id\"`\n  PetID       uint      `json:\"pet_id\"`\n  PetName     string    `json:\"pet_name\"`\n  Category    string    `json:\"category\"`\n  Amount      int       `json:\"amount\"`\n  Description string    `json:\"description\"`\n  Date        time.Time `json:\"date\"`\n  CreatedAt   time.Time `json:\"created_at\"`\n  UpdatedAt   time.Time `json:\"updated_at\"`\n}\n```",
         "testStrategy": "1. 撰寫 API 測試確保所有端點正常運作\n2. 測試各種查詢參數組合\n3. 測試權限驗證\n4. 測試錯誤處理與回應\n5. 測試資料驗證邏輯\n6. 使用 Postman 或類似工具建立 API 測試集合",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "新增「新增費用」按鈕至總覽頁面",
+            "description": "在費用總覽 Dashboard 頁面標題右側，新增了一個「新增費用」按鈕，讓使用者可以快速跳轉至新增費用頁面。",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 4
+          }
+        ]
       },
       {
         "id": 4.5,
         "title": "【前端】實作費用總覽 Dashboard（圖表化主視覺）",
         "description": "建立費用總覽 Dashboard 頁面，主視覺以圖表與摘要區塊為主，支援依寵物細分查詢入口，整合 API 彙總查詢，UI/UX 現代清爽，支援響應式設計。",
         "status": "done",
-        "dependencies": [4, 11, 12],
+        "dependencies": [
+          4,
+          11,
+          12
+        ],
         "priority": "high",
         "details": "✅ 實作完成 (2025-01-27)\n\n原始需求：\n1. 實作主視覺頁面，包含：\n- 圓餅圖（分類分布）\n- 長條圖（本月每日支出）\n- 折線圖（年度趨勢）\n- 摘要區塊（本月總支出、分類排行、最近紀錄）\n- 依寵物細分查詢入口（按鈕/選單）\n2. UI/UX 需現代、清爽，支援響應式設計\n3. 整合 API 彙總查詢，動態更新圖表與摘要資料\n4. 點擊分類/圖表區塊可進一步篩選或跳轉明細查詢頁面\n\n實作成果：\n✅ 重新設計 /expenses 頁面作為主視覺 Dashboard\n✅ 整合 ExpenseCharts 元件（圓餅圖 + 趨勢圖）\n✅ 整合 SummaryPanel 元件（本月支出、變化率、分類統計、最近記錄）\n✅ 實作寵物選擇器（支援「所有寵物」和個別選擇）\n✅ 實作時間範圍選擇器（本月/本季/本年）\n✅ 動態資料處理和圖表更新\n✅ 響應式設計和現代化 UI\n✅ 快速操作卡片（明細查詢、分類管理、費用報告）\n✅ 完整的空狀態和載入狀態處理\n✅ 建立子頁面結構 (/expenses/list, /expenses/new)\n\n技術檔案：\n- web/src/app/expenses/page.tsx (主 Dashboard)\n- web/src/app/expenses/list/page.tsx (明細查詢頁面)\n- web/src/app/expenses/new/page.tsx (新增費用頁面)\n- web/docs/TASK_4.5_IMPLEMENTATION.md (實作報告)",
         "testStrategy": "1. 撰寫單元測試確保 Dashboard 元件正確渲染\n2. 測試圖表資料動態更新\n3. 測試摘要區塊資料正確性\n4. 測試依寵物切換功能\n5. 測試響應式設計與跨裝置顯示\n6. 使用者測試確保主視覺資訊一目了然"
@@ -69,19 +83,28 @@
       {
         "id": 5,
         "title": "【前端】實作費用明細查詢與管理頁面",
-        "description": "建立費用明細查詢與管理頁面，顯示所有費用紀錄，支援多條件篩選、分頁、排序與 CRUD 功能，屬於次要查詢與管理介面。",
-        "status": "pending",
-        "dependencies": [4, 11, 12],
+        "description": "此功能已整合至任務 #4.5 的費用總覽儀表板中，不再作為獨立頁面存在。原有的列表、篩選、分頁功能已由儀表板中的 `ExpenseList` 元件處理。",
+        "status": "done",
+        "dependencies": [
+          4,
+          11,
+          12
+        ],
         "priority": "medium",
-        "details": "1. 建立費用明細查詢頁面，包含：\n- 費用紀錄列表（依日期倒序排列）\n- 每筆紀錄顯示：日期、分類、金額、描述、寵物\n- 篩選區域：寵物選擇器、分類選擇器、日期範圍、關鍵字搜尋\n- 新增、編輯、刪除操作按鈕\n2. 支援多條件篩選、分頁、即時更新\n3. UI/UX 與 Dashboard 風格一致，支援響應式設計\n4. 點擊列表可進入編輯/詳細頁面",
-        "testStrategy": "1. 撰寫單元測試確保元件正確渲染\n2. 測試篩選、分頁、CRUD 功能\n3. 測試多寵物切換功能\n4. 測試 UI 響應式設計\n5. 使用者測試確保查詢與管理流暢"
+        "details": "1. 費用明細查詢與管理功能已整合至費用總覽儀表板中\n2. 原計劃的功能已透過儀表板中的 `ExpenseList` 元件實現：\n   - 費用紀錄列表（依日期倒序排列）\n   - 每筆紀錄顯示：日期、分類、金額、描述、寵物\n   - 篩選區域：寵物選擇器、分類選擇器、日期範圍、關鍵字搜尋\n   - 新增、編輯、刪除操作按鈕\n3. 多條件篩選、分頁、即時更新功能已在儀表板中實現\n4. UI/UX 與 Dashboard 風格保持一致，支援響應式設計",
+        "testStrategy": "1. 確認所有功能已正確整合至費用總覽儀表板\n2. 驗證儀表板中的 `ExpenseList` 元件包含原計劃的所有功能\n3. 測試整合後的篩選、分頁、CRUD 功能\n4. 測試多寵物切換功能\n5. 測試 UI 響應式設計\n6. 使用者測試確保查詢與管理流暢",
+        "subtasks": []
       },
       {
         "id": 5.5,
         "title": "【前端】設計與實作圖表元件",
         "description": "設計並封裝費用總覽所需的圖表元件（圓餅圖、長條圖、折線圖），支援資料動態更新與互動。",
-        "status": "pending",
-        "dependencies": [4.5, 11, 12],
+        "status": "done",
+        "dependencies": [
+          4.5,
+          11,
+          12
+        ],
         "priority": "high",
         "details": "1. 封裝圓餅圖、長條圖、折線圖元件\n2. 支援資料動態更新與互動（如點擊分類高亮、tooltip）\n3. 提供元件 API 供 Dashboard 使用\n4. 支援響應式設計與主題色彩",
         "testStrategy": "1. 撰寫單元測試確保圖表元件正確渲染\n2. 測試資料動態更新與互動\n3. 測試響應式設計\n4. 使用者測試確保圖表資訊易讀"
@@ -90,8 +113,12 @@
         "id": 5.6,
         "title": "【前端】設計與實作摘要元件",
         "description": "設計並封裝費用總覽摘要區塊元件，顯示本月總支出、分類排行、最近紀錄，支援不同時間區間切換。",
-        "status": "pending",
-        "dependencies": [4.5, 11, 12],
+        "status": "done",
+        "dependencies": [
+          4.5,
+          11,
+          12
+        ],
         "priority": "high",
         "details": "1. 封裝摘要區塊元件，顯示：\n- 本月總支出\n- 支出最多分類\n- 最近紀錄（分類、金額、寵物、日期）\n2. 支援不同時間區間切換（本月、本週、去年同期等）\n3. 提供元件 API 供 Dashboard 使用\n4. 支援響應式設計",
         "testStrategy": "1. 撰寫單元測試確保摘要元件正確渲染\n2. 測試資料正確性與區間切換\n3. 測試響應式設計\n4. 使用者測試確保摘要資訊一目了然"
@@ -100,16 +127,62 @@
         "id": 6,
         "title": "【前端】實作費用表單頁面",
         "description": "建立新增與編輯費用的表單頁面，支援所有必要欄位與驗證",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           4,
           11,
           12
         ],
         "priority": "medium",
-        "details": "1. 建立費用表單頁面，包含以下欄位：\n- 寵物選擇器（下拉選單，必填）\n- 分類選擇器（下拉選單，包含預設與自訂分類，必填）\n- 金額輸入框（數字輸入，必填，僅允許正整數）\n- 描述輸入框（文字輸入，選填）\n- 日期選擇器（日期選擇，必填，預設今日）\n- 送出按鈕\n- 取消按鈕\n\n2. 實作表單驗證：\n- 必填欄位檢查\n- 金額格式驗證（正整數）\n- 日期合理性檢查\n\n3. 實作快速輸入模式：\n- 記住上次選擇的分類\n- 記住上次輸入的金額\n- 提供快速填入按鈕\n\n4. 實作分類管理：\n- 新增自訂分類功能\n- 編輯分類功能\n- 刪除分類功能",
-        "testStrategy": "1. 撰寫單元測試確保表單元件正確渲染\n2. 測試表單驗證邏輯\n3. 測試快速輸入功能\n4. 測試分類管理功能\n5. 測試表單提交與取消操作\n6. 使用者測試確保操作流暢度",
-        "subtasks": []
+        "details": "1. 建立費用表單頁面，包含以下欄位：\n- 寵物選擇器（下拉選單，必填）\n- 分類選擇器（下拉選單，包含預設與自訂分類，必填）\n- 金額輸入框（數字輸入，必填，僅允許正整數）\n- 描述輸入框（文字輸入，選填）\n- 日期選擇器（日期選擇，必填，預設今日）\n- 送出按鈕\n- 取消按鈕\n\n2. 實作表單驗證：\n- 必填欄位檢查\n- 金額格式驗證（正整數）\n- 日期合理性檢查\n\n3. 實作快速輸入模式：\n- 記住上次選擇的分類\n- 記住上次輸入的金額\n- 提供快速填入按鈕\n\n4. 實作分類管理：\n- 新增自訂分類功能\n- 編輯分類功能\n- 刪除分類功能\n\n5. 下拉選單（Select）元件處理特殊狀態：\n- 載入中狀態顯示提示訊息\n- 無資料狀態顯示提示訊息\n- 避免使用 value=\"\" 的 <Select.Item> 以防止 Radix UI 執行階段錯誤\n- 使用普通 <div> 元素顯示提示訊息",
+        "testStrategy": "1. 撰寫單元測試確保表單元件正確渲染\n2. 測試表單驗證邏輯\n3. 測試快速輸入功能\n4. 測試分類管理功能\n5. 測試表單提交與取消操作\n6. 使用者測試確保操作流暢度\n7. 測試下拉選單在各種狀態下的行為（載入中、無資料、有資料）\n8. 確保下拉選單在特殊狀態下不會導致應用程式崩潰",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "修復下拉選單（Select）元件錯誤",
+            "description": "修復費用表單中下拉選單在「載入中」或「無資料」狀態時的錯誤",
+            "status": "done",
+            "dependencies": [],
+            "details": "- 問題：當下拉選單處於「載入中」或「無資料」狀態時，使用了 value=\"\" 的 <Select.Item>，這導致了 Radix UI 的執行階段錯誤\n- 解決方案：將無效的 <Select.Item> 替換為帶有提示訊息的普通 <div> 元素\n- 檔案：web/src/components/expenses/expense-form.tsx",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "實作表單基本欄位與驗證",
+            "description": "建立費用表單的基本欄位並實作必要的驗證邏輯",
+            "status": "done",
+            "dependencies": [],
+            "details": "實作表單的所有基本欄位，包括寵物選擇器、分類選擇器、金額輸入框、描述輸入框、日期選擇器以及送出和取消按鈕。確保所有必填欄位有適當的驗證邏輯。",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "實作快速輸入模式",
+            "description": "實作記住上次輸入並提供快速填入功能",
+            "status": "done",
+            "dependencies": [],
+            "details": "實作功能以記住用戶上次選擇的分類和輸入的金額，並提供快速填入按鈕讓用戶可以快速重複上次的輸入。",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "實作分類管理功能",
+            "description": "實作新增、編輯和刪除自訂分類的功能",
+            "status": "done",
+            "dependencies": [],
+            "details": "實作分類管理介面，允許用戶新增自訂分類、編輯現有分類和刪除不需要的分類。",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "優化下拉選單的錯誤處理",
+            "description": "確保下拉選單在各種狀態下都能正常運作",
+            "status": "done",
+            "dependencies": [],
+            "details": "基於已修復的問題，進一步優化下拉選單元件，確保它在所有可能的狀態下（包括載入中、無資料、網絡錯誤等）都能提供良好的用戶體驗，並且不會導致應用程式崩潰。",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 7,
@@ -131,7 +204,12 @@
         "title": "【前端】整合多寵物切換功能",
         "description": "在 Dashboard 與明細頁皆可切換寵物，切換時自動更新圖表與列表，支援單選、多選與全部選項。",
         "status": "pending",
-        "dependencies": [4.5, 5, 11, 12],
+        "dependencies": [
+          4.5,
+          5,
+          11,
+          12
+        ],
         "priority": "medium",
         "details": "1. 建立寵物選擇器元件，支援單選、多選與全部選項\n2. 整合寵物選擇器到 Dashboard 與明細查詢頁面\n3. 切換寵物時自動更新圖表與列表資料\n4. 記住上次選擇的寵物\n5. 支援響應式設計",
         "testStrategy": "1. 撰寫單元測試確保寵物選擇器元件正確渲染\n2. 測試寵物切換功能於 Dashboard 與明細頁\n3. 測試資料動態更新\n4. 使用者測試確保切換體驗流暢"
@@ -197,7 +275,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T03:21:22.226Z",
-      "updated": "2025-07-01T03:08:30.772Z",
+      "updated": "2025-07-03T23:25:04.259Z",
       "description": "費用紀錄功能專用 tag，修正標籤狀態以利後續任務管理。",
       "copiedFrom": {
         "tag": "master",

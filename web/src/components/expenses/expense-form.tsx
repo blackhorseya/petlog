@@ -35,13 +35,13 @@ import {
 } from "@/components/ui/dialog";
 import { usePets } from "@/hooks/use-pets";
 import { useCategories, useCreateCategory, useExpenseManagement } from "@/hooks/use-expenses";
-import type { CreateExpenseRequest, Expense } from "@/lib/types/expense";
+import type { CreateExpenseRequest, UpdateExpenseRequest, Expense } from "@/lib/types/expense";
 
 // 表單驗證 schema
 const expenseFormSchema = z.object({
   pet_id: z.string().min(1, "請選擇寵物"),
   category: z.string().min(1, "請選擇分類"),
-  amount: z.number().int().min(1, "金額必須為正整數"),
+  amount: z.coerce.number().int().min(1, "金額必須為正整數"),
   description: z.string().optional(),
   date: z.string().min(1, "請選擇日期"),
 });
@@ -50,9 +50,8 @@ type ExpenseFormData = z.infer<typeof expenseFormSchema>;
 
 interface ExpenseFormProps {
   initialData?: Expense;
-  onSubmit?: (data: CreateExpenseRequest) => void;
   onCancel?: () => void;
-  isEditing?: boolean;
+  onSuccess?: () => void;
 }
 
 // 快速輸入數據的 localStorage keys
@@ -64,19 +63,20 @@ const STORAGE_KEYS = {
 
 export function ExpenseForm({ 
   initialData, 
-  onSubmit, 
   onCancel, 
-  isEditing = false 
+  onSuccess,
 }: ExpenseFormProps) {
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [showQuickFill, setShowQuickFill] = useState(false);
 
+  const isEditing = !!initialData;
+
   // Hooks
   const { data: pets, isLoading: petsLoading } = usePets();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { mutate: createCategory, isPending: isCreatingCategory } = useCreateCategory();
-  const { create, update, isCreating, isUpdating } = useExpenseManagement();
+  const { create, update, isCreating, isUpdating, isLoading } = useExpenseManagement();
 
   // 表單初始化
   const {
@@ -163,50 +163,50 @@ export function ExpenseForm({
     // 保存快速輸入數據
     saveQuickInputData(data);
 
-    const submitData: CreateExpenseRequest = {
-      pet_id: data.pet_id,
-      category: data.category,
-      amount: data.amount,
-      description: data.description || "",
-      date: new Date(data.date).toISOString(),
-    };
-
-    if (onSubmit) {
-      onSubmit(submitData);
+    if (isEditing) {
+      const submitData: UpdateExpenseRequest = {
+        id: initialData.id,
+        pet_id: data.pet_id,
+        category: data.category,
+        amount: data.amount,
+        description: data.description || "",
+        date: new Date(data.date).toISOString(),
+      };
+      update(submitData, {
+        onSuccess: () => {
+          toast.success("費用記錄更新成功");
+          if (onSuccess) onSuccess();
+        },
+        onError: (error) => {
+          toast.error(`更新失敗: ${error.message}`);
+        },
+      });
     } else {
-      // 使用內建的 mutation
-      if (isEditing && initialData) {
-        update({
-          id: initialData.id,
-          ...submitData,
-        }, {
-          onSuccess: () => {
-            toast.success("費用記錄更新成功");
-            reset();
-          },
-          onError: (error) => {
-            toast.error(`更新失敗: ${error.message}`);
-          },
-        });
-      } else {
-        create(submitData, {
-          onSuccess: () => {
-            toast.success("費用記錄新增成功");
-            reset();
-            // 重新設定預設值
-            setValue("date", new Date().toISOString().split('T')[0]);
-            setValue("amount", 0);
-            setValue("description", "");
-          },
-          onError: (error) => {
-            toast.error(`新增失敗: ${error.message}`);
-          },
-        });
-      }
+      const submitData: CreateExpenseRequest = {
+        pet_id: data.pet_id,
+        category: data.category,
+        amount: data.amount,
+        description: data.description || "",
+        date: new Date(data.date).toISOString(),
+      };
+      create(submitData, {
+        onSuccess: () => {
+          toast.success("費用記錄新增成功");
+          reset();
+          // 重新設定預設值
+          setValue("date", new Date().toISOString().split('T')[0]);
+          setValue("amount", 0);
+          setValue("description", "");
+          if (onSuccess) onSuccess();
+        },
+        onError: (error) => {
+          toast.error(`新增失敗: ${error.message}`);
+        },
+      });
     }
   };
 
-  const isSubmitting = isCreating || isUpdating;
+  const isSubmitting = isLoading;
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

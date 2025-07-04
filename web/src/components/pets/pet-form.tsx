@@ -90,7 +90,7 @@ export function PetForm({ open, onOpenChange, pet, onSuccess }: PetFormProps) {
       if (isEditing) {
         await updatePetMutation.mutateAsync({
           id: pet.id,
-          data: submissionData,
+          ...submissionData,
         });
       } else {
         await createPetMutation.mutateAsync(submissionData);

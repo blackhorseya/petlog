@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { petApi, petQueryKeys } from '@/lib/api/pet';
-import { Pet, CreatePetRequest, PetFormData } from '@/lib/types/pet';
+import { Pet, CreatePetRequest, UpdatePetRequest, PetFormData } from '@/lib/types/pet';
 
 // 獲取所有寵物
 export function usePets() {
@@ -58,25 +58,18 @@ export function useUpdatePet() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: PetFormData }) =>
-      petApi.updatePet(id, {
-        name: data.name,
-        avatar_url: data.avatar_url,
-        dob: data.dob,
-        breed: data.breed,
-        microchip_id: data.microchip_id,
-      }),
-    onSuccess: (_, { id, data }) => {
+    mutationFn: (petData: UpdatePetRequest) => petApi.updatePet(petData),
+    onSuccess: (_, petData) => {
       // 無效化相關查詢
       queryClient.invalidateQueries({ queryKey: petQueryKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: petQueryKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: petQueryKeys.detail(petData.id) });
       
       // 樂觀更新快取中的寵物資料
-      queryClient.setQueryData(petQueryKeys.detail(id), (old: Pet | undefined) => {
+      queryClient.setQueryData(petQueryKeys.detail(petData.id), (old: Pet | undefined) => {
         if (!old) return old;
         return {
           ...old,
-          ...data,
+          ...petData,
           updated_at: new Date().toISOString(),
         };
       });
@@ -110,18 +103,4 @@ export function useDeletePet() {
       toast.error(`刪除寵物失敗: ${error.message}`);
     },
   });
-}
-
-// 樂觀更新：在 mutation 執行前立即更新 UI
-export function useOptimisticPetUpdate() {
-  const queryClient = useQueryClient();
-
-  const updatePetOptimistically = (id: string, updates: Partial<Pet>) => {
-    queryClient.setQueryData(petQueryKeys.detail(id), (old: Pet | undefined) => {
-      if (!old) return old;
-      return { ...old, ...updates };
-    });
-  };
-
-  return { updatePetOptimistically };
 }

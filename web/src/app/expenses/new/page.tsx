@@ -29,12 +29,6 @@ export default function NewExpensePage() {
     );
   }
 
-  const handleFormSubmit = (data: CreateExpenseRequest) => {
-    // ExpenseForm 組件已經處理 API 調用和成功/錯誤處理
-    // 成功後可以選擇導航回總覽頁面
-    console.log('費用新增提交:', data);
-  };
-
   const handleCancel = () => {
     router.push('/expenses');
   };
@@ -62,7 +56,7 @@ export default function NewExpensePage() {
 
       {/* 費用表單 */}
       <ExpenseForm 
-        onSubmit={handleFormSubmit}
+        onSuccess={() => router.push('/expenses')}
         onCancel={handleCancel}
       />
     </div>

@@ -34,7 +34,10 @@ func (h *ListExpensesByPetHandler) Handle(c context.Context, query ListExpensesB
 	ctx.Info("開始根據寵物 ID 查詢費用列表", "pet_id", query.PetID)
 
 	// 組合查詢選項，加上 PetID 篩選
-	opts := append(query.Options, repository.WithPetID(query.PetID))
+	var opts []repository.ExpenseQueryOption
+	if query.PetID != "" {
+		opts = append(opts, repository.WithPetID(query.PetID))
+	}
 
 	expenses, total, err := h.expenseRepo.FindAll(ctx, opts...)
 	if err != nil {
