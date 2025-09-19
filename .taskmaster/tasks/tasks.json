@@ -9,7 +9,7 @@
         "testStrategy": "為 Hospital 模型撰寫單元測試，驗證結構體欄位與 JSON 序列化。為倉儲介面產生 mock，確保介面方法定義正確。",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -51,7 +51,7 @@
               "1.3"
             ],
             "details": "建立 internal/infra/mongodb/hospital_repository_impl.go 檔案，實作 HospitalRepository 介面的所有方法。使用 MongoDB 的 $near 操作符實作地理查詢功能，支援 $text 搜尋進行關鍵字查詢。實作分頁功能使用 Skip 和 Limit。在建構函式中建立適當的索引：地理座標使用 2dsphere 索引，名稱和地址欄位建立文字索引支援搜尋。參考現有的 pet_repository_impl.go 的錯誤處理模式，使用 convertError 函式將 MongoDB 錯誤轉換為 domain 錯誤。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫倉儲實作的整合測試，模擬 MongoDB 操作，測試地理查詢、關鍵字搜尋、分頁功能的正確性。"
           },
           {
@@ -62,7 +62,7 @@
               "1.2"
             ],
             "details": "在完成 HospitalRepository 介面定義後，執行 go generate ./internal/domain/repository/ 指令產生 mock_hospital.go 檔案。確認 mock 檔案正確產生且包含所有介面方法的 mock 實作。驗證 mock 檔案的 package 名稱正確，且可以在測試中正常使用。如果產生過程中遇到錯誤，檢查 mockgen 工具是否正確安裝，以及 //go:generate 指令格式是否正確。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "建立簡單的測試檔案使用產生的 mock，驗證 mock 物件可以正常建立和使用，確保 mock 方法可以正確設定期望行為和返回值。"
           }
         ]
@@ -145,7 +145,7 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -647,7 +647,7 @@
     ],
     "metadata": {
       "created": "2025-09-19T07:47:52.925Z",
-      "updated": "2025-09-19T08:10:25.121Z",
+      "updated": "2025-09-19T08:17:01.447Z",
       "description": "Tasks for master context"
     }
   }
