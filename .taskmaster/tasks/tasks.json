@@ -39,7 +39,7 @@
               "1.1"
             ],
             "details": "建立 internal/infra/mongodb/hospital_repository_model.go 檔案，定義 hospitalMongo struct 包含 bson tag，ID 欄位使用 bson.ObjectID 類型。建立地理座標的結構體支援 MongoDB 的 2dsphere 索引。實作 toDomain() 方法將 hospitalMongo 轉換為 domain model，以及 hospitalMongoFromDomain() 方法進行反向轉換。參考現有的 petMongo 結構和轉換邏輯，處理 ObjectID 與 string 之間的轉換，並在轉換失敗時返回 domain.ErrInvalidID 錯誤。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫 toDomain 和 fromDomain 轉換方法的單元測試，驗證 ID 轉換、地理座標轉換和錯誤處理的正確性。"
           },
           {
@@ -647,7 +647,7 @@
     ],
     "metadata": {
       "created": "2025-09-19T07:47:52.925Z",
-      "updated": "2025-09-19T08:07:49.979Z",
+      "updated": "2025-09-19T08:10:25.121Z",
       "description": "Tasks for master context"
     }
   }

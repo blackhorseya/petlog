@@ -17,6 +17,13 @@ type SearchOptions struct {
 	skip    int
 }
 
+// Getter 方法
+func (s *SearchOptions) Keyword() string { return s.keyword }
+func (s *SearchOptions) County() string  { return s.county }
+func (s *SearchOptions) Status() string  { return s.status }
+func (s *SearchOptions) Limit() int      { return s.limit }
+func (s *SearchOptions) Skip() int       { return s.skip }
+
 // SearchOption 搜尋選項函式
 type SearchOption func(*SearchOptions)
 
@@ -61,6 +68,11 @@ type NearbyOptions struct {
 	radiusKm    float64
 	limit       int
 }
+
+// Getter 方法
+func (n *NearbyOptions) Coordinates() model.Coordinates { return n.coordinates }
+func (n *NearbyOptions) RadiusKm() float64              { return n.radiusKm }
+func (n *NearbyOptions) Limit() int                     { return n.limit }
 
 // NearbyOption 附近搜尋選項函式
 type NearbyOption func(*NearbyOptions)
