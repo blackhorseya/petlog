@@ -20,7 +20,7 @@
     "@tanstack/react-query": "^5.80.10",
     "@tanstack/react-query-devtools": "^5.80.10",
     "@types/recharts": "^1.8.29",
-    "axios": "^1.10.0",
+    "axios": "^1.12.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.519.0",
