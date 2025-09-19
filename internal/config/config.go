@@ -10,9 +10,10 @@ import (
 
 // Config 應用程式配置結構
 type Config struct {
-	Auth0 Auth0Config `mapstructure:"auth0"`
-	Mongo MongoConfig `mapstructure:"mongo"`
-	HTTP  HTTPConfig  `mapstructure:"http"`
+	Auth0            Auth0Config `mapstructure:"auth0"`
+	Mongo            MongoConfig `mapstructure:"mongo"`
+	HTTP             HTTPConfig  `mapstructure:"http"`
+	GoogleMapsAPIKey string      `mapstructure:"google_maps_api_key"`
 }
 
 // Auth0Config Auth0 認證配置
@@ -50,6 +51,7 @@ func Load() (*Config, error) {
 	viper.BindEnv("mongo.uri", "MONGO_URI")
 	viper.BindEnv("mongo.database", "MONGO_DATABASE")
 	viper.BindEnv("http.port", "SERVER_PORT")
+	viper.BindEnv("google_maps_api_key", "GOOGLE_MAPS_API_KEY")
 
 	// 設定預設值
 	viper.SetDefault("http.port", "8080")
