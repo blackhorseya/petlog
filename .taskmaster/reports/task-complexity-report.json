@@ -1,0 +1,109 @@
+{
+	"meta": {
+		"generatedAt": "2025-09-19T07:49:57.730Z",
+		"tasksAnalyzed": 12,
+		"totalTasks": 12,
+		"analysisCount": 12,
+		"thresholdScore": 5,
+		"projectName": "Task Master",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "建立 Hospital 領域模型與倉儲介面",
+			"complexityScore": 3,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down this task into creating the Hospital domain model struct, defining repository interface methods, adding mock generation directives, and writing comprehensive unit tests for the domain layer components.",
+			"reasoning": "Simple domain model creation following existing patterns in the codebase. Pet model and repository already exist as reference implementations, making this straightforward to replicate."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "實作 MongoDB Hospital 倉儲層",
+			"complexityScore": 6,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break this down into creating the MongoDB model with bson tags, implementing domain conversion methods, developing repository implementation with geospatial queries, setting up MongoDB indexes, handling error conversion, and writing integration tests.",
+			"reasoning": "Moderate complexity due to geospatial MongoDB features ($near operator) which requires specialized knowledge and testing. Existing MongoDB repository patterns provide good foundation but geo queries add complexity."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "建立醫院資料匯入腳本",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break this into reading the JSON data file, implementing geocoding API integration with rate limiting, building batch processing logic, adding retry mechanisms for failed requests, creating import reporting, setting up MongoDB indexes, and writing comprehensive tests for the import process.",
+			"reasoning": "High complexity due to external API integration (geocoding), rate limiting requirements, error handling for network failures, and data processing at scale. The JSON file appears to contain thousands of records requiring careful batch processing."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "實作醫院搜尋與查詢 Usecase",
+			"complexityScore": 5,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break this into implementing keyword search handler, developing geospatial search logic, creating hospital detail retrieval, adding pagination and filtering capabilities, and implementing circuit breaker for cost control.",
+			"reasoning": "Moderate complexity with business logic for search, filtering, and geospatial queries. Circuit breaker pattern adds complexity but existing usecase patterns in codebase provide good foundation."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "建立醫院 API Endpoints",
+			"complexityScore": 4,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break this into creating endpoint definitions for search/list/nearby endpoints, implementing DTO to domain model conversions, adding request validation logic, creating Swagger documentation, and implementing error handling.",
+			"reasoning": "Standard endpoint creation following existing patterns. Pet and other endpoints already exist as reference, making this relatively straightforward with established patterns."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "實作醫院 HTTP Transport 層",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break this into creating HTTP handlers for hospital endpoints, implementing route registration in router, adding middleware integration, and setting up request logging and error tracking.",
+			"reasoning": "Standard HTTP transport implementation following existing Gin patterns in the codebase. Router.go and other handlers provide clear templates to follow."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "建立前端醫院 API 客戶端",
+			"complexityScore": 3,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break this into creating hospital API service functions, implementing TypeScript type definitions, integrating with existing axios configuration and Auth0 tokens, and adding client-side caching strategy.",
+			"reasoning": "Simple API client creation following existing pet.ts patterns. Axios configuration and Auth0 integration already established, making this straightforward replication."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "整合 Leaflet 地圖元件",
+			"complexityScore": 8,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break this into installing Leaflet dependencies, creating the base map component with OpenStreetMap tiles, implementing hospital markers and popups, adding user geolocation functionality, creating responsive design for mobile, implementing map controls and interactions, handling loading and error states, and writing comprehensive component tests.",
+			"reasoning": "High complexity due to new library integration (Leaflet not in current dependencies), geolocation APIs, responsive design considerations, and complex map interactions. No existing map components in codebase to reference."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "建立醫院列表與搜尋元件",
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break this into creating hospital card component, implementing search functionality, developing list display with filtering, adding pagination or infinite scroll, integrating TanStack Query for state management, and implementing loading/empty states following Shadcn UI patterns.",
+			"reasoning": "Moderate complexity with multiple components and state management. Existing pet list components provide good patterns but hospital-specific features (location search, maps integration) add complexity."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "建立醫院主頁面與詳情頁",
+			"complexityScore": 6,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break this into creating the main hospital page with map/list toggle, implementing hospital detail pages with dynamic routing, adding navigation and breadcrumbs, optimizing SEO with meta tags, integrating Google Maps navigation links, and implementing responsive layouts.",
+			"reasoning": "Moderate to high complexity due to page routing, state management between map and list views, SEO optimization, and integration with external navigation services. Next.js App Router patterns established in codebase help."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "實作保險絲機制與成本控制",
+			"complexityScore": 9,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break this into creating cost monitoring service, implementing multi-level circuit breaker logic (normal/warning/limited/safe modes), developing frontend degradation UI components, creating admin interface for threshold management, integrating cost tracking across all API calls, implementing automatic recovery mechanisms, adding monitoring and alerting, and comprehensive testing of all degradation scenarios.",
+			"reasoning": "Very high complexity requiring sophisticated system design for cost monitoring, multi-level circuit breaker patterns, graceful degradation, and admin interfaces. No existing patterns in codebase for this advanced functionality."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "優化效能與整合測試",
+			"complexityScore": 8,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break this into implementing Service Worker for caching, setting up Redis caching for backend, creating MongoDB composite indexes, implementing lazy loading and virtual scrolling, developing end-to-end tests, conducting performance testing with Lighthouse, implementing monitoring and alerting systems, and load testing API endpoints.",
+			"reasoning": "High complexity involving multiple performance optimization techniques, caching strategies, database optimization, testing frameworks, and monitoring systems. Requires expertise across frontend, backend, and DevOps domains."
+		}
+	]
+}
