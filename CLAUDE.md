@@ -85,12 +85,13 @@ task dev
 ## 開發規範
 
 ### Go 後端
+- **編程規範**：遵循 [Effective Go](https://go.dev/doc/effective_go) 指導原則
 - **依賴注入**：使用 google/wire
 - **Mock 測試**：使用 uber-go/mock，在 interface 檔案頂部加入 `//go:generate` 指令
 - **錯誤處理**：明確檢查 err，使用 `errors.Is` 判斷標準錯誤
 - **命名規範**：
   - Interface 以用途命名（如 `PetRepository`）
-  - Context 參數一律命名為 `c`
+  - Context 參數命名：原生 `context.Context` 使用 `c`，擴展後的 `contextx.Contextx` 使用 `ctx`
   - Package 名稱小寫單字，與目錄一致
 
 ### 前端
