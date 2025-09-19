@@ -3,414 +3,165 @@
     "tasks": [
       {
         "id": 1,
-        "title": "【後端】建立費用紀錄資料庫結構",
-        "description": "設計並實作費用紀錄功能所需的資料庫結構，包含所有必要欄位",
-        "status": "done",
-        "dependencies": [
-          2,
-          12
-        ],
+        "title": "建立 Hospital 領域模型與倉儲介面",
+        "description": "在 Domain 層建立 Hospital 實體模型及相關倉儲介面，遵循 Clean Architecture 原則",
+        "details": "在 internal/domain/model/ 建立 hospital.go，定義 Hospital struct 包含 ID、Name、Address、Phone、County、Veterinarian、LicenseType、Status、Coordinates (lat/lng)、CreatedAt、UpdatedAt 等欄位，僅使用 json tag。在 internal/domain/repository/ 建立 hospital.go 介面，定義 SearchHospitals、GetHospitalByID、ListHospitalsByArea、GetNearbyHospitals 等方法。使用 //go:generate mockgen 產生 mock 檔案。",
+        "testStrategy": "為 Hospital 模型撰寫單元測試，驗證結構體欄位與 JSON 序列化。為倉儲介面產生 mock，確保介面方法定義正確。",
         "priority": "high",
-        "details": "建立 Expense 資料表，包含以下欄位：\n- id (主鍵)\n- pet_id (外鍵，關聯到寵物表)\n- category (分類，字串型態)\n- amount (金額，正整數)\n- description (描述，可為空)\n- date (日期)\n- created_at (建立時間)\n- updated_at (更新時間)\n\n同時需要建立 Category 資料表，用於儲存預設與自訂分類：\n- id (主鍵)\n- name (分類名稱)\n- user_id (若為自訂分類則關聯到使用者)\n- is_default (布林值，標示是否為預設分類)\n\n預設分類包含：醫療、飼料、保健品、日用品、其他\n\n資料庫遷移腳本需包含初始預設分類資料",
-        "testStrategy": "1. 撰寫單元測試確保資料表結構符合需求\n2. 測試外鍵約束是否正常運作\n3. 測試預設分類是否正確建立\n4. 驗證欄位類型與限制條件是否符合需求",
+        "dependencies": [],
+        "status": "pending",
         "subtasks": []
       },
       {
         "id": 2,
-        "title": "【後端】實作費用紀錄 Domain Model 與 Repository",
-        "description": "建立費用紀錄的領域模型與資料存取層，實現基本的 CRUD 操作",
-        "status": "done",
-        "dependencies": [
-          12
-        ],
+        "title": "實作 MongoDB Hospital 倉儲層",
+        "description": "在 Infrastructure 層實作 Hospital 的 MongoDB 持久化邏輯",
+        "details": "在 internal/infra/mongodb/ 建立 hospital_repository_model.go 定義資料庫模型（包含 bson tag），以及 toDomain/fromDomain 轉換方法。建立 hospital_repository_impl.go 實作 HospitalRepository 介面，包含地理查詢功能使用 MongoDB 的 $near 操作符。建立適當的索引支援地理查詢和文字搜尋。",
+        "testStrategy": "撰寫倉儲實作的整合測試，使用 testcontainer 或 in-memory MongoDB。測試地理查詢、關鍵字搜尋、分頁功能。驗證 toDomain/fromDomain 轉換的正確性。",
         "priority": "high",
-        "details": "1. 建立 Expense domain model，包含所有必要欄位與驗證邏輯：\n```\ntype Expense struct {\n  ID          uint\n  PetID       uint\n  Category    string\n  Amount      int\n  Description string\n  Date        time.Time\n  CreatedAt   time.Time\n  UpdatedAt   time.Time\n  Pet         *Pet\n}\n```\n\n2. 實作 ExpenseRepository 介面與實現：\n```\ntype ExpenseRepository interface {\n  Create(expense *Expense) error\n  FindByID(id uint) (*Expense, error)\n  Update(expense *Expense) error\n  Delete(id uint) error\n  FindAll(filters map[string]interface{}) ([]*Expense, error)\n}\n```\n\n3. 實作 CategoryRepository 介面與實現，用於管理預設與自訂分類",
-        "testStrategy": "1. 撰寫單元測試確保 Repository 的 CRUD 操作正常運作\n2. 測試各種查詢條件組合\n3. 測試邊界情況，如無效 ID、不存在的記錄等\n4. 測試資料驗證邏輯",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
         "subtasks": []
       },
       {
         "id": 3,
-        "title": "【後端】實作費用紀錄 Usecase 層",
-        "description": "建立費用紀錄的業務邏輯層，處理複雜查詢、驗證與業務規則",
-        "status": "done",
-        "dependencies": [
-          2,
-          12
-        ],
+        "title": "建立醫院資料匯入腳本",
+        "description": "建立腳本將 output/hospitals.json 資料匯入到 MongoDB，並處理地址轉座標",
+        "details": "建立 cmd/import-hospitals/ 目錄，撰寫匯入腳本讀取 output/hospitals.json。使用免費的 Nominatim API 或政府開放資料 API 將地址轉換為 GPS 座標。實作批次處理避免 API 限制，加入錯誤重試機制。產生匯入報告顯示成功/失敗統計。建立適當的 MongoDB 索引支援查詢效能。",
+        "testStrategy": "撰寫匯入腳本的單元測試，模擬 JSON 檔案讀取和 API 呼叫。測試錯誤處理和重試邏輯。驗證座標轉換的準確性和資料完整性。",
         "priority": "high",
-        "details": "1. 建立 ExpenseUsecase 介面與實現：\n```\ntype ExpenseUsecase interface {\n  CreateExpense(expense *Expense) error\n  GetExpenseByID(id uint) (*Expense, error)\n  UpdateExpense(expense *Expense) error\n  DeleteExpense(id uint) error\n  ListExpenses(filters map[string]interface{}) ([]*Expense, error)\n  GetExpensesByPetID(petID uint) ([]*Expense, error)\n  GetExpensesByDateRange(start, end time.Time) ([]*Expense, error)\n  GetExpensesByCategory(category string) ([]*Expense, error)\n  SearchExpenses(keyword string) ([]*Expense, error)\n}\n```\n\n2. 實作 CategoryUsecase 介面與實現，用於管理分類：\n```\ntype CategoryUsecase interface {\n  GetAllCategories() ([]*Category, error)\n  GetDefaultCategories() ([]*Category, error)\n  GetUserCategories(userID uint) ([]*Category, error)\n  CreateCategory(category *Category) error\n  UpdateCategory(category *Category) error\n  DeleteCategory(id uint) error\n}\n```\n\n3. 實作業務邏輯，包含：\n- 欄位驗證（必填、金額為正整數等）\n- 多條件組合查詢\n- 快速輸入邏輯（記住上次輸入）",
-        "testStrategy": "1. 撰寫單元測試確保業務邏輯正確\n2. 測試各種查詢條件組合\n3. 測試驗證邏輯，包含必填欄位、金額格式等\n4. 測試快速輸入功能\n5. 模擬各種使用情境進行整合測試",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
         "subtasks": []
       },
       {
         "id": 4,
-        "title": "【後端】實作費用紀錄 API Endpoints",
-        "description": "建立費用紀錄相關的 RESTful API 端點，支援 CRUD 與查詢操作",
-        "status": "done",
+        "title": "實作醫院搜尋與查詢 Usecase",
+        "description": "在 Usecase 層實作醫院相關的業務邏輯處理",
+        "details": "在 internal/usecase/query/ 建立 search_hospitals_handler.go 實作關鍵字搜尋（名稱、地址、獸醫師）和地理範圍搜尋。建立 get_hospital_detail_handler.go 取得單一醫院詳細資訊。建立 list_nearby_hospitals_handler.go 根據使用者位置搜尋附近醫院。加入分頁、排序、篩選功能。實作保險絲機制控制外部 API 使用量。",
+        "testStrategy": "為每個 handler 撰寫單元測試，使用 mock repository。測試不同搜尋條件的組合，驗證分頁邏輯。測試保險絲機制在不同成本限制下的行為。",
+        "priority": "medium",
         "dependencies": [
-          3,
-          12
+          2
         ],
-        "priority": "high",
-        "details": "1. 實作以下 API 端點：\n- POST /api/v1/expenses - 新增費用紀錄\n- GET /api/v1/expenses/:id - 取得單筆費用紀錄\n- PUT /api/v1/expenses/:id - 更新費用紀錄\n- DELETE /api/v1/expenses/:id - 刪除費用紀錄\n- GET /api/v1/expenses - 查詢費用紀錄（支援多條件篩選）\n  - 查詢參數：pet_id, category, start_date, end_date, keyword\n\n2. 實作分類相關 API：\n- GET /api/categories - 取得所有分類\n- POST /api/categories - 新增自訂分類\n- PUT /api/categories/:id - 更新分類\n- DELETE /api/categories/:id - 刪除分類\n\n3. 實作請求與回應的資料結構：\n```\ntype CreateExpenseRequest struct {\n  PetID       uint      `json:\"pet_id\" binding:\"required\"`\n  Category    string    `json:\"category\" binding:\"required\"`\n  Amount      int       `json:\"amount\" binding:\"required,min=1\"`\n  Description string    `json:\"description\"`\n  Date        time.Time `json:\"date\" binding:\"required\"`\n}\n\ntype ExpenseResponse struct {\n  ID          uint      `json:\"id\"`\n  PetID       uint      `json:\"pet_id\"`\n  PetName     string    `json:\"pet_name\"`\n  Category    string    `json:\"category\"`\n  Amount      int       `json:\"amount\"`\n  Description string    `json:\"description\"`\n  Date        time.Time `json:\"date\"`\n  CreatedAt   time.Time `json:\"created_at\"`\n  UpdatedAt   time.Time `json:\"updated_at\"`\n}\n```",
-        "testStrategy": "1. 撰寫 API 測試確保所有端點正常運作\n2. 測試各種查詢參數組合\n3. 測試權限驗證\n4. 測試錯誤處理與回應\n5. 測試資料驗證邏輯\n6. 使用 Postman 或類似工具建立 API 測試集合",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "新增「新增費用」按鈕至總覽頁面",
-            "description": "在費用總覽 Dashboard 頁面標題右側，新增了一個「新增費用」按鈕，讓使用者可以快速跳轉至新增費用頁面。",
-            "details": "",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 4
-          }
-        ]
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "新增「新增費用」按鈕至總覽頁面",
-            "description": "在費用總覽 Dashboard 頁面標題右側，新增了一個「新增費用」按鈕，讓使用者可以快速跳轉至新增費用頁面。",
-            "details": "",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 4
-          }
-        ]
-      },
-      {
-        "id": 4.5,
-        "title": "【前端】實作費用總覽 Dashboard（圖表化主視覺）",
-        "description": "建立費用總覽 Dashboard 頁面，主視覺以圖表與摘要區塊為主，支援依寵物細分查詢入口，整合 API 彙總查詢，UI/UX 現代清爽，支援響應式設計。",
-        "status": "done",
-        "dependencies": [
-          4,
-          11,
-          12
-        ],
-        "dependencies": [
-          4,
-          11,
-          12
-        ],
-        "priority": "high",
-        "details": "✅ 實作完成 (2025-01-27)\n\n原始需求：\n1. 實作主視覺頁面，包含：\n- 圓餅圖（分類分布）\n- 長條圖（本月每日支出）\n- 折線圖（年度趨勢）\n- 摘要區塊（本月總支出、分類排行、最近紀錄）\n- 依寵物細分查詢入口（按鈕/選單）\n2. UI/UX 需現代、清爽，支援響應式設計\n3. 整合 API 彙總查詢，動態更新圖表與摘要資料\n4. 點擊分類/圖表區塊可進一步篩選或跳轉明細查詢頁面\n\n實作成果：\n✅ 重新設計 /expenses 頁面作為主視覺 Dashboard\n✅ 整合 ExpenseCharts 元件（圓餅圖 + 趨勢圖）\n✅ 整合 SummaryPanel 元件（本月支出、變化率、分類統計、最近記錄）\n✅ 實作寵物選擇器（支援「所有寵物」和個別選擇）\n✅ 實作時間範圍選擇器（本月/本季/本年）\n✅ 動態資料處理和圖表更新\n✅ 響應式設計和現代化 UI\n✅ 快速操作卡片（明細查詢、分類管理、費用報告）\n✅ 完整的空狀態和載入狀態處理\n✅ 建立子頁面結構 (/expenses/list, /expenses/new)\n\n技術檔案：\n- web/src/app/expenses/page.tsx (主 Dashboard)\n- web/src/app/expenses/list/page.tsx (明細查詢頁面)\n- web/src/app/expenses/new/page.tsx (新增費用頁面)\n- web/docs/TASK_4.5_IMPLEMENTATION.md (實作報告)",
-        "testStrategy": "1. 撰寫單元測試確保 Dashboard 元件正確渲染\n2. 測試圖表資料動態更新\n3. 測試摘要區塊資料正確性\n4. 測試依寵物切換功能\n5. 測試響應式設計與跨裝置顯示\n6. 使用者測試確保主視覺資訊一目了然"
+        "status": "pending",
+        "subtasks": []
       },
       {
         "id": 5,
-        "title": "【前端】實作費用明細查詢與管理頁面",
-        "description": "建立費用明細查詢與管理頁面，顯示所有費用紀錄，支援多條件篩選、分頁、排序與 CRUD 功能，屬於次要查詢與管理介面。",
-        "status": "in-progress",
-        "dependencies": [
-          4,
-          11,
-          12
-        ],
+        "title": "建立醫院 API Endpoints",
+        "description": "在 Endpoint 層實作醫院相關的 HTTP 端點",
+        "details": "在 internal/endpoint/ 建立 hospital_endpoint.go，實作 GET /api/hospitals（搜尋/列表）、GET /api/hospitals/{id}（詳情）、GET /api/hospitals/nearby（附近醫院）端點。處理 DTO 與領域模型轉換，實作請求驗證和錯誤處理。加入 Swagger 文件註解。支援查詢參數如 keyword、lat、lng、radius、limit、offset。",
+        "testStrategy": "撰寫端點的單元測試，驗證請求/回應格式。測試參數驗證和錯誤處理。使用 testify 驗證不同場景下的回應內容。",
         "priority": "medium",
-        "details": "1. 建立費用明細查詢頁面，包含：\n- 費用紀錄列表（依日期倒序排列）\n- 每筆紀錄顯示：日期、分類、金額、描述、寵物\n- 篩選區域：寵物選擇器、分類選擇器、日期範圍、關鍵字搜尋\n- 新增、編輯、刪除操作按鈕\n2. 支援多條件篩選、分頁、即時更新\n3. UI/UX 與 Dashboard 風格一致，支援響應式設計\n4. 點擊列表可進入編輯/詳細頁面",
-        "testStrategy": "1. 撰寫單元測試確保元件正確渲染\n2. 測試篩選、分頁、CRUD 功能\n3. 測試多寵物切換功能\n4. 測試 UI 響應式設計\n5. 使用者測試確保查詢與管理流暢",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "建立頁面基本骨架",
-            "description": "在 `web/src/app/expenses/list/page.tsx` 建立頁面基本骨架，放置 `<ExpenseList />` 元件，並加入新增按鈕。",
-            "status": "done",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "實作多條件篩選功能",
-            "description": "在費用明細頁面實作多條件篩選功能，包含：\n- 寵物選擇器篩選\n- 分類選擇器篩選\n- 日期範圍篩選\n- 關鍵字搜尋功能",
-            "status": "pending",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "實作列表分頁功能",
-            "description": "為費用明細列表實作分頁功能，確保大量資料時的效能與使用體驗。",
-            "status": "pending",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "實作列表排序功能",
-            "description": "實作費用明細列表的排序功能，允許使用者依不同欄位（如日期、金額、分類等）進行排序。",
-            "status": "pending",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "完成 CRUD 操作功能",
-            "description": "完成費用明細的完整 CRUD 操作：\n- 實作新增/編輯表單\n- 實作刪除功能與確認對話框\n- 確保操作後列表即時更新",
-            "status": "done",
-            "dependencies": [],
-            "details": "",
-            "testStrategy": ""
-          }
-        ]
-      },
-      {
-        "id": 5.5,
-        "title": "【前端】設計與實作圖表元件",
-        "description": "設計並封裝費用總覽所需的圖表元件（圓餅圖、長條圖、折線圖），支援資料動態更新與互動。",
-        "status": "done",
         "dependencies": [
-          4.5,
-          11,
-          12
+          4
         ],
-        "status": "done",
-        "dependencies": [
-          4.5,
-          11,
-          12
-        ],
-        "priority": "high",
-        "details": "1. 封裝圓餅圖、長條圖、折線圖元件\n2. 支援資料動態更新與互動（如點擊分類高亮、tooltip）\n3. 提供元件 API 供 Dashboard 使用\n4. 支援響應式設計與主題色彩",
-        "testStrategy": "1. 撰寫單元測試確保圖表元件正確渲染\n2. 測試資料動態更新與互動\n3. 測試響應式設計\n4. 使用者測試確保圖表資訊易讀"
-      },
-      {
-        "id": 5.6,
-        "title": "【前端】設計與實作摘要元件",
-        "description": "設計並封裝費用總覽摘要區塊元件，顯示本月總支出、分類排行、最近紀錄，支援不同時間區間切換。",
-        "status": "done",
-        "dependencies": [
-          4.5,
-          11,
-          12
-        ],
-        "status": "done",
-        "dependencies": [
-          4.5,
-          11,
-          12
-        ],
-        "priority": "high",
-        "details": "1. 封裝摘要區塊元件，顯示：\n- 本月總支出\n- 支出最多分類\n- 最近紀錄（分類、金額、寵物、日期）\n2. 支援不同時間區間切換（本月、本週、去年同期等）\n3. 提供元件 API 供 Dashboard 使用\n4. 支援響應式設計",
-        "testStrategy": "1. 撰寫單元測試確保摘要元件正確渲染\n2. 測試資料正確性與區間切換\n3. 測試響應式設計\n4. 使用者測試確保摘要資訊一目了然"
+        "status": "pending",
+        "subtasks": []
       },
       {
         "id": 6,
-        "title": "【前端】實作費用表單頁面",
-        "description": "建立新增與編輯費用的表單頁面，支援所有必要欄位與驗證",
-        "status": "done",
-        "status": "done",
-        "dependencies": [
-          4,
-          11,
-          12
-        ],
+        "title": "實作醫院 HTTP Transport 層",
+        "description": "在 Transport 層建立醫院相關的 Gin HTTP 處理器",
+        "details": "在 internal/transport/gin/ 建立 hospital_handler.go，實作 HTTP 請求處理邏輯。處理 HTTP 協議轉換、請求解析、回應格式化。在 router.go 中註冊醫院相關路由。實作適當的 middleware 如 CORS、認證檢查。加入請求記錄和錯誤追蹤。",
+        "testStrategy": "撰寫 HTTP handler 的整合測試，使用 httptest 模擬請求。測試各種 HTTP 狀態碼回應。驗證 JSON 回應格式的正確性。",
         "priority": "medium",
-        "details": "1. 建立費用表單頁面，包含以下欄位：\n- 寵物選擇器（下拉選單，必填）\n- 分類選擇器（下拉選單，包含預設與自訂分類，必填）\n- 金額輸入框（數字輸入，必填，僅允許正整數）\n- 描述輸入框（文字輸入，選填）\n- 日期選擇器（日期選擇，必填，預設今日）\n- 送出按鈕\n- 取消按鈕\n\n2. 實作表單驗證：\n- 必填欄位檢查\n- 金額格式驗證（正整數）\n- 日期合理性檢查\n\n3. 實作快速輸入模式：\n- 記住上次選擇的分類\n- 記住上次輸入的金額\n- 提供快速填入按鈕\n\n4. 實作分類管理：\n- 新增自訂分類功能\n- 編輯分類功能\n- 刪除分類功能\n\n5. 下拉選單（Select）元件處理特殊狀態：\n- 載入中狀態顯示提示訊息\n- 無資料狀態顯示提示訊息\n- 避免使用 value=\"\" 的 <Select.Item> 以防止 Radix UI 執行階段錯誤\n- 使用普通 <div> 元素顯示提示訊息",
-        "testStrategy": "1. 撰寫單元測試確保表單元件正確渲染\n2. 測試表單驗證邏輯\n3. 測試快速輸入功能\n4. 測試分類管理功能\n5. 測試表單提交與取消操作\n6. 使用者測試確保操作流暢度\n7. 測試下拉選單在各種狀態下的行為（載入中、無資料、有資料）\n8. 確保下拉選單在特殊狀態下不會導致應用程式崩潰",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "修復下拉選單（Select）元件錯誤",
-            "description": "修復費用表單中下拉選單在「載入中」或「無資料」狀態時的錯誤",
-            "status": "done",
-            "dependencies": [],
-            "details": "- 問題：當下拉選單處於「載入中」或「無資料」狀態時，使用了 value=\"\" 的 <Select.Item>，這導致了 Radix UI 的執行階段錯誤\n- 解決方案：將無效的 <Select.Item> 替換為帶有提示訊息的普通 <div> 元素\n- 檔案：web/src/components/expenses/expense-form.tsx",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "實作表單基本欄位與驗證",
-            "description": "建立費用表單的基本欄位並實作必要的驗證邏輯",
-            "status": "done",
-            "dependencies": [],
-            "details": "實作表單的所有基本欄位，包括寵物選擇器、分類選擇器、金額輸入框、描述輸入框、日期選擇器以及送出和取消按鈕。確保所有必填欄位有適當的驗證邏輯。",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "實作快速輸入模式",
-            "description": "實作記住上次輸入並提供快速填入功能",
-            "status": "done",
-            "dependencies": [],
-            "details": "實作功能以記住用戶上次選擇的分類和輸入的金額，並提供快速填入按鈕讓用戶可以快速重複上次的輸入。",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "實作分類管理功能",
-            "description": "實作新增、編輯和刪除自訂分類的功能",
-            "status": "done",
-            "dependencies": [],
-            "details": "實作分類管理介面，允許用戶新增自訂分類、編輯現有分類和刪除不需要的分類。",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "優化下拉選單的錯誤處理",
-            "description": "確保下拉選單在各種狀態下都能正常運作",
-            "status": "done",
-            "dependencies": [],
-            "details": "基於已修復的問題，進一步優化下拉選單元件，確保它在所有可能的狀態下（包括載入中、無資料、網絡錯誤等）都能提供良好的用戶體驗，並且不會導致應用程式崩潰。",
-            "testStrategy": ""
-          }
-        ]
-        "details": "1. 建立費用表單頁面，包含以下欄位：\n- 寵物選擇器（下拉選單，必填）\n- 分類選擇器（下拉選單，包含預設與自訂分類，必填）\n- 金額輸入框（數字輸入，必填，僅允許正整數）\n- 描述輸入框（文字輸入，選填）\n- 日期選擇器（日期選擇，必填，預設今日）\n- 送出按鈕\n- 取消按鈕\n\n2. 實作表單驗證：\n- 必填欄位檢查\n- 金額格式驗證（正整數）\n- 日期合理性檢查\n\n3. 實作快速輸入模式：\n- 記住上次選擇的分類\n- 記住上次輸入的金額\n- 提供快速填入按鈕\n\n4. 實作分類管理：\n- 新增自訂分類功能\n- 編輯分類功能\n- 刪除分類功能\n\n5. 下拉選單（Select）元件處理特殊狀態：\n- 載入中狀態顯示提示訊息\n- 無資料狀態顯示提示訊息\n- 避免使用 value=\"\" 的 <Select.Item> 以防止 Radix UI 執行階段錯誤\n- 使用普通 <div> 元素顯示提示訊息",
-        "testStrategy": "1. 撰寫單元測試確保表單元件正確渲染\n2. 測試表單驗證邏輯\n3. 測試快速輸入功能\n4. 測試分類管理功能\n5. 測試表單提交與取消操作\n6. 使用者測試確保操作流暢度\n7. 測試下拉選單在各種狀態下的行為（載入中、無資料、有資料）\n8. 確保下拉選單在特殊狀態下不會導致應用程式崩潰",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "修復下拉選單（Select）元件錯誤",
-            "description": "修復費用表單中下拉選單在「載入中」或「無資料」狀態時的錯誤",
-            "status": "done",
-            "dependencies": [],
-            "details": "- 問題：當下拉選單處於「載入中」或「無資料」狀態時，使用了 value=\"\" 的 <Select.Item>，這導致了 Radix UI 的執行階段錯誤\n- 解決方案：將無效的 <Select.Item> 替換為帶有提示訊息的普通 <div> 元素\n- 檔案：web/src/components/expenses/expense-form.tsx",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "實作表單基本欄位與驗證",
-            "description": "建立費用表單的基本欄位並實作必要的驗證邏輯",
-            "status": "done",
-            "dependencies": [],
-            "details": "實作表單的所有基本欄位，包括寵物選擇器、分類選擇器、金額輸入框、描述輸入框、日期選擇器以及送出和取消按鈕。確保所有必填欄位有適當的驗證邏輯。",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "實作快速輸入模式",
-            "description": "實作記住上次輸入並提供快速填入功能",
-            "status": "done",
-            "dependencies": [],
-            "details": "實作功能以記住用戶上次選擇的分類和輸入的金額，並提供快速填入按鈕讓用戶可以快速重複上次的輸入。",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "實作分類管理功能",
-            "description": "實作新增、編輯和刪除自訂分類的功能",
-            "status": "done",
-            "dependencies": [],
-            "details": "實作分類管理介面，允許用戶新增自訂分類、編輯現有分類和刪除不需要的分類。",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "優化下拉選單的錯誤處理",
-            "description": "確保下拉選單在各種狀態下都能正常運作",
-            "status": "done",
-            "dependencies": [],
-            "details": "基於已修復的問題，進一步優化下拉選單元件，確保它在所有可能的狀態下（包括載入中、無資料、網絡錯誤等）都能提供良好的用戶體驗，並且不會導致應用程式崩潰。",
-            "testStrategy": ""
-          }
-        ]
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
       },
       {
         "id": 7,
-        "title": "【後端】實作分類管理功能（後端部分）",
-        "description": "建立分類管理功能，支援預設分類與自訂分類的管理（暫緩實作，待主流程穩定後再補上）",
-        "status": "pending",
+        "title": "建立前端醫院 API 客戶端",
+        "description": "在前端建立呼叫醫院 API 的統一介面",
+        "details": "在 web/src/lib/api/ 建立 hospital.ts，使用現有的 axios 設定實作醫院 API 呼叫方法。實作 searchHospitals、getHospitalById、getNearbyHospitals 函數。加入 TypeScript 型別定義確保型別安全。整合 Auth0 token 自動帶入。實作前端快取策略減少 API 呼叫。",
+        "testStrategy": "撰寫 API 客戶端的單元測試，模擊 axios 回應。測試錯誤處理和重試邏輯。驗證 TypeScript 型別定義的正確性。",
+        "priority": "medium",
         "dependencies": [
-          2,
-          4,
-          12
+          6
         ],
-        "priority": "low",
-        "details": "**注意：此功能暫緩實作，後端目前聚焦於費用紀錄 CRUD 與查詢，待主流程穩定後再補上。**\n\n計劃實作內容（未來）：\n\n1. 建立分類管理 API，包含以下功能：\n- 獲取所有分類（預設與自訂）\n- 新增自訂分類\n- 編輯自訂分類\n- 刪除自訂分類\n\n2. 實作預設分類：\n- 初始化預設分類：醫療、飼料、保健品、日用品、其他\n- 預設分類不可刪除或編輯\n\n3. 實作自訂分類：\n- 使用者可新增自訂分類\n- 使用者可編輯自己的自訂分類\n- 使用者可刪除自己的自訂分類\n\n4. 支援分類選擇器元件所需的後端 API：\n- 在費用表單中使用\n- 提供所有可用分類\n- 支援快速新增分類",
-        "testStrategy": "**待功能實作時再執行：**\n\n1. 撰寫單元測試確保分類管理功能正常運作\n2. 測試預設分類的保護機制\n3. 測試自訂分類的 CRUD 操作\n4. 測試分類選擇器元件所需的 API\n5. 測試分類在費用表單中的使用\n6. 使用者測試確保操作流暢度",
+        "status": "pending",
         "subtasks": []
       },
       {
         "id": 8,
-        "title": "【前端】整合多寵物切換功能",
-        "description": "在 Dashboard 與明細頁皆可切換寵物，切換時自動更新圖表與列表，支援單選、多選與全部選項。",
+        "title": "整合 Leaflet 地圖元件",
+        "description": "建立基於 Leaflet 和 OpenStreetMap 的地圖顯示元件",
+        "details": "安裝 leaflet 和 react-leaflet 套件。在 web/src/components/hospitals/ 建立 HospitalMap.tsx 元件，使用 OpenStreetMap 作為底圖。實作醫院標記顯示、點擊彈出視窗顯示基本資訊。加入使用者定位功能和縮放控制。實作響應式設計支援行動裝置。處理地圖載入狀態和錯誤處理。",
+        "testStrategy": "撰寫地圖元件的單元測試，模擬 leaflet 行為。測試標記顯示和互動功能。使用 React Testing Library 驗證元件渲染。",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
         "status": "pending",
-        "dependencies": [
-          4.5,
-          5,
-          11,
-          12
-        ],
-        "dependencies": [
-          4.5,
-          5,
-          11,
-          12
-        ],
-        "priority": "medium",
-        "details": "1. 建立寵物選擇器元件，支援單選、多選與全部選項\n2. 整合寵物選擇器到 Dashboard 與明細查詢頁面\n3. 切換寵物時自動更新圖表與列表資料\n4. 記住上次選擇的寵物\n5. 支援響應式設計",
-        "testStrategy": "1. 撰寫單元測試確保寵物選擇器元件正確渲染\n2. 測試寵物切換功能於 Dashboard 與明細頁\n3. 測試資料動態更新\n4. 使用者測試確保切換體驗流暢"
+        "subtasks": []
       },
       {
         "id": 9,
-        "title": "【全端】實作權限驗證與錯誤處理",
-        "description": "實作權限驗證機制，確保只有登入用戶可操作，並優化錯誤處理與提示",
-        "status": "pending",
+        "title": "建立醫院列表與搜尋元件",
+        "description": "實作醫院列表檢視和搜尋功能元件",
+        "details": "在 web/src/components/hospitals/ 建立 HospitalList.tsx、HospitalSearch.tsx、HospitalCard.tsx 元件。實作關鍵字搜尋、地區篩選、排序功能。使用 TanStack Query 管理狀態和快取。實作無限滾動或分頁載入。加入載入狀態和空白狀態處理。遵循 Shadcn UI 設計系統。",
+        "testStrategy": "撰寫列表和搜尋元件的單元測試。測試搜尋、篩選、排序功能。驗證無限滾動或分頁邏輯。測試載入和錯誤狀態處理。",
+        "priority": "medium",
         "dependencies": [
-          4,
-          12
+          7
         ],
-        "priority": "high",
-        "details": "1. 實作權限驗證中間件：\n- 確保所有費用相關 API 需要登入才能訪問\n- 確保使用者只能操作自己的費用紀錄\n- 實作 JWT 或 Session 驗證\n\n2. 實作錯誤處理：\n- 統一錯誤回應格式\n- 友善的錯誤訊息\n- 適當的 HTTP 狀態碼\n\n3. 實作前端錯誤處理：\n- 表單驗證錯誤提示\n- API 錯誤提示\n- 載入失敗處理\n- 操作失敗處理\n\n4. 實作錯誤日誌：\n- 記錄後端錯誤\n- 記錄前端錯誤\n- 錯誤分析與監控",
-        "testStrategy": "1. 撰寫單元測試確保權限驗證正常運作\n2. 測試未登入用戶的訪問限制\n3. 測試使用者只能操作自己資料的限制\n4. 測試各種錯誤情境的處理\n5. 測試錯誤提示的友善度\n6. 安全性測試確保無權限漏洞",
+        "status": "pending",
         "subtasks": []
       },
       {
         "id": 10,
-        "title": "【前端】實作手機操作優化與 UI/UX 改進",
-        "description": "優化手機操作體驗，改進 UI/UX 設計，確保在各種裝置上都有良好的使用體驗",
-        "status": "pending",
-        "dependencies": [
-          5,
-          6,
-          8,
-          11,
-          12
-        ],
+        "title": "建立醫院主頁面與詳情頁",
+        "description": "實作醫院地圖功能的主要頁面結構",
+        "details": "建立 web/src/app/hospitals/page.tsx 主頁面，整合地圖和列表檢視切換功能。建立 web/src/app/hospitals/[id]/page.tsx 詳情頁顯示完整醫院資訊。實作頁面間的導航和狀態管理。加入 SEO 最佳化和 meta tags。實作麵包屑導航和返回功能。整合 Google Maps 導航連結。",
+        "testStrategy": "撰寫頁面元件的整合測試。測試路由導航和參數傳遞。驗證 SEO meta tags 和結構化資料。測試響應式布局在不同螢幕尺寸下的表現。",
         "priority": "medium",
-        "details": "1. 實作響應式設計：\n- 確保所有頁面在手機、平板、桌面都有良好顯示\n- 針對小螢幕優化表單與列表顯示\n- 使用 CSS Grid 或 Flexbox 實現彈性布局\n\n2. 實作手機操作優化：\n- 觸控友善的按鈕與控制項\n- 適當的字體大小與間距\n- 簡化手機版表單\n- 優化手機版篩選功能\n\n3. 實作 UI/UX 改進：\n- 統一設計語言\n- 清晰的視覺層級\n- 適當的動畫與過渡效果\n- 即時反饋\n\n4. 實作快速輸入優化：\n- 一鍵填入常用資料\n- 智能預設值\n- 記住使用者偏好",
-        "testStrategy": "1. 在各種裝置與螢幕尺寸上測試\n2. 使用者測試確保操作流暢度\n3. 測試觸控操作的便利性\n4. 測試響應式設計的斷點\n5. 測試快速輸入功能\n6. 可用性測試確保良好的使用者體驗",
+        "dependencies": [
+          8,
+          9
+        ],
+        "status": "pending",
         "subtasks": []
       },
       {
         "id": 11,
-        "title": "【前端】費用紀錄視覺設計與元件規劃",
-        "description": "根據產品需求文件，設計費用紀錄的視覺元素與元件結構，包含卡片式列表、色彩區分、重點摘要和圖表等，並產出設計文件供前端實作",
-        "status": "done",
-        "dependencies": [
-          6,
-          8,
-          10,
-          12
-        ],
+        "title": "實作保險絲機制與成本控制",
+        "description": "建立 API 使用量監控和降級保護機制",
+        "details": "建立成本監控服務追蹤外部 API 使用量。實作保險絲機制：正常模式（完整功能）、警戒模式（80%，停用次要功能）、限制模式（90%，僅提供必要欄位）、安全模式（95%+，僅使用本地資料）。在前端實作降級 UI 顯示和 Google Maps 導航連結備援。建立管理介面監控和調整閾值。",
+        "testStrategy": "撰寫保險絲機制的單元測試，模擬不同使用量情境。測試自動降級和恢復邏輯。驗證前端降級 UI 的正確顯示。測試管理介面的功能。",
         "priority": "high",
-        "details": "1. 設計卡片式列表與視覺元素：\n- 設計費用卡片 (ExpenseCard) 元件，包含金額、日期、分類、描述等資訊的視覺呈現\n- 設計摘要面板 (SummaryPanel) 元件，顯示總支出、分類統計等\n- 設計分類標籤 (CategoryBadge) 元件，使用色彩區分不同分類\n- 設計圖表元件，包括支出趨勢圖、分類佔比圓餅圖等\n- 確保所有元件在桌面和移動設備上都有良好的顯示效果\n\n2. 規劃元件結構與層級：\n- 定義元件層級與組合關係\n- 規劃元件的 props 與事件\n- 設計元件狀態管理方式\n- 考慮元件的可重用性與擴展性\n\n3. 訂定設計規範：\n- 定義主色調與輔助色彩系統，確保分類標籤有明確區分\n- 選擇適合的字型與字級大小，確保可讀性\n- 規範間距系統，確保一致的視覺節奏\n- 定義陰影、圓角等視覺細節\n- 設計互動狀態（hover、active、focus）的視覺效果\n\n4. 產出設計文件：\n- 製作高保真 mockup 或 wireframe\n- 編寫元件設計說明文件，包含元件結構、props、事件等\n- 製作設計系統文件，包含色彩、字型、間距等規範\n- 提供元件使用範例與最佳實踐建議\n\n5. 與開發團隊協作：\n- 與前端工程師討論實作可行性\n- 根據技術限制調整設計\n- 提供必要的設計資源（圖標、圖片等）",
-        "testStrategy": "1. 設計審核：\n- 與產品經理確認設計是否符合 PRD 需求\n- 與利害關係人進行設計評審，確保符合品牌形象\n- 檢查設計是否符合無障礙設計原則\n\n2. 使用者測試：\n- 使用原型工具（如 Figma、InVision）製作可點擊原型\n- 進行小規模使用者測試，收集對視覺設計的反饋\n- 評估使用者對色彩區分、視覺層級的理解程度\n\n3. 技術可行性測試：\n- 與前端工程師確認設計元素是否可實現\n- 檢查設計在不同螢幕尺寸下的適應性\n- 評估設計對性能的潛在影響\n\n4. 設計一致性檢查：\n- 確保所有元件遵循統一的設計語言\n- 檢查色彩、字型、間距等是否一致\n- 確保視覺元素與現有系統風格協調\n\n5. 文檔完整性檢查：\n- 確認設計文件包含所有必要元件的規格\n- 確認設計規範文件詳細且易於理解\n- 確認提供了足夠的實作指引",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
         "subtasks": []
       },
       {
         "id": 12,
-        "title": "【全端】設計費用紀錄 Swagger API 規格",
-        "description": "依據產品需求文件與前端需求，設計所有費用紀錄相關 API（CRUD、查詢、分類等）的 Swagger/OpenAPI 規格，作為前後端開發的共同依據",
-        "status": "done",
-        "dependencies": [],
-        "priority": "high",
-        "details": "1. 分析需求與規劃 API 架構：\n- 仔細研讀產品需求文件，確認所有費用紀錄相關功能\n- 與前端團隊討論 API 需求，包括資料格式、查詢參數等\n- 規劃 RESTful API 路由結構，遵循最佳實踐\n- 確定 API 版本控制策略\n\n2. 設計基本 CRUD API：\n- POST /api/expenses - 新增費用紀錄\n- GET /api/expenses/{id} - 獲取單一費用紀錄\n- PUT /api/expenses/{id} - 更新費用紀錄\n- DELETE /api/expenses/{id} - 刪除費用紀錄\n- GET /api/expenses - 獲取費用紀錄列表（含分頁、排序）\n\n3. 設計進階查詢 API：\n- GET /api/expenses/search - 支援多條件搜尋（日期範圍、金額範圍、關鍵字等）\n- GET /api/expenses/statistics - 費用統計資料（總額、平均值等）\n- GET /api/expenses/categories - 依分類統計費用\n\n4. 設計多寵物相關 API：\n- 確保所有 API 支援寵物 ID 參數\n- 設計寵物與費用關聯的資料結構\n\n5. 設計分類相關 API：\n- GET /api/categories - 獲取所有分類\n- POST /api/categories - 新增自訂分類\n- PUT /api/categories/{id} - 更新分類\n- DELETE /api/categories/{id} - 刪除分類\n\n6. 使用 golang swag 工具產生文檔：\n- 在 Go 代碼中添加符合 swag 格式的註釋\n- 設置適當的 API 標籤、分組和描述\n- 使用 swag init 命令生成 swagger.json 和 swagger.yaml\n- 配置 Swagger UI 以便於瀏覽和測試 API\n\n7. 詳細定義每個 API 的：\n- 請求參數（路徑參數、查詢參數、請求體）\n- 回應格式與狀態碼\n- 錯誤訊息格式與代碼\n- 權限要求\n- 速率限制（如適用）\n\n8. 文檔化與溝通：\n- 整理 Swagger 文檔，確保清晰易懂\n- 與前端團隊進行 API 規格評審\n- 根據反饋調整 API 設計\n- 最終確認並發布 API 規格文檔",
-        "testStrategy": "1. 文檔完整性檢查：\n- 確認所有 API 端點都有完整的描述\n- 確認所有請求參數都有類型和描述\n- 確認所有回應格式都有明確定義\n- 確認所有錯誤狀態都有說明\n\n2. 技術評審：\n- 與後端團隊進行技術評審，確認 API 設計的可行性\n- 檢查 API 命名是否符合 RESTful 最佳實踐\n- 檢查資料結構是否合理\n- 確認權限控制設計是否完善\n\n3. 前端需求覆蓋檢查：\n- 與前端團隊確認 API 是否滿足所有前端需求\n- 檢查查詢參數是否支援所有前端篩選需求\n- 確認回應格式是否包含前端所需的所有資料\n\n4. Swagger 文檔驗證：\n- 使用 Swagger 驗證工具檢查文檔格式是否正確\n- 確認生成的 swagger.json 或 swagger.yaml 符合 OpenAPI 規範\n- 在 Swagger UI 中測試文檔的可讀性和易用性\n\n5. 模擬測試：\n- 使用 Swagger UI 或 Postman 模擬 API 請求\n- 確認請求和回應格式的一致性\n- 測試各種參數組合的效果\n\n6. 最終確認：\n- 與產品經理確認 API 設計是否符合產品需求\n- 與前後端團隊最終確認 API 規格\n- 記錄任何未解決的問題或後續優化建議",
+        "title": "優化效能與整合測試",
+        "description": "實作快取策略、效能優化並進行端到端測試",
+        "details": "實作前端 Service Worker 快取地圖圖磚和醫院資料。後端實作 Redis 快取熱門搜尋結果。建立 MongoDB 複合索引優化查詢效能。實作圖片懶載入和虛擬滾動優化大量資料顯示。撰寫端到端測試涵蓋完整使用者流程。進行效能測試確保 30 秒內完成醫院查找。建立監控和 alerting 機制。",
+        "testStrategy": "使用 Lighthouse 進行效能測試。撰寫 E2E 測試使用 Playwright 或 Cypress。進行負載測試驗證 API 效能。測試快取機制的有效性和過期邏輯。",
+        "priority": "medium",
+        "dependencies": [
+          10,
+          11
+        ],
+        "status": "pending",
         "subtasks": []
       }
     ],
     "metadata": {
-      "created": "2025-06-30T03:21:22.226Z",
-      "updated": "2025-07-03T03:38:23.776Z",
-      "description": "費用紀錄功能專用 tag，修正標籤狀態以利後續任務管理。",
-      "copiedFrom": {
-        "tag": "master",
-        "date": "2025-06-30T03:21:22.226Z"
-      }
+      "created": "2025-09-19T07:47:52.925Z",
+      "updated": "2025-09-19T07:47:52.925Z",
+      "description": "Tasks for master context"
     }
   }
 }

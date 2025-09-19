@@ -117,3 +117,7 @@ task dev
 5. **程式碼格式**：
    - Go：執行 `gofmt` 與 `goimports`
    - 前端：執行 `pnpm lint`
+
+## Task Master AI Instructions
+**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
+@./.taskmaster/CLAUDE.md

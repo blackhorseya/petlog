@@ -569,3 +569,7 @@ node_modules/
 ## Custom ##
 bin/
 output/
+
+# Task files
+# tasks.json
+# tasks/ 

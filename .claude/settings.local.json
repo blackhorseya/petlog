@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "mcp__serena__activate_project",
-      "mcp__serena__read_memory"
+      "mcp__serena__read_memory",
+      "mcp__serena__list_dir",
+      "mcp__serena__find_file",
+      "mcp__taskmaster-ai__initialize_project"
     ],
     "deny": [],
     "ask": []
