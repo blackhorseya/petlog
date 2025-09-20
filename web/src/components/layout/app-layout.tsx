@@ -36,7 +36,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <div className="flex h-[calc(100vh-3.5rem)]">
         {/* Desktop Sidebar */}
         {user && (
-          <aside className="hidden w-64 flex-col border-r border-border bg-background lg:flex">
+          <aside className="hidden w-64 flex-col border-r border-border bg-background md:flex">
             <Sidebar />
           </aside>
         )}
@@ -48,11 +48,11 @@ export function AppLayout({ children }: AppLayoutProps) {
         />
 
         {/* Main Content */}
-        <main 
+        <main
           className={cn(
             "flex-1 overflow-auto",
             // Add bottom padding on mobile to account for bottom navigation
-            "pb-16 lg:pb-0"
+            "pb-16 md:pb-0"
           )}
         >
           <div className="container mx-auto p-4 lg:p-6">

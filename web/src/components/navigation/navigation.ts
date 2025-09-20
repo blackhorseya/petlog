@@ -1,12 +1,13 @@
-import { 
-  Heart, 
-  PawPrint, 
-  Calendar, 
-  FileText, 
-  Settings, 
+import {
+  Heart,
+  PawPrint,
+  Calendar,
+  FileText,
+  Settings,
   Home,
   BarChart3,
-  DollarSign
+  DollarSign,
+  MapPin
 } from "lucide-react"
 
 export const navigation = [
@@ -19,6 +20,11 @@ export const navigation = [
     name: "我的寵物",
     href: "/pets",
     icon: PawPrint,
+  },
+  {
+    name: "醫院搜尋",
+    href: "/hospitals",
+    icon: MapPin,
   },
   {
     name: "健康記錄",
