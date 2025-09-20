@@ -754,6 +754,223 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/hospitals": {
+            "get": {
+                "description": "根據關鍵字、縣市、狀態等條件搜尋醫院，支援分頁和排序",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospitals"
+                ],
+                "summary": "搜尋醫院",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "搜尋關鍵字（醫院名稱、地址、獸醫師）",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "縣市篩選",
+                        "name": "county",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "狀態篩選（開業、歇業等）",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "執照類型篩選（動物醫院、動物診所）",
+                        "name": "license_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "座標緯度（用於距離排序）",
+                        "name": "latitude",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "座標經度（用於距離排序）",
+                        "name": "longitude",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "搜尋半徑（公里）",
+                        "name": "radius",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "頁碼（預設1）",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每頁數量（預設20）",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序方式（distance, name）",
+                        "name": "sort_by",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.SearchHospitalsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/hospitals/nearby": {
+            "get": {
+                "description": "根據使用者位置座標搜尋指定半徑內的醫院",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospitals"
+                ],
+                "summary": "查詢附近醫院",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "使用者位置緯度",
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "使用者位置經度",
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "搜尋半徑（公里，預設10）",
+                        "name": "radius_km",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "結果數量限制（預設50）",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ListNearbyHospitalsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/hospitals/{id}": {
+            "get": {
+                "description": "根據醫院ID取得完整的醫院資訊",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospitals"
+                ],
+                "summary": "取得醫院詳細資訊",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "醫院ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.GetHospitalDetailResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/medical-records": {
             "get": {
                 "security": [
@@ -1321,6 +1538,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "endpoint.Coordinates": {
+            "type": "object",
+            "properties": {
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
         "endpoint.CreateExpenseRequest": {
             "type": "object",
             "required": [
@@ -1536,6 +1764,15 @@ const docTemplate = `{
                 }
             }
         },
+        "endpoint.GetHospitalDetailResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "hospital": {
+                    "$ref": "#/definitions/endpoint.HospitalDTO"
+                }
+            }
+        },
         "endpoint.GetMedicalRecordResponse": {
             "type": "object",
             "properties": {
@@ -1551,6 +1788,50 @@ const docTemplate = `{
                 "error": {},
                 "pet": {
                     "$ref": "#/definitions/model.Pet"
+                }
+            }
+        },
+        "endpoint.HospitalDTO": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "coordinates": {
+                    "$ref": "#/definitions/endpoint.Coordinates"
+                },
+                "county": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "issued_date": {
+                    "type": "string"
+                },
+                "license_no": {
+                    "type": "string"
+                },
+                "license_type": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "veterinarian": {
+                    "type": "string"
                 }
             }
         },
@@ -1590,6 +1871,18 @@ const docTemplate = `{
                 }
             }
         },
+        "endpoint.ListNearbyHospitalsResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "hospitals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/endpoint.HospitalDTO"
+                    }
+                }
+            }
+        },
         "endpoint.ListPetsResponse": {
             "type": "object",
             "properties": {
@@ -1599,6 +1892,30 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/model.Pet"
                     }
+                }
+            }
+        },
+        "endpoint.SearchHospitalsResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "hospitals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/endpoint.HospitalDTO"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "stats": {
+                    "$ref": "#/definitions/query.SearchStats"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },
@@ -1873,6 +2190,32 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "query.SearchStats": {
+            "type": "object",
+            "properties": {
+                "by_county": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "by_license_type": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "by_status": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "total_hospitals": {
+                    "type": "integer"
                 }
             }
         }

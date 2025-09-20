@@ -20,7 +20,7 @@ func newInjector(config2 config.Config) (*injector, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	hospitalRepository := mongodb.NewHospitalMongoRepo(database)
+	hospitalRepository := mongodb.NewHospitalRepository(database)
 	geocodeService := provideGoogleGeocodeService(config2)
 	mainInjector := &injector{
 		config:         config2,

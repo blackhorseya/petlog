@@ -70,8 +70,13 @@ func initPetAPI(c context.Context, cfg config.Config) (http.Handler, func(), err
 	listExpensesByPetHandler := query.NewListExpensesByPetHandler(expenseRepository)
 	getExpenseSummaryHandler := query.NewGetExpenseSummaryHandler(expenseRepository)
 	expenseEndpoints := endpoint.MakeExpenseEndpoints(createExpenseHandler, updateExpenseHandler, deleteExpenseHandler, getExpenseByIDHandler, listExpensesByPetHandler, getExpenseSummaryHandler)
+	hospitalRepository := mongodb.NewHospitalRepository(database)
+	searchHospitalsHandler := query.NewSearchHospitalsHandler(hospitalRepository)
+	getHospitalDetailHandler := query.NewGetHospitalDetailHandler(hospitalRepository)
+	listNearbyHospitalsHandler := query.NewListNearbyHospitalsHandler(hospitalRepository)
+	hospitalEndpoints := endpoint.MakeHospitalEndpoints(searchHospitalsHandler, getHospitalDetailHandler, listNearbyHospitalsHandler)
 	v := _wireValue
-	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, healthLogEndpoints, dashboardEndpoints, medicalRecordEndpoints, expenseEndpoints, v)
+	handler := gin.NewHTTPHandler(engine, cfg, petEndpoints, healthLogEndpoints, dashboardEndpoints, medicalRecordEndpoints, expenseEndpoints, hospitalEndpoints, v)
 	return handler, func() {
 		cleanup()
 	}, nil
