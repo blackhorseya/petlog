@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/blackhorseya/petlog/internal/domain/model"
@@ -72,24 +73,79 @@ func (r *hospitalMongoRepo) ensureIndexes() {
 		Options: options.Index().SetName("phone_index"),
 	}
 
-	// 建立執照號碼唯一索引（部分索引，只對非空值建立唯一約束）
+	// 建立執照號碼唯一索引（部分索引，只對存在的執照號碼建立唯一約束）
 	licenseIndex := mongo.IndexModel{
 		Keys: bson.D{{Key: "license_no", Value: 1}},
 		Options: options.Index().
 			SetName("license_no_unique").
 			SetUnique(true).
-			SetPartialFilterExpression(bson.M{"license_no": bson.M{"$ne": nil}}),
+			SetPartialFilterExpression(bson.M{
+				"license_no": bson.M{"$exists": true},
+			}),
 	}
 
 	// 執行索引建立
-	_, _ = collection.Indexes().CreateMany(ctx, []mongo.IndexModel{
-		geoIndex,
-		textIndex,
-		countyIndex,
-		statusIndex,
-		phoneIndex,
-		licenseIndex,
-	})
+	log.Printf("開始建立 MongoDB 索引...")
+
+	// 檢查現有索引
+	cursor, err := collection.Indexes().List(ctx)
+	if err != nil {
+		log.Printf("❌ 列出現有索引失敗: %v", err)
+	} else {
+		var existingIndexes []bson.M
+		if err := cursor.All(ctx, &existingIndexes); err == nil {
+			log.Printf("📋 現有索引數量: %d", len(existingIndexes))
+			for _, idx := range existingIndexes {
+				if name, ok := idx["name"].(string); ok {
+					log.Printf("  - %s", name)
+				}
+			}
+		}
+	}
+
+	// 逐個建立索引以便更好的錯誤追蹤
+	indexes := []struct {
+		name  string
+		model mongo.IndexModel
+	}{
+		{"地理位置索引 (2dsphere)", geoIndex},
+		{"文字搜尋索引", textIndex},
+		{"縣市索引", countyIndex},
+		{"狀態索引", statusIndex},
+		{"電話索引", phoneIndex},
+		{"執照號碼索引", licenseIndex},
+	}
+
+	for _, idx := range indexes {
+		_, err := collection.Indexes().CreateOne(ctx, idx.model)
+		if err != nil {
+			log.Printf("❌ 建立 %s 失敗: %v", idx.name, err)
+		} else {
+			log.Printf("✅ 建立 %s 成功", idx.name)
+		}
+	}
+
+	// 最後再檢查一次地理位置索引
+	geoIndexExists := false
+	cursor, err = collection.Indexes().List(ctx)
+	if err == nil {
+		var indexes []bson.M
+		if err := cursor.All(ctx, &indexes); err == nil {
+			for _, idx := range indexes {
+				if name, ok := idx["name"].(string); ok && name == "location_2dsphere" {
+					geoIndexExists = true
+					log.Printf("🎯 地理位置索引確認存在: %s", name)
+					break
+				}
+			}
+		}
+	}
+
+	if !geoIndexExists {
+		log.Printf("⚠️  地理位置索引可能不存在，附近搜尋功能將無法正常工作")
+	}
+
+	log.Printf("索引建立過程完成")
 }
 
 // Create 建立新醫院

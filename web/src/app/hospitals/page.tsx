@@ -1,11 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { Building2 } from "lucide-react";
+import { Building2, Map, List, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 import { HospitalSearch } from "@/components/hospitals/hospital-search";
 import { HospitalCard } from "@/components/hospitals/hospital-card";
 import { HospitalPagination } from "@/components/hospitals/hospital-pagination";
+import { HospitalMap } from "@/components/hospitals/hospital-map";
 import { hospitalApi } from "@/lib/api/hospital";
 import {
   Hospital,
@@ -14,11 +16,17 @@ import {
   DEFAULT_SEARCH_PARAMS
 } from "@/lib/types/hospital";
 
+type ViewMode = "list" | "map";
+
 export default function HospitalsPage() {
   const [searchResponse, setSearchResponse] = React.useState<SearchHospitalsResponse | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [currentParams, setCurrentParams] = React.useState<SearchHospitalsParams>({});
+  const [viewMode, setViewMode] = React.useState<ViewMode>("list");
+  const [userLocation, setUserLocation] = React.useState<{ lat: number; lng: number } | null>(null);
+  const [locationError, setLocationError] = React.useState<string | null>(null);
+  const [requestLocation, setRequestLocation] = React.useState(false);
 
   const handleSearch = React.useCallback(async (params: SearchHospitalsParams) => {
     setIsLoading(true);
@@ -57,6 +65,65 @@ export default function HospitalsPage() {
     window.open(googleMapsUrl, "_blank");
   };
 
+  const handleLocationFound = React.useCallback((location: { lat: number; lng: number }) => {
+    setUserLocation(location);
+    setRequestLocation(false); // 重置請求狀態
+  }, []);
+
+  const handleLocationError = React.useCallback((error: string) => {
+    console.error("定位錯誤:", error);
+    setLocationError(error);
+    setRequestLocation(false); // 重置請求狀態
+    // 3秒後清除錯誤訊息
+    setTimeout(() => setLocationError(null), 3000);
+  }, []);
+
+  const handleNearbyHospitalsRequest = React.useCallback(async (latitude: number, longitude: number) => {
+    console.log("開始搜尋附近醫院:", { latitude, longitude });
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // 調用附近醫院 API
+      const nearbyHospitals = await hospitalApi.getNearbyHospitals({
+        latitude,
+        longitude,
+        radius_km: 10, // 搜尋半徑 10 公里
+        limit: 50 // 最多顯示 50 間醫院
+      });
+
+      // 生成基本的統計資料
+      const statusCounts: Record<string, number> = {};
+      nearbyHospitals.forEach(hospital => {
+        statusCounts[hospital.status] = (statusCounts[hospital.status] || 0) + 1;
+      });
+
+      // 更新搜尋結果，模擬 SearchHospitalsResponse 格式
+      const response: SearchHospitalsResponse = {
+        hospitals: nearbyHospitals,
+        total: nearbyHospitals.length,
+        page: 1,
+        limit: 50,
+        stats: {
+          total_hospitals: nearbyHospitals.length,
+          by_status: statusCounts,
+          by_license_type: {}, // 附近搜尋暫不提供授權類型統計
+          by_county: {} // 附近搜尋暫不提供縣市統計
+        }
+      };
+
+      setSearchResponse(response);
+      setCurrentParams({ latitude, longitude, radius: 10 }); // 更新當前參數
+
+      console.log(`✅ 找到 ${nearbyHospitals.length} 間附近醫院`);
+    } catch (err) {
+      console.error("搜尋附近醫院失敗:", err);
+      setError(err instanceof Error ? err.message : "搜尋附近醫院失敗");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   // 頁面載入時執行預設搜尋
   React.useEffect(() => {
     handleSearch(DEFAULT_SEARCH_PARAMS);
@@ -77,6 +144,72 @@ export default function HospitalsPage() {
 
       {/* 搜尋元件 */}
       <HospitalSearch onSearch={handleSearch} isLoading={isLoading} />
+
+      {/* 位置錯誤提示 */}
+      {locationError && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <MapPin className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="text-sm font-medium text-yellow-800">定位服務提示</h4>
+              <p className="text-sm text-yellow-700 mt-1 mb-2">
+                {locationError}
+              </p>
+              <details className="text-xs text-yellow-600">
+                <summary className="cursor-pointer hover:text-yellow-800">解決方法</summary>
+                <div className="mt-2 space-y-1">
+                  <p>• 確保您在戶外或窗邊，GPS 訊號較佳的位置</p>
+                  <p>• iPhone 用戶：設定 → 隱私權與安全性 → 定位服務 → Safari → 允許 + 精確位置</p>
+                  <p>• 確保網站使用 HTTPS 連線</p>
+                  <p>• 您也可以手動在地圖上搜尋或移動到想要的位置</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 檢視模式切換 */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button
+            variant={viewMode === "list" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("list")}
+            disabled={isLoading}
+          >
+            <List className="mr-2 h-4 w-4" />
+            列表檢視
+          </Button>
+          <Button
+            variant={viewMode === "map" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("map")}
+            disabled={isLoading}
+          >
+            <Map className="mr-2 h-4 w-4" />
+            地圖檢視
+          </Button>
+        </div>
+
+        {viewMode === "map" && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              // 清除位置錯誤和當前位置
+              setLocationError(null);
+              setUserLocation(null);
+              // 觸發位置請求
+              setRequestLocation(true);
+            }}
+            disabled={isLoading || requestLocation}
+          >
+            <MapPin className="mr-2 h-4 w-4" />
+            {requestLocation ? "定位中..." : "我的位置"}
+          </Button>
+        )}
+      </div>
 
       {/* 搜尋結果 */}
       <div className="space-y-4">
@@ -130,8 +263,8 @@ export default function HospitalsPage() {
           </div>
         )}
 
-        {/* 空狀態 */}
-        {searchResponse && searchResponse.hospitals.length === 0 && !isLoading && (
+        {/* 空狀態 - 只在列表模式顯示 */}
+        {searchResponse && searchResponse.hospitals.length === 0 && !isLoading && viewMode === "list" && (
           <div className="text-center py-12">
             <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
               <Building2 className="h-12 w-12 text-muted-foreground" />
@@ -143,30 +276,66 @@ export default function HospitalsPage() {
           </div>
         )}
 
-        {/* 醫院列表 */}
-        {searchResponse && searchResponse.hospitals.length > 0 && !isLoading && (
+        {/* 醫院內容 - 根據檢視模式顯示 */}
+        {searchResponse && !isLoading && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {searchResponse.hospitals.map((hospital) => (
-                <HospitalCard
-                  key={hospital.id}
-                  hospital={hospital}
-                  onViewDetail={handleViewDetail}
-                  onNavigate={handleNavigate}
-                />
-              ))}
-            </div>
+            {viewMode === "list" ? (
+              // 列表檢視 - 只有有醫院時才顯示
+              searchResponse.hospitals.length > 0 && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {searchResponse.hospitals.map((hospital) => (
+                      <HospitalCard
+                        key={hospital.id}
+                        hospital={hospital}
+                        onViewDetail={handleViewDetail}
+                        onNavigate={handleNavigate}
+                      />
+                    ))}
+                  </div>
 
-            {/* 分頁元件 */}
-            <HospitalPagination
-              currentPage={searchResponse.page}
-              totalPages={Math.ceil(searchResponse.total / searchResponse.limit)}
-              totalItems={searchResponse.total}
-              pageSize={searchResponse.limit}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              isLoading={isLoading}
-            />
+                  {/* 分頁元件 */}
+                  <HospitalPagination
+                    currentPage={searchResponse.page}
+                    totalPages={Math.ceil(searchResponse.total / searchResponse.limit)}
+                    totalItems={searchResponse.total}
+                    pageSize={searchResponse.limit}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                    isLoading={isLoading}
+                  />
+                </>
+              )
+            ) : (
+              // 地圖檢視 - 不論有無醫院都顯示地圖
+              <div className="space-y-4">
+                <HospitalMap
+                  hospitals={searchResponse.hospitals}
+                  center={userLocation || undefined}
+                  zoom={userLocation ? 14 : 11}
+                  height="600px"
+                  onHospitalClick={handleViewDetail}
+                  showUserLocation={!!userLocation}
+                  onLocationFound={handleLocationFound}
+                  onLocationError={handleLocationError}
+                  requestLocation={requestLocation}
+                  onNearbyHospitalsRequest={handleNearbyHospitalsRequest}
+                />
+
+                {/* 地圖模式下的提示 */}
+                {searchResponse.hospitals.length === 0 && (
+                  <div className="text-center py-6 bg-muted/50 rounded-lg">
+                    <Building2 className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">
+                      目前區域沒有找到醫院
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      請嘗試移動地圖到其他區域或調整搜尋條件
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>
