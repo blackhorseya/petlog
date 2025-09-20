@@ -19,26 +19,7 @@ var (
 	inputFile string
 	batchSize int
 	dryRun    bool
-	geocoding bool
 )
-
-// mockGeocodeService 簡單的地理編碼服務實作（用於測試）
-type mockGeocodeService struct{}
-
-func newMockGeocodeService() GeocodeService {
-	return &mockGeocodeService{}
-}
-
-func (m *mockGeocodeService) Geocode(address string) geocodeResult {
-	// TODO: 實作真實的地理編碼服務（Google Maps API、HERE API 等）
-	// 模擬地理編碼（實際應該呼叫外部 API）
-	// 這裡只是回傳台灣中心點附近的隨機座標
-	return geocodeResult{
-		Latitude:  24.0 + float64(len(address)%100)/1000.0,
-		Longitude: 121.0 + float64(len(address)%100)/1000.0,
-		Err:       nil,
-	}
-}
 
 // rootCmd 根命令
 var rootCmd = &cobra.Command{
@@ -53,7 +34,6 @@ func init() {
 	rootCmd.Flags().StringVarP(&inputFile, "input", "i", "output/hospitals.json", "輸入的 JSON 檔案路徑")
 	rootCmd.Flags().IntVarP(&batchSize, "batch-size", "b", 100, "批次處理大小")
 	rootCmd.Flags().BoolVarP(&dryRun, "dry-run", "n", false, "預覽模式，不實際寫入資料庫")
-	rootCmd.Flags().BoolVarP(&geocoding, "geocoding", "g", false, "啟用地理編碼（取得座標）")
 }
 
 func main() {
@@ -87,23 +67,20 @@ func runImport(cmd *cobra.Command, args []string) error {
 	}
 	defer cleanup()
 
-	// 3. 轉換資料
-	fmt.Println("開始轉換資料...")
-	domainHospitals, err := convertToDomainModels(hospitals, inject.geocodeService)
-	if err != nil {
-		return fmt.Errorf("資料轉換失敗：%w", err)
-	}
-	fmt.Printf("成功轉換 %d 筆資料\n", len(domainHospitals))
-
-	// 4. 如果是預覽模式，只顯示前幾筆資料
+	// 3. 如果是預覽模式，轉換前幾筆資料進行預覽
 	if dryRun {
 		fmt.Println("\n=== 預覽模式 ===")
 		previewCount := 3
-		if len(domainHospitals) < previewCount {
-			previewCount = len(domainHospitals)
+		if len(hospitals) < previewCount {
+			previewCount = len(hospitals)
 		}
-		for i := 0; i < previewCount; i++ {
-			h := domainHospitals[i]
+
+		previewHospitals, err := convertToDomainModels(hospitals[:previewCount], inject.geocodeService)
+		if err != nil {
+			return fmt.Errorf("預覽資料轉換失敗：%w", err)
+		}
+
+		for i, h := range previewHospitals {
 			fmt.Printf("醫院 %d:\n", i+1)
 			fmt.Printf("  名稱：%s\n", h.Name())
 			fmt.Printf("  地址：%s\n", h.Address())
@@ -112,15 +89,15 @@ func runImport(cmd *cobra.Command, args []string) error {
 			fmt.Printf("  座標：%.6f, %.6f\n", h.Coordinates().Latitude(), h.Coordinates().Longitude())
 			fmt.Println()
 		}
-		fmt.Printf("總共將匯入 %d 筆資料\n", len(domainHospitals))
+		fmt.Printf("總共將匯入 %d 筆資料\n", len(hospitals))
 		return nil
 	}
 
-	// 5. 批次匯入
-	fmt.Printf("開始批次匯入（批次大小：%d）\n", batchSize)
-	err = batchImport(ctx, inject.hospitalRepo, domainHospitals, batchSize)
+	// 4. 逐一轉換並儲存
+	fmt.Println("開始逐一轉換並儲存資料...")
+	err = convertAndSaveOneByOne(ctx, inject.hospitalRepo, hospitals, inject.geocodeService)
 	if err != nil {
-		return fmt.Errorf("批次匯入失敗：%w", err)
+		return fmt.Errorf("轉換儲存失敗：%w", err)
 	}
 
 	fmt.Println("匯入完成！")
@@ -160,36 +137,56 @@ func convertToDomainModels(jsonHospitals []*hospitalJSON, geocoder GeocodeServic
 	return result, nil
 }
 
-// batchImport 批次匯入醫院資料
-func batchImport(c context.Context, repo repository.HospitalRepository, hospitals []*model.Hospital, batchSize int) error {
-	total := len(hospitals)
+// convertAndSaveOneByOne 逐一轉換並儲存醫院資料
+func convertAndSaveOneByOne(c context.Context, repo repository.HospitalRepository, jsonHospitals []*hospitalJSON, geocoder GeocodeService) error {
+	total := len(jsonHospitals)
 	successCount := 0
 	errorCount := 0
+	geocodeCount := 0
 
-	for i := 0; i < total; i += batchSize {
-		end := i + batchSize
-		if end > total {
-			end = total
+	fmt.Printf("總共 %d 筆資料需要處理\n", total)
+
+	for i, jsonHospital := range jsonHospitals {
+		fmt.Printf("處理第 %d/%d 筆：%s\n", i+1, total, jsonHospital.Name)
+
+		// 轉換為領域模型，檢查現有資料
+		domainHospital, needsGeocode, isUpdate, err := jsonHospital.toDomainWithLocationCheck(c, repo, geocoder)
+		if err != nil {
+			fmt.Printf("  轉換失敗：%v\n", err)
+			errorCount++
+			continue
 		}
 
-		batch := hospitals[i:end]
-		fmt.Printf("處理批次 %d-%d / %d\n", i+1, end, total)
+		if needsGeocode {
+			geocodeCount++
+			fmt.Printf("  已進行地理編碼\n")
+		}
 
-		// 批次處理當前批次
-		for j, hospital := range batch {
-			err := repo.Create(c, hospital)
+		// 儲存或更新到資料庫
+		if isUpdate {
+			err = repo.Update(c, domainHospital)
 			if err != nil {
-				fmt.Printf("  第 %d 筆匯入失敗：%v\n", i+j+1, err)
+				fmt.Printf("  更新失敗：%v\n", err)
 				errorCount++
 			} else {
 				successCount++
+				fmt.Printf("  更新成功\n")
+			}
+		} else {
+			err = repo.Create(c, domainHospital)
+			if err != nil {
+				fmt.Printf("  儲存失敗：%v\n", err)
+				errorCount++
+			} else {
+				successCount++
+				fmt.Printf("  儲存成功\n")
 			}
 		}
 
-		// 避免過於頻繁的資料庫操作
-		time.Sleep(100 * time.Millisecond)
+		// 避免過於頻繁的操作
+		time.Sleep(50 * time.Millisecond)
 	}
 
-	fmt.Printf("\n匯入結果：成功 %d 筆，失敗 %d 筆\n", successCount, errorCount)
+	fmt.Printf("\n處理結果：成功 %d 筆，失敗 %d 筆，地理編碼 %d 筆\n", successCount, errorCount, geocodeCount)
 	return nil
 }

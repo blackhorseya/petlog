@@ -24,6 +24,6 @@ func newInjector(config config.Config) (*injector, func(), error) {
 		wire.Struct(new(injector), "*"),
 		mongodb.ProviderSet,
 		mongodb.NewHospitalMongoRepo,
-		newMockGeocodeService,
+		provideGoogleGeocodeService,
 	))
 }

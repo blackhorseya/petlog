@@ -106,6 +106,12 @@ type HospitalRepository interface {
 	// GetByID 根據 ID 取得單一醫院
 	GetByID(c context.Context, id string) (*model.Hospital, error)
 
+	// GetByPhone 根據電話號碼取得醫院
+	GetByPhone(c context.Context, phone string) (*model.Hospital, error)
+
+	// GetByLicenseNo 根據執照號碼取得醫院
+	GetByLicenseNo(c context.Context, licenseNo string) (*model.Hospital, error)
+
 	// Search 搜尋醫院（支援關鍵字、縣市、狀態篩選和分頁）
 	Search(c context.Context, opts ...SearchOption) (*SearchResult, error)
 

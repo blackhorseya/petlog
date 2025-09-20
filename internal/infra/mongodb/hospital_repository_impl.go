@@ -66,12 +66,29 @@ func (r *hospitalMongoRepo) ensureIndexes() {
 		Options: options.Index().SetName("status_index"),
 	}
 
+	// 建立電話號碼索引
+	phoneIndex := mongo.IndexModel{
+		Keys:    bson.D{{Key: "phone", Value: 1}},
+		Options: options.Index().SetName("phone_index"),
+	}
+
+	// 建立執照號碼唯一索引（部分索引，只對非空值建立唯一約束）
+	licenseIndex := mongo.IndexModel{
+		Keys: bson.D{{Key: "license_no", Value: 1}},
+		Options: options.Index().
+			SetName("license_no_unique").
+			SetUnique(true).
+			SetPartialFilterExpression(bson.M{"license_no": bson.M{"$ne": nil}}),
+	}
+
 	// 執行索引建立
 	_, _ = collection.Indexes().CreateMany(ctx, []mongo.IndexModel{
 		geoIndex,
 		textIndex,
 		countyIndex,
 		statusIndex,
+		phoneIndex,
+		licenseIndex,
 	})
 }
 
@@ -128,6 +145,60 @@ func (r *hospitalMongoRepo) GetByID(c context.Context, id string) (*model.Hospit
 	}
 
 	ctx.Info("成功找到醫院", "hospital_name", hospitalDoc.Name)
+	return hospitalDoc.toDomain(), nil
+}
+
+// GetByPhone 根據電話號碼取得醫院
+func (r *hospitalMongoRepo) GetByPhone(c context.Context, phone string) (*model.Hospital, error) {
+	ctx := contextx.WithContext(c)
+	ctx.Info("根據電話號碼查詢醫院", "phone", phone)
+
+	if phone == "" {
+		ctx.Error("電話號碼不能為空")
+		return nil, convertMongoError(mongo.ErrNoDocuments)
+	}
+
+	collection := r.db.Collection(hospitalCollection)
+	var hospitalDoc hospitalMongo
+
+	err := collection.FindOne(c, bson.M{"phone": phone}).Decode(&hospitalDoc)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			ctx.Info("根據電話號碼找不到醫院", "phone", phone)
+		} else {
+			ctx.Error("查詢醫院失敗", "error", err)
+		}
+		return nil, convertMongoError(err)
+	}
+
+	ctx.Info("成功根據電話號碼找到醫院", "hospital_name", hospitalDoc.Name, "phone", phone)
+	return hospitalDoc.toDomain(), nil
+}
+
+// GetByLicenseNo 根據執照號碼取得醫院
+func (r *hospitalMongoRepo) GetByLicenseNo(c context.Context, licenseNo string) (*model.Hospital, error) {
+	ctx := contextx.WithContext(c)
+	ctx.Info("根據執照號碼查詢醫院", "license_no", licenseNo)
+
+	if licenseNo == "" {
+		ctx.Error("執照號碼不能為空")
+		return nil, convertMongoError(mongo.ErrNoDocuments)
+	}
+
+	collection := r.db.Collection(hospitalCollection)
+	var hospitalDoc hospitalMongo
+
+	err := collection.FindOne(c, bson.M{"license_no": licenseNo}).Decode(&hospitalDoc)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			ctx.Info("根據執照號碼找不到醫院", "license_no", licenseNo)
+		} else {
+			ctx.Error("查詢醫院失敗", "error", err)
+		}
+		return nil, convertMongoError(err)
+	}
+
+	ctx.Info("成功根據執照號碼找到醫院", "hospital_name", hospitalDoc.Name, "license_no", licenseNo)
 	return hospitalDoc.toDomain(), nil
 }
 

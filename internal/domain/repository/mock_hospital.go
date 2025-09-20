@@ -99,6 +99,36 @@ func (mr *MockHospitalRepositoryMockRecorder) GetByID(c, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockHospitalRepository)(nil).GetByID), c, id)
 }
 
+// GetByLicenseNo mocks base method.
+func (m *MockHospitalRepository) GetByLicenseNo(c context.Context, licenseNo string) (*model.Hospital, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByLicenseNo", c, licenseNo)
+	ret0, _ := ret[0].(*model.Hospital)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByLicenseNo indicates an expected call of GetByLicenseNo.
+func (mr *MockHospitalRepositoryMockRecorder) GetByLicenseNo(c, licenseNo any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByLicenseNo", reflect.TypeOf((*MockHospitalRepository)(nil).GetByLicenseNo), c, licenseNo)
+}
+
+// GetByPhone mocks base method.
+func (m *MockHospitalRepository) GetByPhone(c context.Context, phone string) (*model.Hospital, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByPhone", c, phone)
+	ret0, _ := ret[0].(*model.Hospital)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByPhone indicates an expected call of GetByPhone.
+func (mr *MockHospitalRepositoryMockRecorder) GetByPhone(c, phone any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByPhone", reflect.TypeOf((*MockHospitalRepository)(nil).GetByPhone), c, phone)
+}
+
 // GetNearby mocks base method.
 func (m *MockHospitalRepository) GetNearby(c context.Context, opts ...NearbyOption) ([]*model.Hospital, error) {
 	m.ctrl.T.Helper()
