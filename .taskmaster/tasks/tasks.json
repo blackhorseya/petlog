@@ -364,15 +364,79 @@
       {
         "id": 8,
         "title": "整合 Leaflet 地圖元件",
-        "description": "建立基於 Leaflet 和 OpenStreetMap 的地圖顯示元件",
-        "details": "安裝 leaflet 和 react-leaflet 套件。在 web/src/components/hospitals/ 建立 HospitalMap.tsx 元件，使用 OpenStreetMap 作為底圖。實作醫院標記顯示、點擊彈出視窗顯示基本資訊。加入使用者定位功能和縮放控制。實作響應式設計支援行動裝置。處理地圖載入狀態和錯誤處理。",
-        "testStrategy": "撰寫地圖元件的單元測試，模擬 leaflet 行為。測試標記顯示和互動功能。使用 React Testing Library 驗證元件渲染。",
-        "priority": "high",
+        "description": "建立基於 Google Maps API 的地圖顯示元件，替代原先的 Leaflet 實作",
+        "status": "in-progress",
         "dependencies": [
           7
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "high",
+        "details": "安裝 @googlemaps/react-wrapper 和 @types/google.maps 套件。在 web/src/components/hospitals/ 建立 HospitalMap.tsx 元件，使用 Google Maps API 替代 OpenStreetMap。實作醫院標記顯示、點擊彈出視窗顯示基本資訊。加入使用者定位功能和地圖控制項。實作響應式設計支援行動裝置。處理地圖載入狀態和錯誤處理。整合到醫院搜尋頁面 (web/src/app/hospitals/page.tsx)，支援地圖/列表檢視切換功能。利用 Google Maps 的優勢：更好的台灣地圖資料品質、內建路線規劃功能、豐富的地標資訊和更佳的效能穩定性。",
+        "testStrategy": "撰寫地圖元件的單元測試，模擬 Google Maps API 行為。測試標記顯示和互動功能。使用 React Testing Library 驗證元件渲染。測試地圖/列表檢視切換功能和響應式布局。",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "安裝 Google Maps 相關套件",
+            "description": "安裝 @googlemaps/react-wrapper 和 @types/google.maps",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "建立 HospitalMap 元件基礎結構",
+            "description": "在 web/src/components/hospitals/ 建立 HospitalMap.tsx，設定 Google Maps API 整合",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "實作醫院標記和彈出視窗功能",
+            "description": "實作醫院位置標記顯示，點擊標記顯示醫院基本資訊彈出視窗",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "加入使用者定位和地圖控制功能",
+            "description": "實作使用者當前位置顯示、地圖縮放控制和地圖類型切換",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "實作響應式設計和載入狀態處理",
+            "description": "優化行動裝置顯示效果，加入地圖載入狀態和錯誤處理機制",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "整合地圖到醫院搜尋頁面",
+            "description": "將 HospitalMap 整合到 web/src/app/hospitals/page.tsx，實作地圖/列表檢視切換",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "撰寫地圖元件測試",
+            "description": "使用 React Testing Library 撰寫 HospitalMap 元件的單元測試和整合測試",
+            "status": "deferred",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 9,
@@ -647,7 +711,7 @@
     ],
     "metadata": {
       "created": "2025-09-19T07:47:52.925Z",
-      "updated": "2025-09-20T04:47:14.533Z",
+      "updated": "2025-09-20T05:33:22.412Z",
       "description": "Tasks for master context"
     }
   }
