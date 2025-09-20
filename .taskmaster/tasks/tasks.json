@@ -291,7 +291,7 @@
         "dependencies": [
           5
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -299,7 +299,7 @@
             "description": "在 endpoint 層建立醫院相關的端點定義，為後續的 HTTP 處理器建立基礎介面",
             "dependencies": [],
             "details": "在 internal/endpoint/ 建立 hospital_endpoint.go，定義 HospitalEndpoints struct 包含 SearchHospitals、GetHospitalByID、GetNearbyHospitals 等端點方法。定義對應的 Request/Response 結構體，包含適當的 JSON tag 和 Swagger 註解。遵循現有的 endpoint 模式，如 PetEndpoints 的實作方式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫端點介面的單元測試，驗證 Request/Response 結構體的 JSON 序列化。測試端點方法的簽名和行為定義。"
           },
           {
@@ -310,7 +310,7 @@
               "6.1"
             ],
             "details": "在 internal/transport/gin/ 建立 hospital_handler.go，實作 SearchHospitals、GetHospitalByID、GetNearbyHospitals 等處理函數。每個函數遵循現有的 handler 模式：使用 httptransport.NewServer 建立 go-kit server，實作 decodeRequest/encodeResponse 函數處理 HTTP 協議轉換。加入適當的 Swagger 註解，遵循 pet_handler.go 的格式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫 HTTP handler 函數的單元測試，使用 httptest 模擬 HTTP 請求。測試正常回應和錯誤處理邏輯。驗證 JSON 回應格式的正確性。"
           },
           {
@@ -321,7 +321,7 @@
               "6.2"
             ],
             "details": "在 hospital_handler.go 中實作 RegisterHospitalRoutes 函數，遵循 RegisterPetRoutes 的模式。建立 /api/v1/hospitals 路由群組，註冊 GET /search、GET /:id、GET /nearby 等路由。配置相同的錯誤處理器和認證中介軟體 EnsureValidToken。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫路由註冊的整合測試，驗證路由路徑和 HTTP 方法的正確性。測試認證中介軟體的套用。"
           },
           {
@@ -332,7 +332,7 @@
               "6.3"
             ],
             "details": "修改 router.go 中的 NewHTTPHandler 函數，在函數參數中加入 hospitalEndpoints endpoint.HospitalEndpoints，並在路由註冊區段加入 RegisterHospitalRoutes 呼叫。確保遵循現有的程式碼風格和註解格式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫整合測試驗證完整的路由配置。測試醫院路由與其他模組路由的共存性。驗證 HTTP 伺服器的正常啟動。"
           },
           {
@@ -343,7 +343,7 @@
               "6.4"
             ],
             "details": "在醫院 handler 中整合現有的錯誤處理機制，使用 encodeError 函數統一錯誤回應格式。加入適當的日誌記錄，包含請求追蹤和效能監控。實作 API 使用量統計，為後續的成本控制機制準備基礎。遵循現有 middleware.go 中的模式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "測試各種錯誤情境的回應格式，包含 400、404、500 等狀態碼。驗證日誌記錄的完整性和格式。測試監控指標的正確收集。"
           }
         ]
@@ -647,7 +647,7 @@
     ],
     "metadata": {
       "created": "2025-09-19T07:47:52.925Z",
-      "updated": "2025-09-20T03:43:30.097Z",
+      "updated": "2025-09-20T03:53:22.545Z",
       "description": "Tasks for master context"
     }
   }
