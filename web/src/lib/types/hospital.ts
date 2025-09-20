@@ -101,11 +101,11 @@ export type SortOption = (typeof SORT_BY)[keyof typeof SORT_BY];
 
 // 台灣縣市列表
 export const TAIWAN_COUNTIES = [
-  "台北市",
+  "臺北市",
   "新北市",
   "桃園市",
-  "台中市",
-  "台南市",
+  "臺中市",
+  "臺南市",
   "高雄市",
   "新竹縣",
   "苗栗縣",
@@ -116,7 +116,7 @@ export const TAIWAN_COUNTIES = [
   "屏東縣",
   "宜蘭縣",
   "花蓮縣",
-  "台東縣",
+  "臺東縣",
   "澎湖縣",
   "金門縣",
   "連江縣",

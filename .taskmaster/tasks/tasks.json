@@ -392,7 +392,7 @@
             "description": "在 lib/types/ 建立 hospital.ts 定義 Hospital 型別、搜尋參數與 API 回應型別，並在 lib/api/ 建立 hospital.ts 實作 API 函數",
             "dependencies": [],
             "details": "建立 web/src/lib/types/hospital.ts 定義 Hospital interface、HospitalSearchParams、HospitalListResponse 等型別。建立 web/src/lib/api/hospital.ts 實作 searchHospitals、getHospitalById 等 API 函數，使用現有的 apiRequest 函數處理 HTTP 請求。定義 hospitalQueryKeys 用於 TanStack Query 快取管理。遵循現有 pet.ts 的模式進行實作。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫型別定義的單元測試，驗證 API 函數的請求參數和回應格式正確性"
           },
           {
@@ -403,7 +403,7 @@
               "9.1"
             ],
             "details": "在 web/src/components/hospitals/ 建立 HospitalSearch.tsx，使用 Shadcn UI 的 Input 和 Select 元件實作搜尋介面。包含關鍵字輸入框、縣市地區下拉選單、排序選項（距離、評分、名稱）。使用 debounce 優化搜尋輸入效能。實作搜尋參數狀態管理和回調函數。遵循現有元件的設計模式和 Tailwind CSS 樣式規範。",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "測試搜尋輸入的 debounce 機制、篩選條件變更的回調觸發、UI 元件的互動行為"
           },
           {
@@ -647,7 +647,7 @@
     ],
     "metadata": {
       "created": "2025-09-19T07:47:52.925Z",
-      "updated": "2025-09-20T04:07:54.677Z",
+      "updated": "2025-09-20T04:09:19.561Z",
       "description": "Tasks for master context"
     }
   }

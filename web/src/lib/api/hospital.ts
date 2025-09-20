@@ -8,7 +8,7 @@ import {
   DEFAULT_SEARCH_PARAMS,
   DEFAULT_NEARBY_PARAMS,
 } from "../types/hospital";
-import { apiRequest } from "./request";
+import { publicApiRequest } from "./request";
 
 // 醫院 API 服務
 export const hospitalApi = {
@@ -18,7 +18,7 @@ export const hospitalApi = {
   ): Promise<SearchHospitalsResponse> {
     const searchParams = { ...DEFAULT_SEARCH_PARAMS, ...params };
 
-    const response = await apiRequest<SearchHospitalsResponse>(
+    const response = await publicApiRequest<SearchHospitalsResponse>(
       "/api/v1/hospitals",
       {
         method: "GET",
@@ -31,7 +31,7 @@ export const hospitalApi = {
 
   // 根據 ID 獲取醫院詳細資訊 - GET /api/v1/hospitals/{id}
   async getHospitalById(id: string): Promise<Hospital> {
-    const response = await apiRequest<GetHospitalDetailResponse>(
+    const response = await publicApiRequest<GetHospitalDetailResponse>(
       `/api/v1/hospitals/${id}`,
       {
         method: "GET",
@@ -45,7 +45,7 @@ export const hospitalApi = {
   async getNearbyHospitals(params: NearbyHospitalsParams): Promise<Hospital[]> {
     const searchParams = { ...DEFAULT_NEARBY_PARAMS, ...params };
 
-    const response = await apiRequest<ListNearbyHospitalsResponse>(
+    const response = await publicApiRequest<ListNearbyHospitalsResponse>(
       "/api/v1/hospitals/nearby",
       {
         method: "GET",
