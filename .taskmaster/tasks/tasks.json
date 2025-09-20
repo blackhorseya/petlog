@@ -384,7 +384,7 @@
         "dependencies": [
           7
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -403,7 +403,7 @@
               "9.1"
             ],
             "details": "在 web/src/components/hospitals/ 建立 HospitalSearch.tsx，使用 Shadcn UI 的 Input 和 Select 元件實作搜尋介面。包含關鍵字輸入框、縣市地區下拉選單、排序選項（距離、評分、名稱）。使用 debounce 優化搜尋輸入效能。實作搜尋參數狀態管理和回調函數。遵循現有元件的設計模式和 Tailwind CSS 樣式規範。",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "測試搜尋輸入的 debounce 機制、篩選條件變更的回調觸發、UI 元件的互動行為"
           },
           {
@@ -414,7 +414,7 @@
               "9.1"
             ],
             "details": "在 web/src/components/hospitals/ 建立 HospitalCard.tsx，使用 Shadcn UI 的 Card 元件架構。顯示醫院名稱、地址、電話、營業狀態、距離等資訊。包含查看詳情、導航按鈕。實作響應式設計適應不同螢幕尺寸。使用適當的圖示（Lucide React）和載入狀態處理。遵循現有 PetCard 的設計模式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "測試卡片資訊顯示正確性、按鈕點擊事件處理、響應式布局在不同螢幕尺寸下的表現"
           },
           {
@@ -426,7 +426,7 @@
               "9.3"
             ],
             "details": "在 web/src/components/hospitals/ 建立 HospitalList.tsx，整合 HospitalSearch 和 HospitalCard 元件。使用 TanStack Query 的 useQuery 實作資料獲取和快取管理。實作載入狀態（骨架屏）、錯誤狀態、空白狀態的 UI 處理。實作分頁或無限滾動載入功能。管理搜尋參數狀態並觸發 API 重新查詢。遵循現有 PetList 的架構模式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "測試列表資料載入邏輯、搜尋參數變更時的重新查詢、分頁功能、各種狀態的 UI 顯示"
           },
           {
@@ -438,7 +438,7 @@
               "9.4"
             ],
             "details": "在 web/src/hooks/ 建立 use-hospitals.ts，實作 useHospitals、useSearchHospitals、useHospital 等 Hook。使用 TanStack Query 管理快取、錯誤處理、重試邏輯。實作樂觀更新和背景重新整理。提供適當的 staleTime 和 cacheTime 設定。遵循現有 use-pets.ts 的模式。進行完整的元件整合測試確保所有功能正常運作。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫 Hook 的單元測試，驗證快取策略、錯誤處理邏輯。進行端到端測試確保搜尋、篩選、分頁等功能的完整流程"
           }
         ]
@@ -647,7 +647,7 @@
     ],
     "metadata": {
       "created": "2025-09-19T07:47:52.925Z",
-      "updated": "2025-09-20T04:09:19.561Z",
+      "updated": "2025-09-20T04:47:14.533Z",
       "description": "Tasks for master context"
     }
   }

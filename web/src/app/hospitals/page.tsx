@@ -5,21 +5,25 @@ import { Building2 } from "lucide-react";
 
 import { HospitalSearch } from "@/components/hospitals/hospital-search";
 import { HospitalCard } from "@/components/hospitals/hospital-card";
+import { HospitalPagination } from "@/components/hospitals/hospital-pagination";
 import { hospitalApi } from "@/lib/api/hospital";
 import {
   Hospital,
   SearchHospitalsParams,
-  SearchHospitalsResponse
+  SearchHospitalsResponse,
+  DEFAULT_SEARCH_PARAMS
 } from "@/lib/types/hospital";
 
 export default function HospitalsPage() {
   const [searchResponse, setSearchResponse] = React.useState<SearchHospitalsResponse | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [currentParams, setCurrentParams] = React.useState<SearchHospitalsParams>({});
 
   const handleSearch = React.useCallback(async (params: SearchHospitalsParams) => {
     setIsLoading(true);
     setError(null);
+    setCurrentParams(params);
 
     try {
       const response = await hospitalApi.searchHospitals(params);
@@ -31,6 +35,16 @@ export default function HospitalsPage() {
       setIsLoading(false);
     }
   }, []);
+
+  const handlePageChange = React.useCallback((page: number) => {
+    const newParams = { ...currentParams, page };
+    handleSearch(newParams);
+  }, [currentParams, handleSearch]);
+
+  const handlePageSizeChange = React.useCallback((limit: number) => {
+    const newParams = { ...currentParams, page: 1, limit };
+    handleSearch(newParams);
+  }, [currentParams, handleSearch]);
 
   const handleViewDetail = (hospital: Hospital) => {
     console.log("查看醫院詳情:", hospital);
@@ -45,7 +59,7 @@ export default function HospitalsPage() {
 
   // 頁面載入時執行預設搜尋
   React.useEffect(() => {
-    handleSearch({});
+    handleSearch(DEFAULT_SEARCH_PARAMS);
   }, []);
 
   return (
@@ -131,16 +145,29 @@ export default function HospitalsPage() {
 
         {/* 醫院列表 */}
         {searchResponse && searchResponse.hospitals.length > 0 && !isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {searchResponse.hospitals.map((hospital) => (
-              <HospitalCard
-                key={hospital.id}
-                hospital={hospital}
-                onViewDetail={handleViewDetail}
-                onNavigate={handleNavigate}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {searchResponse.hospitals.map((hospital) => (
+                <HospitalCard
+                  key={hospital.id}
+                  hospital={hospital}
+                  onViewDetail={handleViewDetail}
+                  onNavigate={handleNavigate}
+                />
+              ))}
+            </div>
+
+            {/* 分頁元件 */}
+            <HospitalPagination
+              currentPage={searchResponse.page}
+              totalPages={Math.ceil(searchResponse.total / searchResponse.limit)}
+              totalItems={searchResponse.total}
+              pageSize={searchResponse.limit}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              isLoading={isLoading}
+            />
+          </>
         )}
       </div>
     </div>
