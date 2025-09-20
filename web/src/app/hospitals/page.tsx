@@ -78,6 +78,41 @@ export default function HospitalsPage() {
     setTimeout(() => setLocationError(null), 3000);
   }, []);
 
+  const handleNearbyHospitalsRequest = React.useCallback(async (latitude: number, longitude: number) => {
+    console.log("開始搜尋附近醫院:", { latitude, longitude });
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // 調用附近醫院 API
+      const nearbyHospitals = await hospitalApi.getNearbyHospitals({
+        latitude,
+        longitude,
+        radius_km: 10, // 搜尋半徑 10 公里
+        limit: 50 // 最多顯示 50 間醫院
+      });
+
+      // 更新搜尋結果，模擬 SearchHospitalsResponse 格式
+      const response: SearchHospitalsResponse = {
+        hospitals: nearbyHospitals,
+        total: nearbyHospitals.length,
+        page: 1,
+        limit: 50,
+        stats: undefined // 附近搜尋不提供統計資料
+      };
+
+      setSearchResponse(response);
+      setCurrentParams({ latitude, longitude, radius: 10 }); // 更新當前參數
+
+      console.log(`✅ 找到 ${nearbyHospitals.length} 間附近醫院`);
+    } catch (err) {
+      console.error("搜尋附近醫院失敗:", err);
+      setError(err instanceof Error ? err.message : "搜尋附近醫院失敗");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   // 頁面載入時執行預設搜尋
   React.useEffect(() => {
     handleSearch(DEFAULT_SEARCH_PARAMS);
@@ -217,8 +252,8 @@ export default function HospitalsPage() {
           </div>
         )}
 
-        {/* 空狀態 */}
-        {searchResponse && searchResponse.hospitals.length === 0 && !isLoading && (
+        {/* 空狀態 - 只在列表模式顯示 */}
+        {searchResponse && searchResponse.hospitals.length === 0 && !isLoading && viewMode === "list" && (
           <div className="text-center py-12">
             <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
               <Building2 className="h-12 w-12 text-muted-foreground" />
@@ -231,35 +266,37 @@ export default function HospitalsPage() {
         )}
 
         {/* 醫院內容 - 根據檢視模式顯示 */}
-        {searchResponse && searchResponse.hospitals.length > 0 && !isLoading && (
+        {searchResponse && !isLoading && (
           <>
             {viewMode === "list" ? (
-              // 列表檢視
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {searchResponse.hospitals.map((hospital) => (
-                    <HospitalCard
-                      key={hospital.id}
-                      hospital={hospital}
-                      onViewDetail={handleViewDetail}
-                      onNavigate={handleNavigate}
-                    />
-                  ))}
-                </div>
+              // 列表檢視 - 只有有醫院時才顯示
+              searchResponse.hospitals.length > 0 && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {searchResponse.hospitals.map((hospital) => (
+                      <HospitalCard
+                        key={hospital.id}
+                        hospital={hospital}
+                        onViewDetail={handleViewDetail}
+                        onNavigate={handleNavigate}
+                      />
+                    ))}
+                  </div>
 
-                {/* 分頁元件 */}
-                <HospitalPagination
-                  currentPage={searchResponse.page}
-                  totalPages={Math.ceil(searchResponse.total / searchResponse.limit)}
-                  totalItems={searchResponse.total}
-                  pageSize={searchResponse.limit}
-                  onPageChange={handlePageChange}
-                  onPageSizeChange={handlePageSizeChange}
-                  isLoading={isLoading}
-                />
-              </>
+                  {/* 分頁元件 */}
+                  <HospitalPagination
+                    currentPage={searchResponse.page}
+                    totalPages={Math.ceil(searchResponse.total / searchResponse.limit)}
+                    totalItems={searchResponse.total}
+                    pageSize={searchResponse.limit}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                    isLoading={isLoading}
+                  />
+                </>
+              )
             ) : (
-              // 地圖檢視
+              // 地圖檢視 - 不論有無醫院都顯示地圖
               <div className="space-y-4">
                 <HospitalMap
                   hospitals={searchResponse.hospitals}
@@ -271,20 +308,21 @@ export default function HospitalsPage() {
                   onLocationFound={handleLocationFound}
                   onLocationError={handleLocationError}
                   requestLocation={requestLocation}
+                  onNearbyHospitalsRequest={handleNearbyHospitalsRequest}
                 />
 
-                {/* 地圖模式下的簡單分頁 */}
-                <div className="flex justify-center">
-                  <HospitalPagination
-                    currentPage={searchResponse.page}
-                    totalPages={Math.ceil(searchResponse.total / searchResponse.limit)}
-                    totalItems={searchResponse.total}
-                    pageSize={searchResponse.limit}
-                    onPageChange={handlePageChange}
-                    onPageSizeChange={handlePageSizeChange}
-                    isLoading={isLoading}
-                  />
-                </div>
+                {/* 地圖模式下的提示 */}
+                {searchResponse.hospitals.length === 0 && (
+                  <div className="text-center py-6 bg-muted/50 rounded-lg">
+                    <Building2 className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">
+                      目前區域沒有找到醫院
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      請嘗試移動地圖到其他區域或調整搜尋條件
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </>

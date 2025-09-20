@@ -19,6 +19,7 @@ interface HospitalMapProps {
   onLocationFound?: (location: { lat: number; lng: number }) => void;
   onLocationError?: (error: string) => void;
   requestLocation?: boolean;
+  onNearbyHospitalsRequest?: (latitude: number, longitude: number) => void;
 }
 
 interface MapComponentProps {
@@ -30,6 +31,7 @@ interface MapComponentProps {
   onLocationFound?: (location: { lat: number; lng: number }) => void;
   onLocationError?: (error: string) => void;
   requestLocation?: boolean;
+  onNearbyHospitalsRequest?: (latitude: number, longitude: number) => void;
 }
 
 // 內部地圖元件，只在 Google Maps API 載入後渲染
@@ -41,7 +43,8 @@ function MapComponent({
   showUserLocation = false,
   onLocationFound,
   onLocationError,
-  requestLocation = false
+  requestLocation = false,
+  onNearbyHospitalsRequest
 }: MapComponentProps) {
   const mapRef = React.useRef<HTMLDivElement>(null);
   const [map, setMap] = React.useState<google.maps.Map>();
@@ -49,6 +52,8 @@ function MapComponent({
   const infoWindowRef = React.useRef<google.maps.InfoWindow>();
   const userLocationMarkerRef = React.useRef<google.maps.marker.AdvancedMarkerElement>();
   const userLocationFoundRef = React.useRef<boolean>(false); // 追蹤是否已找到用戶位置
+  const searchTimeoutRef = React.useRef<NodeJS.Timeout>(); // 搜尋延遲計時器
+  const isLocationUpdatingRef = React.useRef<boolean>(false); // 追蹤是否正在程式控制移動地圖
 
   // 初始化地圖
   React.useEffect(() => {
@@ -72,8 +77,87 @@ function MapComponent({
         maxWidth: 300,
       });
       infoWindowRef.current = newInfoWindow;
+
+      // 檢查醫院是否在地圖可視範圍內
+      const isHospitalVisible = (hospital: Hospital, bounds: google.maps.LatLngBounds): boolean => {
+        const hospitalPosition = new google.maps.LatLng(
+          hospital.coordinates.latitude,
+          hospital.coordinates.longitude
+        );
+        return bounds.contains(hospitalPosition);
+      };
+
+      // 檢查是否需要重新載入附近醫院
+      const shouldReloadHospitals = (): boolean => {
+        const bounds = newMap.getBounds();
+        if (!bounds || hospitals.length === 0) return true;
+
+        // 計算當前可視範圍內的醫院數量
+        const visibleHospitals = hospitals.filter(hospital =>
+          isHospitalVisible(hospital, bounds)
+        );
+
+        // 如果可視範圍內的醫院數量少於原本的 30% 或少於 3 間，則重新載入
+        const visibilityThreshold = Math.max(3, Math.floor(hospitals.length * 0.3));
+        const shouldReload = visibleHospitals.length < visibilityThreshold;
+
+        console.log("🔍 醫院可視性檢查:", {
+          總醫院數: hospitals.length,
+          可視醫院數: visibleHospitals.length,
+          閾值: visibilityThreshold,
+          需要重載: shouldReload
+        });
+
+        return shouldReload;
+      };
+
+      // 添加地圖移動監聽器（用於自動搜尋附近醫院）
+      const handleMapMove = () => {
+        // 只有在有搜尋回調時才執行
+        if (!onNearbyHospitalsRequest) return;
+
+        // 如果是程式控制的移動（如定位成功），不觸發搜尋
+        if (isLocationUpdatingRef.current) {
+          console.log("⏭️ 跳過程式控制的地圖移動");
+          return;
+        }
+
+        // 清除之前的計時器（防抖動）
+        if (searchTimeoutRef.current) {
+          clearTimeout(searchTimeoutRef.current);
+        }
+
+        // 設定 1.5 秒延遲後檢查是否需要搜尋附近醫院
+        searchTimeoutRef.current = setTimeout(() => {
+          const mapCenter = newMap.getCenter();
+          const currentZoom = newMap.getZoom();
+
+          if (mapCenter && currentZoom && currentZoom >= 10) { // 只有在縮放級別 >= 10 時才搜尋
+            // 檢查是否需要重新載入醫院
+            if (shouldReloadHospitals()) {
+              const lat = mapCenter.lat();
+              const lng = mapCenter.lng();
+              console.log("🗺️ 原醫院不在可視範圍，搜尋附近醫院:", { lat, lng, zoom: currentZoom });
+              onNearbyHospitalsRequest(lat, lng);
+            } else {
+              console.log("✅ 原醫院仍在可視範圍內，無需重新載入");
+            }
+          }
+        }, 1500); // 1.5 秒延遲
+      };
+
+      // 監聽地圖拖拽結束和縮放結束事件
+      newMap.addListener("dragend", handleMapMove);
+      newMap.addListener("zoom_changed", handleMapMove);
+
+      // 清理函數
+      return () => {
+        if (searchTimeoutRef.current) {
+          clearTimeout(searchTimeoutRef.current);
+        }
+      };
     }
-  }, [center, zoom, map]);
+  }, [center, zoom, map, onNearbyHospitalsRequest]);
 
   // 新增醫院標記
   React.useEffect(() => {
@@ -211,6 +295,7 @@ function MapComponent({
 
     // 重置定位狀態
     userLocationFoundRef.current = false;
+    isLocationUpdatingRef.current = false;
 
     if (!navigator.geolocation) {
       onLocationError?.("此瀏覽器不支援地理位置功能");
@@ -435,9 +520,20 @@ function MapComponent({
             // 將地圖中心移至使用者位置，使用適當的縮放級別
             // 使用 setTimeout 確保地圖完全載入後再移動
             setTimeout(() => {
+              // 標記為程式控制的移動
+              isLocationUpdatingRef.current = true;
+
               map.setCenter(userLocation);
               map.setZoom(12); // 約 10 公里範圍，適合 IP 定位的精確度
+
+              // 短暫延遲後重置標記，確保移動完成
+              setTimeout(() => {
+                isLocationUpdatingRef.current = false;
+              }, 500);
             }, 100);
+
+            // 觸發附近醫院搜尋
+            onNearbyHospitalsRequest?.(userLocation.lat, userLocation.lng);
 
             console.log(`✅ ${service.name} IP 定位成功:`, location);
             return; // 成功後退出函數
@@ -573,9 +669,20 @@ function MapComponent({
           // 將地圖中心移至使用者位置
           // 使用 setTimeout 確保地圖完全載入後再移動
           setTimeout(() => {
+            // 標記為程式控制的移動
+            isLocationUpdatingRef.current = true;
+
             map.setCenter(userLocation);
             map.setZoom(14);
+
+            // 短暫延遲後重置標記，確保移動完成
+            setTimeout(() => {
+              isLocationUpdatingRef.current = false;
+            }, 500);
           }, 100);
+
+          // 觸發附近醫院搜尋
+          onNearbyHospitalsRequest?.(userLocation.lat, userLocation.lng);
         },
         (error) => {
           // 如果高精度定位失敗且尚未嘗試低精度，則重試
@@ -647,6 +754,15 @@ function MapComponent({
     startLocationProcess();
   }, [map, requestLocation, onLocationFound, onLocationError]);
 
+  // 清理計時器
+  React.useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return <div ref={mapRef} className="w-full h-full" />;
 }
 
@@ -688,6 +804,7 @@ export function HospitalMap({
   onLocationFound,
   onLocationError,
   requestLocation = false,
+  onNearbyHospitalsRequest,
 }: HospitalMapProps) {
   // 渲染狀態處理
   const render = (status: Status): React.ReactElement => {
@@ -707,6 +824,7 @@ export function HospitalMap({
             onLocationFound={onLocationFound}
             onLocationError={onLocationError}
             requestLocation={requestLocation}
+            onNearbyHospitalsRequest={onNearbyHospitalsRequest}
           />
         );
     }
