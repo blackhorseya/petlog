@@ -77,7 +77,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -85,7 +85,7 @@
             "description": "在 internal/infra/mongodb/ 建立 hospital_repository_model.go，定義 hospitalMongo struct 包含 bson 標籤，並實作 toDomain 和 fromDomain 轉換方法",
             "dependencies": [],
             "details": "參考現有的 petMongo 結構，建立 hospitalMongo struct 包含 ID (bson.ObjectID)、Name、Address、Phone、County、Veterinarian、LicenseType、Status、Coordinates (經緯度)、CreatedAt、UpdatedAt 等欄位，皆加上適當的 bson 標籤。實作 toDomain() 方法將 hospitalMongo 轉換為 model.Hospital，以及 hospitalMongoFromDomain() 方法處理反向轉換，包含 ObjectID 與 string ID 的轉換邏輯。參考 petMongoFromDomain 的錯誤處理模式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫單元測試驗證 toDomain 和 fromDomain 轉換的正確性，測試不同 ID 格式的處理，確保座標欄位正確對應"
           },
           {
@@ -96,7 +96,7 @@
               "2.1"
             ],
             "details": "參考 petMongoRepo 的實作模式，建立 hospitalMongoRepo struct 包含 db *mongo.Database。實作 Create、FindByID、SearchByKeyword、FindNearby、ListByArea 等方法。使用 MongoDB 的地理查詢功能 ($near, $geoWithin) 實作位置相關查詢。加入適當的錯誤處理，使用 convertMongoError 轉換 MongoDB 錯誤為領域錯誤。實作分頁功能支援 limit/offset 參數。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫整合測試使用 testcontainer 或 in-memory MongoDB，測試所有 CRUD 操作、地理查詢功能、分頁邏輯、錯誤處理"
           },
           {
@@ -107,7 +107,7 @@
               "2.2"
             ],
             "details": "實作 FindNearby 方法使用 MongoDB 的 $near 查詢，支援指定經緯度和距離範圍搜尋附近醫院。建立 $geoWithin 查詢支援區域範圍搜尋。處理座標格式為 GeoJSON Point 格式 {type: \"Point\", coordinates: [lng, lat]}。加入距離排序和結果限制功能。實作錯誤處理，包含無效座標的驗證。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "測試不同座標點的地理查詢結果，驗證距離計算正確性，測試邊界條件和無效座標的處理"
           },
           {
@@ -118,7 +118,7 @@
               "2.1"
             ],
             "details": "建立地理空間索引在 coordinates 欄位支援 $near 查詢 (2dsphere index)。建立文字索引在 name、address、veterinarian 欄位支援關鍵字搜尋。建立複合索引優化常用查詢組合如 county + status。建立單一欄位索引在 county、status、license_type 等篩選欄位。考慮索引大小和查詢效能的平衡。可在 client.go 或獨立的 index.go 檔案中定義索引建立邏輯。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "驗證索引建立成功，測試索引對查詢效能的提升，確認地理查詢和文字搜尋都能正確使用索引"
           },
           {
@@ -130,7 +130,7 @@
               "2.4"
             ],
             "details": "實作 SearchByKeyword 方法使用 MongoDB 的 $text 查詢或 $regex 查詢。支援多欄位搜尋 (name, address, veterinarian)，使用 $or 操作符組合查詢條件。實作模糊搜尋功能，處理繁體中文字元。加入搜尋結果相關性排序。支援分頁和篩選條件組合 (如縣市、執照類別、營業狀態)。處理空搜尋關鍵字的情況。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "測試各種關鍵字搜尋組合，驗證中文搜尋正確性，測試分頁和篩選功能，確認搜尋結果相關性"
           }
         ]
@@ -145,7 +145,7 @@
         "dependencies": [
           2
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -153,7 +153,7 @@
             "description": "在 cmd/import-hospitals/ 目錄建立匯入腳本的基礎結構，實作讀取 output/hospitals.json 檔案的功能",
             "dependencies": [],
             "details": "建立 cmd/import-hospitals/main.go 檔案，設定 CLI 參數處理（檔案路徑、批次大小等）。實作 JSON 檔案讀取功能，解析醫院資料結構（縣市、字號、執照類別、狀態、機構名稱、負責獸醫、機構電話、發照日期、機構地址）。加入基本的錯誤處理與日誌記錄。參考現有的 config.Load() 模式進行配置管理。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫單元測試驗證 JSON 檔案讀取功能，測試不同格式的檔案輸入，確保錯誤處理機制正常運作。"
           },
           {
@@ -164,7 +164,7 @@
               "3.1"
             ],
             "details": "建立 geocoding 套件，實作 Nominatim API 客戶端。設計 GeocodeService 介面支援批次地址查詢。實作 API 請求限制（rate limiting）與重試機制，避免超過 API 使用限制。加入快取機制避免重複查詢相同地址。支援多個地理編碼服務作為備援（Nominatim + 政府開放資料）。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "模擬 API 回應進行單元測試，測試 rate limiting 與重試邏輯，驗證座標轉換結果的合理性（台灣地區範圍檢查）。"
           },
           {
@@ -175,7 +175,7 @@
               "3.1"
             ],
             "details": "建立 hospital 資料轉換函式，將 JSON 中的中文欄位（縣市、字號、執照類別等）對應到 Hospital 領域模型。實作資料驗證邏輯（電話號碼格式、地址完整性、日期格式）。加入資料清理功能（移除多餘空白、統一格式）。處理資料不完整的情況，設定預設值或標記為需要人工處理。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "測試各種資料格式的轉換，驗證資料驗證規則，確保轉換後的資料符合領域模型要求。"
           },
           {
@@ -187,7 +187,7 @@
               "3.3"
             ],
             "details": "參考現有的 MongoDB 連線模式（internal/infra/mongodb/client.go），建立資料庫連線。實作批次插入邏輯，避免逐筆寫入造成效能問題。加入事務處理確保資料一致性。實作衝突處理邏輯（重複資料的 upsert 策略）。記錄詳細的匯入日誌，包含成功/失敗統計與錯誤原因。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "使用 testcontainer 或 in-memory MongoDB 進行整合測試，驗證批次匯入功能與錯誤恢復機制。"
           },
           {
@@ -198,7 +198,7 @@
               "3.4"
             ],
             "details": "建立適當的 MongoDB 索引：地理位置索引（2dsphere）支援附近醫院查詢、文字索引支援名稱與地址搜尋、複合索引支援縣市與狀態查詢。實作匯入報告生成，包含總計數量、成功匯入數量、失敗數量與原因分析、地理編碼成功率、重複資料統計。加入匯入結果驗證，確保資料完整性與索引效能。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "測試索引建立與查詢效能，驗證報告統計數據的準確性，確保索引正確支援各種查詢場景。"
           }
         ]
@@ -213,7 +213,7 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -221,7 +221,7 @@
             "description": "實作關鍵字搜尋和地理範圍搜尋功能，支援醫院名稱、地址、獸醫師搜尋",
             "dependencies": [],
             "details": "建立 SearchHospitalsQuery struct 包含 keyword、county、coordinates、radius 等欄位。實作 SearchHospitalsHandler struct 注入 HospitalRepository。在 Handle 方法中實作關鍵字搜尋邏輯，支援醫院名稱、地址、獸醫師的模糊搜尋。加入分頁支援（page、limit）和排序功能（按距離、評分）。遵循現有 query handler 模式，使用 contextx.WithContext 和錯誤處理方式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫單元測試涵蓋不同搜尋條件組合，使用 mock HospitalRepository 驗證搜尋邏輯和分頁功能"
           },
           {
@@ -230,7 +230,7 @@
             "description": "實作取得單一醫院完整詳細資訊的功能",
             "dependencies": [],
             "details": "建立 GetHospitalDetailQuery struct 包含 hospitalID 欄位。實作 GetHospitalDetailHandler struct 注入 HospitalRepository。在 Handle 方法中呼叫 repository.GetHospitalByID 取得醫院詳細資訊。加入錯誤處理，當醫院不存在時回傳適當錯誤。遵循現有 GetPetByIDHandler 的實作模式，使用相同的錯誤處理和記錄方式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫單元測試驗證正常取得醫院詳情和醫院不存在的錯誤處理，使用 mock repository"
           },
           {
@@ -239,7 +239,7 @@
             "description": "實作根據使用者位置搜尋附近醫院的功能",
             "dependencies": [],
             "details": "建立 ListNearbyHospitalsQuery struct 包含 latitude、longitude、radius、limit 等欄位。實作 ListNearbyHospitalsHandler struct 注入 HospitalRepository。在 Handle 方法中使用地理查詢功能，呼叫 repository.GetNearbyHospitals 方法。支援按距離排序和結果數量限制。加入距離計算和範圍驗證邏輯。遵循現有 list handler 的實作模式。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫單元測試驗證地理範圍查詢邏輯、距離排序和邊界條件處理，模擬不同位置和範圍的測試案例"
           },
           {
@@ -250,7 +250,7 @@
               "4.1"
             ],
             "details": "擴展 SearchHospitalsQuery 加入篩選條件：licenseType（診所/醫院）、hasEmergency（急診服務）、openNow（目前營業）等欄位。實作多種排序選項：按距離、評分、營業時間排序。在 SearchHospitalsHandler 中實作篩選邏輯和排序處理。加入搜尋結果統計資訊（總數、平均距離等）。優化查詢效能，減少不必要的資料傳輸。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "測試各種篩選條件組合和排序選項，驗證搜尋結果的正確性和效能表現"
           },
           {
@@ -263,7 +263,7 @@
               "4.3"
             ],
             "details": "建立 APIUsageTracker service 追蹤外部 API 調用次數和成本。實作 CircuitBreaker pattern 包含四種模式：正常模式（完整功能）、警戒模式（80% 使用量，停用次要功能）、限制模式（90% 使用量，僅提供必要欄位）、安全模式（95%+ 使用量，僅使用本地資料）。在各個 handler 中整合保險絲機制，根據使用量狀態調整回應內容。建立監控介面和閾值配置管理。",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "撰寫保險絲機制單元測試，模擬不同使用量情境下的自動降級和恢復行為，驗證成本控制邏輯"
           }
         ]
@@ -647,7 +647,7 @@
     ],
     "metadata": {
       "created": "2025-09-19T07:47:52.925Z",
-      "updated": "2025-09-19T08:17:01.447Z",
+      "updated": "2025-09-20T03:36:24.903Z",
       "description": "Tasks for master context"
     }
   }
