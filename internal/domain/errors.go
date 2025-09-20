@@ -20,6 +20,9 @@ var (
 
 	// ErrInvalidParameter is returned when a parameter is invalid.
 	ErrInvalidParameter = errors.New("invalid parameter provided")
+
+	// ErrInvalidCoordinates 表示座標格式無效
+	ErrInvalidCoordinates = errors.New("invalid coordinates")
 )
 
 // Helper functions for error type checking

@@ -29,3 +29,8 @@ variable "mongo_database" {
   description = "MongoDB 資料庫名稱"
   type        = string
 }
+
+variable "google_maps_api_key" {
+  description = "Google Maps API 金鑰"
+  type        = string
+}

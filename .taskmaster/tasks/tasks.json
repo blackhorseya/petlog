@@ -9,8 +9,63 @@
         "testStrategy": "為 Hospital 模型撰寫單元測試，驗證結構體欄位與 JSON 序列化。為倉儲介面產生 mock，確保介面方法定義正確。",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "建立 Hospital 領域模型結構體",
+            "description": "在 internal/domain/model/ 建立 hospital.go 檔案，定義 Hospital struct 包含完整欄位定義",
+            "dependencies": [],
+            "details": "建立 internal/domain/model/hospital.go 檔案，定義 Hospital struct 包含 ID (string)、Name (string)、Address (string)、Phone (string)、County (string)、Veterinarian (string)、LicenseType (string)、Status (string)、Coordinates (包含 Latitude 和 Longitude float64 欄位)、CreatedAt 和 UpdatedAt (time.Time) 等欄位。所有欄位僅使用 json tag，遵循專案的領域模型純淨性原則，不包含任何資料庫相關標籤。參考現有的 pet.go 模型結構和命名慣例。",
+            "status": "done",
+            "testStrategy": "撰寫 Hospital 結構體的單元測試，驗證 JSON 序列化和反序列化功能正確性，確保所有欄位都能正確轉換。"
+          },
+          {
+            "id": 2,
+            "title": "建立 Hospital 倉儲介面定義",
+            "description": "在 internal/domain/repository/ 建立 hospital.go 檔案，定義 HospitalRepository 介面及其方法",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "建立 internal/domain/repository/hospital.go 檔案，在檔案開頭加入 //go:generate mockgen -destination=./mock_${GOFILE} -package=${GOPACKAGE} -source=${GOFILE} 指令。定義 HospitalRepository 介面包含以下方法：SearchHospitals (關鍵字搜尋，支援分頁)、GetHospitalByID (根據 ID 取得單一醫院)、ListHospitalsByArea (根據縣市區域列出醫院)、GetNearbyHospitals (根據座標和半徑搜尋附近醫院)。所有方法都接收 context.Context 作為第一個參數，遵循專案的 Context 參數命名慣例。",
+            "status": "done",
+            "testStrategy": "使用 //go:generate mockgen 產生 mock 檔案，確保介面方法定義正確且可以正常產生 mock 物件。"
+          },
+          {
+            "id": 3,
+            "title": "建立 MongoDB Hospital 持久化模型",
+            "description": "在 internal/infra/mongodb/ 建立 hospital_repository_model.go，定義資料庫模型和轉換方法",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "建立 internal/infra/mongodb/hospital_repository_model.go 檔案，定義 hospitalMongo struct 包含 bson tag，ID 欄位使用 bson.ObjectID 類型。建立地理座標的結構體支援 MongoDB 的 2dsphere 索引。實作 toDomain() 方法將 hospitalMongo 轉換為 domain model，以及 hospitalMongoFromDomain() 方法進行反向轉換。參考現有的 petMongo 結構和轉換邏輯，處理 ObjectID 與 string 之間的轉換，並在轉換失敗時返回 domain.ErrInvalidID 錯誤。",
+            "status": "done",
+            "testStrategy": "撰寫 toDomain 和 fromDomain 轉換方法的單元測試，驗證 ID 轉換、地理座標轉換和錯誤處理的正確性。"
+          },
+          {
+            "id": 4,
+            "title": "實作 MongoDB Hospital 倉儲實作",
+            "description": "在 internal/infra/mongodb/ 建立 hospital_repository_impl.go，實作 HospitalRepository 介面",
+            "dependencies": [
+              "1.2",
+              "1.3"
+            ],
+            "details": "建立 internal/infra/mongodb/hospital_repository_impl.go 檔案，實作 HospitalRepository 介面的所有方法。使用 MongoDB 的 $near 操作符實作地理查詢功能，支援 $text 搜尋進行關鍵字查詢。實作分頁功能使用 Skip 和 Limit。在建構函式中建立適當的索引：地理座標使用 2dsphere 索引，名稱和地址欄位建立文字索引支援搜尋。參考現有的 pet_repository_impl.go 的錯誤處理模式，使用 convertError 函式將 MongoDB 錯誤轉換為 domain 錯誤。",
+            "status": "done",
+            "testStrategy": "撰寫倉儲實作的整合測試，模擬 MongoDB 操作，測試地理查詢、關鍵字搜尋、分頁功能的正確性。"
+          },
+          {
+            "id": 5,
+            "title": "產生 Hospital Repository Mock 檔案",
+            "description": "執行 go generate 指令產生 HospitalRepository 的 mock 檔案",
+            "dependencies": [
+              "1.2"
+            ],
+            "details": "在完成 HospitalRepository 介面定義後，執行 go generate ./internal/domain/repository/ 指令產生 mock_hospital.go 檔案。確認 mock 檔案正確產生且包含所有介面方法的 mock 實作。驗證 mock 檔案的 package 名稱正確，且可以在測試中正常使用。如果產生過程中遇到錯誤，檢查 mockgen 工具是否正確安裝，以及 //go:generate 指令格式是否正確。",
+            "status": "done",
+            "testStrategy": "建立簡單的測試檔案使用產生的 mock，驗證 mock 物件可以正常建立和使用，確保 mock 方法可以正確設定期望行為和返回值。"
+          }
+        ]
       },
       {
         "id": 2,
@@ -23,7 +78,62 @@
           1
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "建立 Hospital MongoDB 持久化模型",
+            "description": "在 internal/infra/mongodb/ 建立 hospital_repository_model.go，定義 hospitalMongo struct 包含 bson 標籤，並實作 toDomain 和 fromDomain 轉換方法",
+            "dependencies": [],
+            "details": "參考現有的 petMongo 結構，建立 hospitalMongo struct 包含 ID (bson.ObjectID)、Name、Address、Phone、County、Veterinarian、LicenseType、Status、Coordinates (經緯度)、CreatedAt、UpdatedAt 等欄位，皆加上適當的 bson 標籤。實作 toDomain() 方法將 hospitalMongo 轉換為 model.Hospital，以及 hospitalMongoFromDomain() 方法處理反向轉換，包含 ObjectID 與 string ID 的轉換邏輯。參考 petMongoFromDomain 的錯誤處理模式。",
+            "status": "pending",
+            "testStrategy": "撰寫單元測試驗證 toDomain 和 fromDomain 轉換的正確性，測試不同 ID 格式的處理，確保座標欄位正確對應"
+          },
+          {
+            "id": 2,
+            "title": "實作 Hospital Repository 介面實作",
+            "description": "在 internal/infra/mongodb/ 建立 hospital_repository_impl.go，實作 HospitalRepository 介面的所有方法",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "參考 petMongoRepo 的實作模式，建立 hospitalMongoRepo struct 包含 db *mongo.Database。實作 Create、FindByID、SearchByKeyword、FindNearby、ListByArea 等方法。使用 MongoDB 的地理查詢功能 ($near, $geoWithin) 實作位置相關查詢。加入適當的錯誤處理，使用 convertMongoError 轉換 MongoDB 錯誤為領域錯誤。實作分頁功能支援 limit/offset 參數。",
+            "status": "pending",
+            "testStrategy": "撰寫整合測試使用 testcontainer 或 in-memory MongoDB，測試所有 CRUD 操作、地理查詢功能、分頁邏輯、錯誤處理"
+          },
+          {
+            "id": 3,
+            "title": "實作地理查詢功能",
+            "description": "在 hospital_repository_impl.go 中實作使用 MongoDB $near 操作符的地理查詢功能",
+            "dependencies": [
+              "2.2"
+            ],
+            "details": "實作 FindNearby 方法使用 MongoDB 的 $near 查詢，支援指定經緯度和距離範圍搜尋附近醫院。建立 $geoWithin 查詢支援區域範圍搜尋。處理座標格式為 GeoJSON Point 格式 {type: \"Point\", coordinates: [lng, lat]}。加入距離排序和結果限制功能。實作錯誤處理，包含無效座標的驗證。",
+            "status": "pending",
+            "testStrategy": "測試不同座標點的地理查詢結果，驗證距離計算正確性，測試邊界條件和無效座標的處理"
+          },
+          {
+            "id": 4,
+            "title": "建立 MongoDB 索引支援",
+            "description": "建立支援地理查詢和文字搜尋的 MongoDB 索引配置",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "建立地理空間索引在 coordinates 欄位支援 $near 查詢 (2dsphere index)。建立文字索引在 name、address、veterinarian 欄位支援關鍵字搜尋。建立複合索引優化常用查詢組合如 county + status。建立單一欄位索引在 county、status、license_type 等篩選欄位。考慮索引大小和查詢效能的平衡。可在 client.go 或獨立的 index.go 檔案中定義索引建立邏輯。",
+            "status": "pending",
+            "testStrategy": "驗證索引建立成功，測試索引對查詢效能的提升，確認地理查詢和文字搜尋都能正確使用索引"
+          },
+          {
+            "id": 5,
+            "title": "實作關鍵字搜尋功能",
+            "description": "實作 SearchByKeyword 方法支援醫院名稱、地址、獸醫師的關鍵字搜尋",
+            "dependencies": [
+              "2.2",
+              "2.4"
+            ],
+            "details": "實作 SearchByKeyword 方法使用 MongoDB 的 $text 查詢或 $regex 查詢。支援多欄位搜尋 (name, address, veterinarian)，使用 $or 操作符組合查詢條件。實作模糊搜尋功能，處理繁體中文字元。加入搜尋結果相關性排序。支援分頁和篩選條件組合 (如縣市、執照類別、營業狀態)。處理空搜尋關鍵字的情況。",
+            "status": "pending",
+            "testStrategy": "測試各種關鍵字搜尋組合，驗證中文搜尋正確性，測試分頁和篩選功能，確認搜尋結果相關性"
+          }
+        ]
       },
       {
         "id": 3,
@@ -35,8 +145,63 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "建立匯入腳本基礎結構與 JSON 檔案讀取",
+            "description": "在 cmd/import-hospitals/ 目錄建立匯入腳本的基礎結構，實作讀取 output/hospitals.json 檔案的功能",
+            "dependencies": [],
+            "details": "建立 cmd/import-hospitals/main.go 檔案，設定 CLI 參數處理（檔案路徑、批次大小等）。實作 JSON 檔案讀取功能，解析醫院資料結構（縣市、字號、執照類別、狀態、機構名稱、負責獸醫、機構電話、發照日期、機構地址）。加入基本的錯誤處理與日誌記錄。參考現有的 config.Load() 模式進行配置管理。",
+            "status": "pending",
+            "testStrategy": "撰寫單元測試驗證 JSON 檔案讀取功能，測試不同格式的檔案輸入，確保錯誤處理機制正常運作。"
+          },
+          {
+            "id": 2,
+            "title": "實作地理編碼服務與 API 整合",
+            "description": "建立地理編碼服務，整合 Nominatim API 或政府開放資料 API 將地址轉換為 GPS 座標",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "建立 geocoding 套件，實作 Nominatim API 客戶端。設計 GeocodeService 介面支援批次地址查詢。實作 API 請求限制（rate limiting）與重試機制，避免超過 API 使用限制。加入快取機制避免重複查詢相同地址。支援多個地理編碼服務作為備援（Nominatim + 政府開放資料）。",
+            "status": "pending",
+            "testStrategy": "模擬 API 回應進行單元測試，測試 rate limiting 與重試邏輯，驗證座標轉換結果的合理性（台灣地區範圍檢查）。"
+          },
+          {
+            "id": 3,
+            "title": "建立 Hospital 資料模型轉換與驗證邏輯",
+            "description": "實作從 JSON 資料格式到 Hospital 領域模型的轉換邏輯，包含資料驗證與清理",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "建立 hospital 資料轉換函式，將 JSON 中的中文欄位（縣市、字號、執照類別等）對應到 Hospital 領域模型。實作資料驗證邏輯（電話號碼格式、地址完整性、日期格式）。加入資料清理功能（移除多餘空白、統一格式）。處理資料不完整的情況，設定預設值或標記為需要人工處理。",
+            "status": "pending",
+            "testStrategy": "測試各種資料格式的轉換，驗證資料驗證規則，確保轉換後的資料符合領域模型要求。"
+          },
+          {
+            "id": 4,
+            "title": "實作批次匯入邏輯與 MongoDB 整合",
+            "description": "建立批次處理邏輯，將轉換後的醫院資料寫入 MongoDB，包含錯誤處理與事務管理",
+            "dependencies": [
+              "3.2",
+              "3.3"
+            ],
+            "details": "參考現有的 MongoDB 連線模式（internal/infra/mongodb/client.go），建立資料庫連線。實作批次插入邏輯，避免逐筆寫入造成效能問題。加入事務處理確保資料一致性。實作衝突處理邏輯（重複資料的 upsert 策略）。記錄詳細的匯入日誌，包含成功/失敗統計與錯誤原因。",
+            "status": "pending",
+            "testStrategy": "使用 testcontainer 或 in-memory MongoDB 進行整合測試，驗證批次匯入功能與錯誤恢復機制。"
+          },
+          {
+            "id": 5,
+            "title": "建立索引最佳化與匯入報告生成",
+            "description": "建立 MongoDB 索引支援查詢效能，並實作匯入完成後的統計報告生成",
+            "dependencies": [
+              "3.4"
+            ],
+            "details": "建立適當的 MongoDB 索引：地理位置索引（2dsphere）支援附近醫院查詢、文字索引支援名稱與地址搜尋、複合索引支援縣市與狀態查詢。實作匯入報告生成，包含總計數量、成功匯入數量、失敗數量與原因分析、地理編碼成功率、重複資料統計。加入匯入結果驗證，確保資料完整性與索引效能。",
+            "status": "pending",
+            "testStrategy": "測試索引建立與查詢效能，驗證報告統計數據的準確性，確保索引正確支援各種查詢場景。"
+          }
+        ]
       },
       {
         "id": 4,
@@ -49,7 +214,59 @@
           2
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "建立醫院搜尋 Handler (search_hospitals_handler.go)",
+            "description": "實作關鍵字搜尋和地理範圍搜尋功能，支援醫院名稱、地址、獸醫師搜尋",
+            "dependencies": [],
+            "details": "建立 SearchHospitalsQuery struct 包含 keyword、county、coordinates、radius 等欄位。實作 SearchHospitalsHandler struct 注入 HospitalRepository。在 Handle 方法中實作關鍵字搜尋邏輯，支援醫院名稱、地址、獸醫師的模糊搜尋。加入分頁支援（page、limit）和排序功能（按距離、評分）。遵循現有 query handler 模式，使用 contextx.WithContext 和錯誤處理方式。",
+            "status": "pending",
+            "testStrategy": "撰寫單元測試涵蓋不同搜尋條件組合，使用 mock HospitalRepository 驗證搜尋邏輯和分頁功能"
+          },
+          {
+            "id": 2,
+            "title": "建立醫院詳細資訊 Handler (get_hospital_detail_handler.go)",
+            "description": "實作取得單一醫院完整詳細資訊的功能",
+            "dependencies": [],
+            "details": "建立 GetHospitalDetailQuery struct 包含 hospitalID 欄位。實作 GetHospitalDetailHandler struct 注入 HospitalRepository。在 Handle 方法中呼叫 repository.GetHospitalByID 取得醫院詳細資訊。加入錯誤處理，當醫院不存在時回傳適當錯誤。遵循現有 GetPetByIDHandler 的實作模式，使用相同的錯誤處理和記錄方式。",
+            "status": "pending",
+            "testStrategy": "撰寫單元測試驗證正常取得醫院詳情和醫院不存在的錯誤處理，使用 mock repository"
+          },
+          {
+            "id": 3,
+            "title": "建立附近醫院查詢 Handler (list_nearby_hospitals_handler.go)",
+            "description": "實作根據使用者位置搜尋附近醫院的功能",
+            "dependencies": [],
+            "details": "建立 ListNearbyHospitalsQuery struct 包含 latitude、longitude、radius、limit 等欄位。實作 ListNearbyHospitalsHandler struct 注入 HospitalRepository。在 Handle 方法中使用地理查詢功能，呼叫 repository.GetNearbyHospitals 方法。支援按距離排序和結果數量限制。加入距離計算和範圍驗證邏輯。遵循現有 list handler 的實作模式。",
+            "status": "pending",
+            "testStrategy": "撰寫單元測試驗證地理範圍查詢邏輯、距離排序和邊界條件處理，模擬不同位置和範圍的測試案例"
+          },
+          {
+            "id": 4,
+            "title": "實作進階搜尋篩選與排序功能",
+            "description": "在搜尋功能中加入篩選條件和多種排序選項",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "擴展 SearchHospitalsQuery 加入篩選條件：licenseType（診所/醫院）、hasEmergency（急診服務）、openNow（目前營業）等欄位。實作多種排序選項：按距離、評分、營業時間排序。在 SearchHospitalsHandler 中實作篩選邏輯和排序處理。加入搜尋結果統計資訊（總數、平均距離等）。優化查詢效能，減少不必要的資料傳輸。",
+            "status": "pending",
+            "testStrategy": "測試各種篩選條件組合和排序選項，驗證搜尋結果的正確性和效能表現"
+          },
+          {
+            "id": 5,
+            "title": "實作保險絲機制與成本控制",
+            "description": "建立外部 API 使用量監控和自動降級保護機制",
+            "dependencies": [
+              "4.1",
+              "4.2",
+              "4.3"
+            ],
+            "details": "建立 APIUsageTracker service 追蹤外部 API 調用次數和成本。實作 CircuitBreaker pattern 包含四種模式：正常模式（完整功能）、警戒模式（80% 使用量，停用次要功能）、限制模式（90% 使用量，僅提供必要欄位）、安全模式（95%+ 使用量，僅使用本地資料）。在各個 handler 中整合保險絲機制，根據使用量狀態調整回應內容。建立監控介面和閾值配置管理。",
+            "status": "pending",
+            "testStrategy": "撰寫保險絲機制單元測試，模擬不同使用量情境下的自動降級和恢復行為，驗證成本控制邏輯"
+          }
+        ]
       },
       {
         "id": 5,
@@ -75,7 +292,61 @@
           5
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "建立 Hospital Endpoint 介面定義",
+            "description": "在 endpoint 層建立醫院相關的端點定義，為後續的 HTTP 處理器建立基礎介面",
+            "dependencies": [],
+            "details": "在 internal/endpoint/ 建立 hospital_endpoint.go，定義 HospitalEndpoints struct 包含 SearchHospitals、GetHospitalByID、GetNearbyHospitals 等端點方法。定義對應的 Request/Response 結構體，包含適當的 JSON tag 和 Swagger 註解。遵循現有的 endpoint 模式，如 PetEndpoints 的實作方式。",
+            "status": "pending",
+            "testStrategy": "撰寫端點介面的單元測試，驗證 Request/Response 結構體的 JSON 序列化。測試端點方法的簽名和行為定義。"
+          },
+          {
+            "id": 2,
+            "title": "實作 Hospital Handler 核心邏輯",
+            "description": "建立 hospital_handler.go 檔案，實作醫院相關的 HTTP 處理函數",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "在 internal/transport/gin/ 建立 hospital_handler.go，實作 SearchHospitals、GetHospitalByID、GetNearbyHospitals 等處理函數。每個函數遵循現有的 handler 模式：使用 httptransport.NewServer 建立 go-kit server，實作 decodeRequest/encodeResponse 函數處理 HTTP 協議轉換。加入適當的 Swagger 註解，遵循 pet_handler.go 的格式。",
+            "status": "pending",
+            "testStrategy": "撰寫 HTTP handler 函數的單元測試，使用 httptest 模擬 HTTP 請求。測試正常回應和錯誤處理邏輯。驗證 JSON 回應格式的正確性。"
+          },
+          {
+            "id": 3,
+            "title": "建立醫院路由註冊函數",
+            "description": "實作醫院路由的註冊邏輯，將 HTTP 端點與處理函數綁定",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "在 hospital_handler.go 中實作 RegisterHospitalRoutes 函數，遵循 RegisterPetRoutes 的模式。建立 /api/v1/hospitals 路由群組，註冊 GET /search、GET /:id、GET /nearby 等路由。配置相同的錯誤處理器和認證中介軟體 EnsureValidToken。",
+            "status": "pending",
+            "testStrategy": "撰寫路由註冊的整合測試，驗證路由路徑和 HTTP 方法的正確性。測試認證中介軟體的套用。"
+          },
+          {
+            "id": 4,
+            "title": "更新主路由器整合醫院路由",
+            "description": "修改 router.go 以整合新的醫院路由註冊",
+            "dependencies": [
+              "6.3"
+            ],
+            "details": "修改 router.go 中的 NewHTTPHandler 函數，在函數參數中加入 hospitalEndpoints endpoint.HospitalEndpoints，並在路由註冊區段加入 RegisterHospitalRoutes 呼叫。確保遵循現有的程式碼風格和註解格式。",
+            "status": "pending",
+            "testStrategy": "撰寫整合測試驗證完整的路由配置。測試醫院路由與其他模組路由的共存性。驗證 HTTP 伺服器的正常啟動。"
+          },
+          {
+            "id": 5,
+            "title": "實作 HTTP 錯誤處理和日誌記錄",
+            "description": "加強醫院 API 的錯誤處理、請求日誌和監控機制",
+            "dependencies": [
+              "6.4"
+            ],
+            "details": "在醫院 handler 中整合現有的錯誤處理機制，使用 encodeError 函數統一錯誤回應格式。加入適當的日誌記錄，包含請求追蹤和效能監控。實作 API 使用量統計，為後續的成本控制機制準備基礎。遵循現有 middleware.go 中的模式。",
+            "status": "pending",
+            "testStrategy": "測試各種錯誤情境的回應格式，包含 400、404、500 等狀態碼。驗證日誌記錄的完整性和格式。測試監控指標的正確收集。"
+          }
+        ]
       },
       {
         "id": 7,
@@ -114,7 +385,63 @@
           7
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "建立醫院相關型別定義與 API 函數",
+            "description": "在 lib/types/ 建立 hospital.ts 定義 Hospital 型別、搜尋參數與 API 回應型別，並在 lib/api/ 建立 hospital.ts 實作 API 函數",
+            "dependencies": [],
+            "details": "建立 web/src/lib/types/hospital.ts 定義 Hospital interface、HospitalSearchParams、HospitalListResponse 等型別。建立 web/src/lib/api/hospital.ts 實作 searchHospitals、getHospitalById 等 API 函數，使用現有的 apiRequest 函數處理 HTTP 請求。定義 hospitalQueryKeys 用於 TanStack Query 快取管理。遵循現有 pet.ts 的模式進行實作。",
+            "status": "pending",
+            "testStrategy": "撰寫型別定義的單元測試，驗證 API 函數的請求參數和回應格式正確性"
+          },
+          {
+            "id": 2,
+            "title": "建立醫院搜尋元件 HospitalSearch.tsx",
+            "description": "實作醫院搜尋功能元件，包含關鍵字搜尋、地區篩選、排序等功能",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "在 web/src/components/hospitals/ 建立 HospitalSearch.tsx，使用 Shadcn UI 的 Input 和 Select 元件實作搜尋介面。包含關鍵字輸入框、縣市地區下拉選單、排序選項（距離、評分、名稱）。使用 debounce 優化搜尋輸入效能。實作搜尋參數狀態管理和回調函數。遵循現有元件的設計模式和 Tailwind CSS 樣式規範。",
+            "status": "pending",
+            "testStrategy": "測試搜尋輸入的 debounce 機制、篩選條件變更的回調觸發、UI 元件的互動行為"
+          },
+          {
+            "id": 3,
+            "title": "建立醫院卡片元件 HospitalCard.tsx",
+            "description": "實作醫院資訊卡片展示元件，顯示醫院基本資訊與操作按鈕",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "在 web/src/components/hospitals/ 建立 HospitalCard.tsx，使用 Shadcn UI 的 Card 元件架構。顯示醫院名稱、地址、電話、營業狀態、距離等資訊。包含查看詳情、導航按鈕。實作響應式設計適應不同螢幕尺寸。使用適當的圖示（Lucide React）和載入狀態處理。遵循現有 PetCard 的設計模式。",
+            "status": "pending",
+            "testStrategy": "測試卡片資訊顯示正確性、按鈕點擊事件處理、響應式布局在不同螢幕尺寸下的表現"
+          },
+          {
+            "id": 4,
+            "title": "建立醫院列表容器元件 HospitalList.tsx",
+            "description": "實作醫院列表主容器，整合搜尋、卡片展示與分頁功能",
+            "dependencies": [
+              "9.2",
+              "9.3"
+            ],
+            "details": "在 web/src/components/hospitals/ 建立 HospitalList.tsx，整合 HospitalSearch 和 HospitalCard 元件。使用 TanStack Query 的 useQuery 實作資料獲取和快取管理。實作載入狀態（骨架屏）、錯誤狀態、空白狀態的 UI 處理。實作分頁或無限滾動載入功能。管理搜尋參數狀態並觸發 API 重新查詢。遵循現有 PetList 的架構模式。",
+            "status": "pending",
+            "testStrategy": "測試列表資料載入邏輯、搜尋參數變更時的重新查詢、分頁功能、各種狀態的 UI 顯示"
+          },
+          {
+            "id": 5,
+            "title": "建立醫院資料 Hook 與整合測試",
+            "description": "建立 use-hospitals.ts Hook 管理醫院資料查詢狀態，並進行整合測試",
+            "dependencies": [
+              "9.1",
+              "9.4"
+            ],
+            "details": "在 web/src/hooks/ 建立 use-hospitals.ts，實作 useHospitals、useSearchHospitals、useHospital 等 Hook。使用 TanStack Query 管理快取、錯誤處理、重試邏輯。實作樂觀更新和背景重新整理。提供適當的 staleTime 和 cacheTime 設定。遵循現有 use-pets.ts 的模式。進行完整的元件整合測試確保所有功能正常運作。",
+            "status": "pending",
+            "testStrategy": "撰寫 Hook 的單元測試，驗證快取策略、錯誤處理邏輯。進行端到端測試確保搜尋、篩選、分頁等功能的完整流程"
+          }
+        ]
       },
       {
         "id": 10,
@@ -128,7 +455,62 @@
           9
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "建立醫院路由和基礎頁面結構",
+            "description": "建立 web/src/app/hospitals/ 目錄結構，包含主頁面 page.tsx 和動態路由 [id]/page.tsx 的基本框架",
+            "dependencies": [],
+            "details": "在 web/src/app/ 下建立 hospitals 目錄，建立 page.tsx 主頁面和 [id]/page.tsx 詳情頁。實作基本的頁面元件結構，包含 loading.tsx 和 error.tsx。遵循 Next.js App Router 規範，使用 TypeScript 和正體中文註解。設定基本的 SEO metadata 和 viewport 配置。",
+            "status": "pending",
+            "testStrategy": "驗證路由正確設定，測試頁面基本渲染和錯誤處理"
+          },
+          {
+            "id": 2,
+            "title": "實作醫院主頁面的地圖與列表切換功能",
+            "description": "在主頁面實作地圖檢視和列表檢視的切換功能，整合狀態管理",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "在 hospitals/page.tsx 實作 ViewToggle 元件，提供地圖和列表兩種檢視模式。使用 React useState 管理檢視狀態，實作 MapView 和 ListView 元件的條件渲染。加入檢視切換的動畫效果和響應式設計。整合搜尋和篩選功能的狀態管理。",
+            "status": "pending",
+            "testStrategy": "測試檢視切換功能，驗證狀態保持和響應式表現"
+          },
+          {
+            "id": 3,
+            "title": "建立醫院詳情頁面完整資訊展示",
+            "description": "實作醫院詳情頁面，展示完整醫院資訊並整合 Google Maps 導航功能",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "在 [id]/page.tsx 實作完整的醫院詳情展示，包含基本資訊、聯絡方式、營業時間、服務項目等。整合 Google Maps 導航連結和位置顯示。實作圖片展示區域和評價顯示功能。加入分享功能和收藏功能。使用動態 import 優化載入效能。",
+            "status": "pending",
+            "testStrategy": "測試動態路由參數解析，驗證 Google Maps 整合和響應式布局"
+          },
+          {
+            "id": 4,
+            "title": "實作頁面導航和麵包屑功能",
+            "description": "建立完整的頁面導航系統，包含麵包屑導航和返回功能",
+            "dependencies": [
+              "10.2",
+              "10.3"
+            ],
+            "details": "實作 Breadcrumb 元件顯示當前頁面路徑，加入到 navigation.ts 配置中。在詳情頁面加入返回按鈕和上一頁功能。實作頁面間的平滑過渡動畫。整合到現有的 Sidebar 和 MobileNav 導航系統中。使用 next/navigation 的 useRouter 和 usePathname hooks。",
+            "status": "pending",
+            "testStrategy": "測試導航功能的正確性，驗證麵包屑路徑和返回按鈕"
+          },
+          {
+            "id": 5,
+            "title": "優化 SEO 和加入 meta tags",
+            "description": "為醫院頁面加入完整的 SEO 優化，包含動態 meta tags 和結構化資料",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "在 hospitals/page.tsx 和 [id]/page.tsx 實作動態 generateMetadata 函數。加入 Open Graph 和 Twitter Card meta tags。實作結構化資料 JSON-LD 格式，包含醫療機構資訊。設定適當的 canonical URLs 和 robots meta。實作動態頁面標題和描述生成。遵循醫療網站的 SEO 最佳實務。",
+            "status": "pending",
+            "testStrategy": "使用 SEO 工具驗證 meta tags 正確性，測試結構化資料格式"
+          }
+        ]
       },
       {
         "id": 11,
@@ -141,7 +523,61 @@
           6
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "建立成本監控服務與 API 使用量追蹤",
+            "description": "實作外部 API 使用量監控基礎設施，包含使用量統計、成本計算和閾值管理",
+            "dependencies": [],
+            "details": "在 internal/domain/service/ 建立 CostMonitoringService 介面定義成本監控方法。在 internal/infra/mongodb/ 建立 api_usage_repository 追蹤 API 使用量和成本。在 internal/config/config.go 新增成本控制相關配置（閾值、API key）。建立 API 使用量記錄模型包含 API 名稱、呼叫次數、成本、時間戳。實作使用量累計和重置邏輯。",
+            "status": "pending",
+            "testStrategy": "撰寫成本監控服務的單元測試，模擬不同 API 使用量情境。測試閾值計算和使用量記錄的正確性。"
+          },
+          {
+            "id": 2,
+            "title": "實作保險絲機制與模式切換邏輯",
+            "description": "建立四級保險絲機制，根據使用量自動切換系統模式",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "在 internal/domain/service/ 建立 CircuitBreakerService 定義模式切換邏輯。實作四種模式：正常模式（100%功能）、警戒模式（80%，停用次要功能）、限制模式（90%，僅必要欄位）、安全模式（95%+，僅本地資料）。在 middleware 層加入保險絲檢查，根據當前模式調整 API 行為。實作自動恢復機制，當使用量降低時自動升級模式。建立模式狀態持久化確保重啟後保持狀態。",
+            "status": "pending",
+            "testStrategy": "測試不同使用量觸發的模式切換邏輯。驗證自動降級和恢復機制。模擬系統重啟後狀態保持。"
+          },
+          {
+            "id": 3,
+            "title": "整合保險絲機制到現有 API 端點",
+            "description": "在現有的 usecase 和 endpoint 層整合保險絲檢查，實現功能降級",
+            "dependencies": [
+              "11.2"
+            ],
+            "details": "修改 internal/usecase/query/ 中的 handler，加入模式檢查邏輯。在警戒模式下停用非必要查詢，限制模式下簡化回應欄位，安全模式下使用快取或本地資料。修改 internal/endpoint/ 在請求處理前檢查當前模式。實作降級回應結構，包含模式資訊和可用功能說明。確保向下相容，不破壞現有 API 契約。",
+            "status": "pending",
+            "testStrategy": "測試各模式下 API 回應的正確性。驗證降級功能不影響核心業務邏輯。測試 API 契約的向下相容性。"
+          },
+          {
+            "id": 4,
+            "title": "實作前端降級 UI 與備援導航",
+            "description": "在前端顯示系統模式狀態，實作降級 UI 和 Google Maps 備援導航",
+            "dependencies": [
+              "11.3"
+            ],
+            "details": "在 web/src/components/ui/ 建立 SystemStatusBanner 元件顯示當前系統模式。在 web/src/lib/api/request.ts 加入模式檢查，根據回應調整 UI 顯示。實作 Google Maps 導航連結作為降級模式的備援方案。在受影響的頁面加入降級說明和替代操作建議。建立 AlertDialog 通知使用者功能限制狀況。使用 React Context 管理全域模式狀態。",
+            "status": "pending",
+            "testStrategy": "測試不同模式下 UI 的正確顯示。驗證 Google Maps 連結的正確性。測試使用者體驗和降級說明的清晰度。"
+          },
+          {
+            "id": 5,
+            "title": "建立管理介面監控和閾值調整功能",
+            "description": "實作管理介面用於監控 API 使用量和動態調整保險絲閾值",
+            "dependencies": [
+              "11.4"
+            ],
+            "details": "在 web/src/app/ 建立 admin 路由專門用於管理功能。建立 CostMonitoringDashboard 元件顯示即時使用量、成本統計和模式歷史。實作閾值調整表單，支援動態修改四個模式的觸發點。加入使用量趨勢圖表和預測功能。建立 API 端點供管理介面查詢統計資料和修改設定。實作權限控制確保只有管理員可存取。加入警告通知機制，接近閾值時主動提醒。",
+            "status": "pending",
+            "testStrategy": "測試管理介面的資料顯示正確性。驗證閾值調整功能和即時生效。測試權限控制和警告通知機制。"
+          }
+        ]
       },
       {
         "id": 12,
@@ -155,12 +591,63 @@
           11
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "實作 Service Worker 快取機制",
+            "description": "建立前端 Service Worker 快取地圖圖磚和醫院資料，包含離線支援和快取更新策略",
+            "dependencies": [],
+            "details": "在 web/public/ 建立 sw.js Service Worker 檔案，實作地圖圖磚快取 (stale-while-revalidate 策略) 和醫院資料快取 (network-first 策略)。在 web/src/app/layout.tsx 註冊 Service Worker。建立快取版本管理和過期機制。實作離線回退頁面和快取清理邏輯。加入快取狀態指示器到 UI 中。",
+            "status": "pending",
+            "testStrategy": "撰寫 Service Worker 註冊和快取策略的單元測試。測試離線場景下的快取回退功能。驗證快取過期和更新邏輯。"
+          },
+          {
+            "id": 2,
+            "title": "建立 Redis 快取層與熱門搜尋快取",
+            "description": "實作後端 Redis 快取服務，快取熱門搜尋結果和醫院資料查詢",
+            "dependencies": [],
+            "details": "在 go.mod 新增 go-redis 依賴。在 internal/config/config.go 新增 Redis 設定。建立 internal/infra/redis/ 目錄，實作 client.go 和 cache_service.go。實作醫院搜尋結果快取 (TTL 1小時) 和地理位置查詢快取 (TTL 30分鐘)。在相關 usecase 中整合快取邏輯，實作 cache-aside 模式。建立快取 key 命名規範和快取穿透保護。",
+            "status": "pending",
+            "testStrategy": "撰寫 Redis 連線和快取操作的單元測試。測試快取命中和未命中情境。驗證 TTL 過期和快取穿透保護機制。"
+          },
+          {
+            "id": 3,
+            "title": "最佳化 MongoDB 索引與查詢效能",
+            "description": "建立 MongoDB 複合索引優化醫院地理查詢和文字搜尋效能",
+            "dependencies": [],
+            "details": "在 internal/infra/mongodb/hospital_repository_impl.go 實作索引建立邏輯。建立地理位置複合索引 (coordinates, county, status) 和文字搜尋索引 (name, address)。實作分頁查詢優化，使用 limit 和 skip 最佳化。加入查詢效能監控和慢查詢記錄。優化地理查詢使用 $nearSphere 和 $geoWithin 操作符。建立索引管理指令和遷移腳本。",
+            "status": "pending",
+            "testStrategy": "撰寫索引建立和查詢效能的整合測試。使用 explain() 驗證查詢計劃和索引使用。測試大量資料下的查詢效能。"
+          },
+          {
+            "id": 4,
+            "title": "實作前端效能優化功能",
+            "description": "實作圖片懶載入、虛擬滾動和元件最佳化以改善大量資料顯示效能",
+            "dependencies": [],
+            "details": "建立 web/src/components/ui/LazyImage.tsx 元件實作圖片懶載入。建立 web/src/components/ui/VirtualList.tsx 虛擬滾動元件。在醫院列表頁面實作虛擬滾動顯示大量資料。使用 React.memo 和 useMemo 優化元件重渲染。實作圖片預載入和漸進式載入。加入載入狀態指示器和骨架螢幕。建立效能監控 hook 記錄渲染時間。",
+            "status": "pending",
+            "testStrategy": "撰寫懶載入和虛擬滾動元件的單元測試。測試大量資料情境下的渲染效能。驗證記憶體使用量和滾動流暢度。"
+          },
+          {
+            "id": 5,
+            "title": "建立端到端測試與效能監控",
+            "description": "撰寫 E2E 測試涵蓋完整使用者流程，建立效能測試和監控機制",
+            "dependencies": [
+              "12.1",
+              "12.2",
+              "12.3",
+              "12.4"
+            ],
+            "details": "在 web/ 新增 Playwright 依賴和設定檔。建立 e2e/ 測試目錄，撰寫醫院搜尋、地圖互動、詳情檢視的端到端測試。實作效能測試驗證 30 秒內完成醫院查找需求。建立 Lighthouse CI 整合進行效能評分。在後端建立 /health 健康檢查端點和效能指標收集。建立監控 dashboard 和 alerting 機制。設定自動效能迴歸測試。",
+            "status": "pending",
+            "testStrategy": "建立 E2E 測試管道涵蓋關鍵使用者路徑。設定效能基準線和迴歸檢測。驗證快取機制在 E2E 測試中的正確性。"
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-09-19T07:47:52.925Z",
-      "updated": "2025-09-19T07:47:52.925Z",
+      "updated": "2025-09-19T08:17:01.447Z",
       "description": "Tasks for master context"
     }
   }

@@ -39,6 +39,13 @@ resource "aws_ssm_parameter" "mongo_database" {
   overwrite = true
 }
 
+resource "aws_ssm_parameter" "google_maps_api_key" {
+  name      = "/petlog/${var.stage}/GOOGLE_MAPS_API_KEY"
+  type      = "SecureString"
+  value     = var.google_maps_api_key
+  overwrite = true
+}
+
 # 取得 AWS Account ID
 data "aws_caller_identity" "current" {}
 
