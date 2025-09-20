@@ -92,13 +92,24 @@ export default function HospitalsPage() {
         limit: 50 // 最多顯示 50 間醫院
       });
 
+      // 生成基本的統計資料
+      const statusCounts: Record<string, number> = {};
+      nearbyHospitals.forEach(hospital => {
+        statusCounts[hospital.status] = (statusCounts[hospital.status] || 0) + 1;
+      });
+
       // 更新搜尋結果，模擬 SearchHospitalsResponse 格式
       const response: SearchHospitalsResponse = {
         hospitals: nearbyHospitals,
         total: nearbyHospitals.length,
         page: 1,
         limit: 50,
-        stats: undefined // 附近搜尋不提供統計資料
+        stats: {
+          total_hospitals: nearbyHospitals.length,
+          by_status: statusCounts,
+          by_license_type: {}, // 附近搜尋暫不提供授權類型統計
+          by_county: {} // 附近搜尋暫不提供縣市統計
+        }
       };
 
       setSearchResponse(response);
