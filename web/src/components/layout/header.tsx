@@ -30,7 +30,7 @@ export function Header({ onMenuToggle, isMenuOpen }: HeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden"
+          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
           onClick={onMenuToggle}
           aria-label={isMenuOpen ? "關閉選單" : "開啟選單"}
         >
@@ -52,7 +52,7 @@ export function Header({ onMenuToggle, isMenuOpen }: HeaderProps) {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden items-center space-x-6 text-sm font-medium lg:flex">
+        <nav className="hidden items-center space-x-4 text-sm font-medium md:flex lg:space-x-6">
           <Link
             href="/pets"
             className="transition-colors hover:text-foreground/80 text-foreground/60"
@@ -66,10 +66,34 @@ export function Header({ onMenuToggle, isMenuOpen }: HeaderProps) {
             健康記錄
           </Link>
           <Link
+            href="/hospitals"
+            className="transition-colors hover:text-foreground/80 text-foreground/60"
+          >
+            醫院搜尋
+          </Link>
+          <Link
             href="/medical-records"
             className="transition-colors hover:text-foreground/80 text-foreground/60"
           >
             醫療記錄
+          </Link>
+          <Link
+            href="/expenses"
+            className="transition-colors hover:text-foreground/80 text-foreground/60"
+          >
+            費用記錄
+          </Link>
+          <Link
+            href="/calendar"
+            className="transition-colors hover:text-foreground/80 text-foreground/60"
+          >
+            日曆檢視
+          </Link>
+          <Link
+            href="/analytics"
+            className="transition-colors hover:text-foreground/80 text-foreground/60"
+          >
+            數據分析
           </Link>
         </nav>
 
