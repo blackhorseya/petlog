@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  endpoint.Coordinates:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
   endpoint.CreateExpenseRequest:
     properties:
       amount:
@@ -149,6 +156,12 @@ definitions:
       health_log:
         $ref: '#/definitions/model.HealthLog'
     type: object
+  endpoint.GetHospitalDetailResponse:
+    properties:
+      error: {}
+      hospital:
+        $ref: '#/definitions/endpoint.HospitalDTO'
+    type: object
   endpoint.GetMedicalRecordResponse:
     properties:
       error: {}
@@ -160,6 +173,35 @@ definitions:
       error: {}
       pet:
         $ref: '#/definitions/model.Pet'
+    type: object
+  endpoint.HospitalDTO:
+    properties:
+      address:
+        type: string
+      coordinates:
+        $ref: '#/definitions/endpoint.Coordinates'
+      county:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      issued_date:
+        type: string
+      license_no:
+        type: string
+      license_type:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      veterinarian:
+        type: string
     type: object
   endpoint.ListExpensesResponse:
     properties:
@@ -185,6 +227,14 @@ definitions:
           $ref: '#/definitions/model.MedicalRecord'
         type: array
     type: object
+  endpoint.ListNearbyHospitalsResponse:
+    properties:
+      error: {}
+      hospitals:
+        items:
+          $ref: '#/definitions/endpoint.HospitalDTO'
+        type: array
+    type: object
   endpoint.ListPetsResponse:
     properties:
       error: {}
@@ -192,6 +242,22 @@ definitions:
         items:
           $ref: '#/definitions/model.Pet'
         type: array
+    type: object
+  endpoint.SearchHospitalsResponse:
+    properties:
+      error: {}
+      hospitals:
+        items:
+          $ref: '#/definitions/endpoint.HospitalDTO'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      stats:
+        $ref: '#/definitions/query.SearchStats'
+      total:
+        type: integer
     type: object
   endpoint.UpdateExpenseRequest:
     properties:
@@ -377,6 +443,23 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  query.SearchStats:
+    properties:
+      by_county:
+        additionalProperties:
+          type: integer
+        type: object
+      by_license_type:
+        additionalProperties:
+          type: integer
+        type: object
+      by_status:
+        additionalProperties:
+          type: integer
+        type: object
+      total_hospitals:
+        type: integer
     type: object
 host: localhost:8080
 info:
@@ -865,6 +948,152 @@ paths:
       summary: 更新健康日誌
       tags:
       - health-logs
+  /api/v1/hospitals:
+    get:
+      consumes:
+      - application/json
+      description: 根據關鍵字、縣市、狀態等條件搜尋醫院，支援分頁和排序
+      parameters:
+      - description: 搜尋關鍵字（醫院名稱、地址、獸醫師）
+        in: query
+        name: keyword
+        type: string
+      - description: 縣市篩選
+        in: query
+        name: county
+        type: string
+      - description: 狀態篩選（開業、歇業等）
+        in: query
+        name: status
+        type: string
+      - description: 執照類型篩選（動物醫院、動物診所）
+        in: query
+        name: license_type
+        type: string
+      - description: 座標緯度（用於距離排序）
+        in: query
+        name: latitude
+        type: number
+      - description: 座標經度（用於距離排序）
+        in: query
+        name: longitude
+        type: number
+      - description: 搜尋半徑（公里）
+        in: query
+        name: radius
+        type: number
+      - description: 頁碼（預設1）
+        in: query
+        name: page
+        type: integer
+      - description: 每頁數量（預設20）
+        in: query
+        name: limit
+        type: integer
+      - description: 排序方式（distance, name）
+        in: query
+        name: sort_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.SearchHospitalsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 搜尋醫院
+      tags:
+      - hospitals
+  /api/v1/hospitals/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根據醫院ID取得完整的醫院資訊
+      parameters:
+      - description: 醫院ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.GetHospitalDetailResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 取得醫院詳細資訊
+      tags:
+      - hospitals
+  /api/v1/hospitals/nearby:
+    get:
+      consumes:
+      - application/json
+      description: 根據使用者位置座標搜尋指定半徑內的醫院
+      parameters:
+      - description: 使用者位置緯度
+        in: query
+        name: latitude
+        required: true
+        type: number
+      - description: 使用者位置經度
+        in: query
+        name: longitude
+        required: true
+        type: number
+      - description: 搜尋半徑（公里，預設10）
+        in: query
+        name: radius_km
+        type: number
+      - description: 結果數量限制（預設50）
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoint.ListNearbyHospitalsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 查詢附近醫院
+      tags:
+      - hospitals
   /api/v1/medical-records:
     get:
       consumes:

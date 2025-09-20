@@ -23,7 +23,7 @@ func newInjector(config config.Config) (*injector, func(), error) {
 	panic(wire.Build(
 		wire.Struct(new(injector), "*"),
 		mongodb.ProviderSet,
-		mongodb.NewHospitalMongoRepo,
+		mongodb.NewHospitalRepository,
 		provideGoogleGeocodeService,
 	))
 }

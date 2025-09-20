@@ -43,6 +43,7 @@ func NewHTTPHandler(
 	dashboardEndpoints endpoint.DashboardEndpoints,
 	medicalRecordEndpoints endpoint.MedicalRecordEndpoints,
 	expenseEndpoints endpoint.ExpenseEndpoints,
+	hospitalEndpoints endpoint.HospitalEndpoints,
 	options []httptransport.ServerOption,
 ) http.Handler {
 	// Register routes for the "pet" module.
@@ -59,6 +60,9 @@ func NewHTTPHandler(
 
 	// Register routes for the "expense" module.
 	RegisterExpenseRoutes(r, cfg, expenseEndpoints, options...)
+
+	// Register routes for the "hospital" module.
+	RegisterHospitalRoutes(r, cfg, hospitalEndpoints, options...)
 
 	return r
 }

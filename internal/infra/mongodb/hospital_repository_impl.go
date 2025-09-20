@@ -21,8 +21,8 @@ type hospitalMongoRepo struct {
 	db *mongo.Database
 }
 
-// NewHospitalMongoRepo 建立新的 Hospital MongoDB Repository
-func NewHospitalMongoRepo(db *mongo.Database) repository.HospitalRepository {
+// NewHospitalRepository 建立新的 Hospital MongoDB Repository
+func NewHospitalRepository(db *mongo.Database) repository.HospitalRepository {
 	repo := &hospitalMongoRepo{
 		db: db,
 	}
