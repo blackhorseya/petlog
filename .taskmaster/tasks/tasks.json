@@ -365,7 +365,7 @@
         "id": 8,
         "title": "整合 Leaflet 地圖元件",
         "description": "建立基於 Google Maps API 的地圖顯示元件，替代原先的 Leaflet 實作",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           7
         ],
@@ -431,7 +431,7 @@
             "id": 7,
             "title": "撰寫地圖元件測試",
             "description": "使用 React Testing Library 撰寫 HospitalMap 元件的單元測試和整合測試",
-            "status": "deferred",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -711,7 +711,7 @@
     ],
     "metadata": {
       "created": "2025-09-19T07:47:52.925Z",
-      "updated": "2025-09-20T05:33:22.412Z",
+      "updated": "2025-09-20T06:51:08.886Z",
       "description": "Tasks for master context"
     }
   }
