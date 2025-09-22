@@ -1,4 +1,4 @@
-//go:generate mockgen -destination=./mock_${GOFILE} -package=${GOPACKAGE} -source=${GOFILE}
+//go:generate go tool mockgen -destination=./mock_${GOFILE} -package=${GOPACKAGE} -source=${GOFILE}
 
 package repository
 

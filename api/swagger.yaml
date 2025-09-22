@@ -448,14 +448,17 @@ definitions:
     properties:
       by_county:
         additionalProperties:
+          format: int64
           type: integer
         type: object
       by_license_type:
         additionalProperties:
+          format: int64
           type: integer
         type: object
       by_status:
         additionalProperties:
+          format: int64
           type: integer
         type: object
       total_hospitals:

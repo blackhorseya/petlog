@@ -1,4 +1,4 @@
-//go:generate mockgen -destination=./mock_expense.go -package=repository -source=expense.go
+//go:generate go tool mockgen -destination=./mock_expense.go -package=repository -source=expense.go
 package repository
 
 import (

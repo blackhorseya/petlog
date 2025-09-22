@@ -40,4 +40,4 @@ tasks:
   gen:swagger:
     desc: 生成 Swagger 文件
     cmds:
-      - go run github.com/swaggo/swag/cmd/swag init --output ./api -g ./cmd/petlog/main.go
+      - go tool swag init --output ./api -g ./cmd/petlog/main.go
