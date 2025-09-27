@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Auth0Provider } from "@auth0/nextjs-auth0";
 
@@ -7,8 +6,6 @@ import { ThemeProvider } from "@/hooks/use-theme";
 import { AppLayout } from "@/components/layout/app-layout";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ToasterProvider } from "@/components/providers/toaster-provider";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "PetLog - 寵物健康管理系統",
@@ -30,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-TW" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className="font-sans">
         <Auth0Provider>
           <QueryProvider>
             <ThemeProvider defaultTheme="system" storageKey="petlog-ui-theme">
