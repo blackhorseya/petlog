@@ -95,7 +95,7 @@ export default function Home() {
             <Button asChild size="lg">
               <Link href="/pets">
                 開始管理寵物
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight />
               </Link>
             </Button>
           </div>
@@ -103,7 +103,7 @@ export default function Home() {
           <Button asChild size="lg">
             <Link href="/api/auth/login">
               開始使用
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight />
             </Link>
           </Button>
         )}
