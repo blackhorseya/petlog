@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export default function HealthPage() {
   const { user, isLoading: userLoading } = useUser();
+  // 只有在已登入時才呼叫 pets 和 health logs hooks
   const { data: pets, isLoading: petsLoading } = usePets();
   const [selectedPetId, setSelectedPetId] = useState<string>("");
   const queryClient = useQueryClient();
