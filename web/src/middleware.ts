@@ -1,8 +1,9 @@
-import { NextRequest } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import { NextRequest, NextResponse } from 'next/server';
 
+// 移除強制登入要求，允許未登入用戶瀏覽所有頁面
+// 實際的認證檢查由各頁面元件和後端 API 處理
 export async function middleware(request: NextRequest) {
-  return auth0.middleware(request);
+  return NextResponse.next();
 }
 
 export const config = {

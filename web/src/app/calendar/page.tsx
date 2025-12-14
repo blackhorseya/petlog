@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useUser } from "@auth0/nextjs-auth0";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Filter, Calendar as CalendarIcon } from 'lucide-react';
+import { ArrowLeft, Filter, Calendar as CalendarIcon, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { usePets } from '@/hooks/use-pets';
 import { useHealthLogs } from '@/hooks/use-health-logs';
@@ -126,7 +126,45 @@ export default function HealthLogCalendarPage() {
   }, [healthLogsData?.health_logs, filters]);
 
   // 載入狀態
-  if (userLoading || petsLoading) {
+  if (userLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  // 未登入的情況
+  if (!user) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+            <CalendarIcon className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold">日曆檢視</h1>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            以日曆方式檢視所有健康記錄和重要事件，一目了然掌握寵物狀況
+          </p>
+        </div>
+
+        <div className="max-w-2xl mx-auto rounded-lg border border-border bg-card p-8 text-center">
+          <Lock className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-xl font-semibold mb-2">需要登入才能使用日曆功能</h2>
+          <p className="text-muted-foreground mb-6">
+            登入後即可在日曆上查看和管理您的寵物健康記錄
+          </p>
+          <Button asChild size="lg">
+            <Link href="/api/auth/login">
+              立即登入
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (petsLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
