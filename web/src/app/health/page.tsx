@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@auth0/nextjs-auth0";
-import { Heart, Plus, Calendar } from "lucide-react";
+import { Heart, Plus, Calendar, Lock } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { usePets } from "@/hooks/use-pets";
@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export default function HealthPage() {
   const { user, isLoading: userLoading } = useUser();
+  // 只有在已登入時才呼叫 pets 和 health logs hooks
   const { data: pets, isLoading: petsLoading } = usePets();
   const [selectedPetId, setSelectedPetId] = useState<string>("");
   const queryClient = useQueryClient();
@@ -52,7 +53,7 @@ export default function HealthPage() {
     alert(`點擊編輯：${logId}（可擴充為 modal 編輯表單）`);
   }
 
-  if (userLoading || petsLoading) {
+  if (userLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -62,9 +63,58 @@ export default function HealthPage() {
 
   if (!user) {
     return (
-      <div className="text-center space-y-4">
-        <h1 className="text-2xl font-bold">請先登入</h1>
-        <p className="text-muted-foreground">您需要登入才能檢視健康記錄</p>
+      <div className="space-y-6">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+            <Heart className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold">健康記錄</h1>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            追蹤寵物的體重、飲食、行為等日常健康指標，建立完整的健康歷史
+          </p>
+        </div>
+
+        <div className="max-w-2xl mx-auto rounded-lg border border-border bg-card p-8 text-center">
+          <Lock className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-xl font-semibold mb-2">需要登入才能記錄健康資料</h2>
+          <p className="text-muted-foreground mb-6">
+            登入後即可為您的寵物新增、編輯和查看健康記錄
+          </p>
+          <Button asChild size="lg">
+            <Link href="/api/auth/login">
+              立即登入
+            </Link>
+          </Button>
+        </div>
+
+        <div className="max-w-4xl mx-auto grid gap-6 md:grid-cols-3">
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">體重追蹤</h3>
+            <p className="text-sm text-muted-foreground">
+              定期記錄寵物體重，監控健康趨勢
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">飲食管理</h3>
+            <p className="text-sm text-muted-foreground">
+              記錄每日食物攝取量，確保營養均衡
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">行為觀察</h3>
+            <p className="text-sm text-muted-foreground">
+              記錄日常行為和排泄狀況，及早發現異常
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (petsLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
       </div>
     );
   }

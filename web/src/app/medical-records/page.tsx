@@ -7,7 +7,8 @@ import { usePets } from "@/hooks/use-pets";
 import { useMedicalRecords } from "@/hooks/use-medical-records";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, AlertTriangle, PawPrint } from "lucide-react";
+import { Calendar, AlertTriangle, PawPrint, Lock, FileText } from "lucide-react";
+import Link from "next/link";
 
 export default function MedicalRecordsPage() {
   const { user, isLoading: userLoading } = useUser();
@@ -69,9 +70,50 @@ export default function MedicalRecordsPage() {
 
   if (!user) {
     return (
-      <div className="text-center space-y-4">
-        <h1 className="text-2xl font-bold">請先登入</h1>
-        <p className="text-muted-foreground">您需要登入才能管理醫療記錄</p>
+      <div className="space-y-6">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+            <FileText className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold">醫療記錄</h1>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            管理疫苗接種、體檢報告和重要的醫療文件
+          </p>
+        </div>
+
+        <div className="max-w-2xl mx-auto rounded-lg border border-border bg-card p-8 text-center">
+          <Lock className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-xl font-semibold mb-2">需要登入才能管理醫療記錄</h2>
+          <p className="text-muted-foreground mb-6">
+            登入後即可新增、編輯和查看寵物的醫療記錄
+          </p>
+          <Button asChild size="lg">
+            <Link href="/api/auth/login">
+              立即登入
+            </Link>
+          </Button>
+        </div>
+
+        <div className="max-w-4xl mx-auto grid gap-6 md:grid-cols-3">
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">疫苗管理</h3>
+            <p className="text-sm text-muted-foreground">
+              記錄疫苗接種日期，自動提醒下次施打時間
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">體檢報告</h3>
+            <p className="text-sm text-muted-foreground">
+              儲存定期健檢結果，追蹤健康變化
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">就診記錄</h3>
+            <p className="text-sm text-muted-foreground">
+              完整記錄每次就醫過程與處方
+            </p>
+          </div>
+        </div>
       </div>
     );
   }

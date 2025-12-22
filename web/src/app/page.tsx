@@ -36,6 +36,7 @@ const features = [
 
 export default function Home() {
   const { user, error, isLoading } = useUser();
+  // 只有在已登入時才獲取 dashboard 資料
   const { data: dashboardData, isLoading: isDashboardLoading, error: dashboardError } = useDashboardOverview();
 
   if (isLoading) {
@@ -46,25 +47,7 @@ export default function Home() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-center">
-          {error.message === 'Unauthorized' || error.message === 'UNAUTHORIZED' ? (
-            <>
-              <p className="text-destructive">請先登入</p>
-              <p className="text-sm text-muted-foreground">您必須登入才能瀏覽此頁面</p>
-            </>
-          ) : (
-            <>
-              <p className="text-destructive">載入時發生錯誤</p>
-              <p className="text-sm text-muted-foreground">{error.message}</p>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  }
+  // 移除錯誤檢查 - 未登入不應視為錯誤
 
   return (
     <div className="space-y-8">
@@ -129,14 +112,12 @@ export default function Home() {
               <p className="mt-4 text-sm text-muted-foreground">
                 {feature.description}
               </p>
-              {user && (
-                <Link
-                  href={feature.href}
-                  className="absolute inset-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <span className="sr-only">前往 {feature.name}</span>
-                </Link>
-              )}
+              <Link
+                href={feature.href}
+                className="absolute inset-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <span className="sr-only">前往 {feature.name}</span>
+              </Link>
             </div>
           );
         })}

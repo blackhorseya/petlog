@@ -1,10 +1,12 @@
 "use client";
 
 import { useUser } from "@auth0/nextjs-auth0";
-import { BarChart, TrendingUp } from "lucide-react";
+import { BarChart, TrendingUp, Lock } from "lucide-react";
 import { usePets } from "@/hooks/use-pets";
 import { HealthTrendsCharts, HealthSummaryCards } from "@/components/health-logs";
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function AnalyticsPage() {
   const { user, isLoading: userLoading } = useUser();
@@ -26,7 +28,7 @@ export default function AnalyticsPage() {
     ? pets.find(pet => pet.id === selectedPetId) 
     : null;
 
-  if (userLoading || petsLoading) {
+  if (userLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -36,9 +38,58 @@ export default function AnalyticsPage() {
 
   if (!user) {
     return (
-      <div className="text-center space-y-4">
-        <h1 className="text-2xl font-bold">請先登入</h1>
-        <p className="text-muted-foreground">您需要登入才能檢視數據分析</p>
+      <div className="space-y-6">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+            <TrendingUp className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold">數據分析</h1>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            透過視覺化圖表分析寵物的健康趨勢，科學化管理寵物健康
+          </p>
+        </div>
+
+        <div className="max-w-2xl mx-auto rounded-lg border border-border bg-card p-8 text-center">
+          <Lock className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-xl font-semibold mb-2">需要登入才能查看數據分析</h2>
+          <p className="text-muted-foreground mb-6">
+            登入後即可查看您的寵物健康趨勢分析與統計報表
+          </p>
+          <Button asChild size="lg">
+            <Link href="/api/auth/login">
+              立即登入
+            </Link>
+          </Button>
+        </div>
+
+        <div className="max-w-4xl mx-auto grid gap-6 md:grid-cols-3">
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">體重趨勢</h3>
+            <p className="text-sm text-muted-foreground">
+              圖表呈現體重變化，及早發現健康問題
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">飲食分析</h3>
+            <p className="text-sm text-muted-foreground">
+              追蹤食物攝取量，確保營養充足
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">健康指標</h3>
+            <p className="text-sm text-muted-foreground">
+              綜合健康數據，提供全面性分析
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (petsLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
       </div>
     );
   }

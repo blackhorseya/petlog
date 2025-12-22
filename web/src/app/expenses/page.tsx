@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useUser } from "@auth0/nextjs-auth0";
-import { DollarSign, BarChart, Plus, PieChart } from "lucide-react";
+import { DollarSign, BarChart, Plus, PieChart, Lock } from "lucide-react";
 import Link from 'next/link';
 
 import { Button } from "@/components/ui/button";
@@ -106,14 +106,59 @@ export default function ExpensesDashboardPage() {
   };
 
   if (userLoading) {
-    return <div className="p-6">讀取中...</div>;
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
   }
 
   if (!user) {
     return (
-      <div className="p-6 text-center space-y-4">
-        <h1 className="text-2xl font-bold">請先登入</h1>
-        <p className="text-muted-foreground">您需要登入才能檢視費用資料</p>
+      <div className="space-y-6">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+            <DollarSign className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold">費用記錄</h1>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            記錄寵物的各項開銷，分析費用趨勢，讓您輕鬆掌握寵物照顧成本
+          </p>
+        </div>
+
+        <div className="max-w-2xl mx-auto rounded-lg border border-border bg-card p-8 text-center">
+          <Lock className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-xl font-semibold mb-2">需要登入才能記錄費用</h2>
+          <p className="text-muted-foreground mb-6">
+            登入後即可新增、編輯和查看寵物的費用記錄與統計分析
+          </p>
+          <Button asChild size="lg">
+            <Link href="/api/auth/login">
+              立即登入
+            </Link>
+          </Button>
+        </div>
+
+        <div className="max-w-4xl mx-auto grid gap-6 md:grid-cols-3">
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">費用分類</h3>
+            <p className="text-sm text-muted-foreground">
+              依照醫療、飲食、用品等類別記錄支出
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">趨勢分析</h3>
+            <p className="text-sm text-muted-foreground">
+              視覺化圖表呈現月度支出趨勢
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="font-semibold mb-2">統計報表</h3>
+            <p className="text-sm text-muted-foreground">
+              自動計算總支出與各類別佔比
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
