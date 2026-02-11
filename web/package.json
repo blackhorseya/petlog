@@ -22,7 +22,7 @@
     "@tanstack/react-query-devtools": "^5.80.10",
     "@types/google.maps": "^3.58.1",
     "@types/recharts": "^1.8.29",
-    "axios": "^1.12.0",
+    "axios": "^1.13.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.519.0",
